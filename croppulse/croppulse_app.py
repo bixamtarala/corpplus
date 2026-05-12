@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import os
 
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
@@ -146,7 +147,10 @@ st.markdown("""
 @st.cache_data
 def load_data():
     """Load commodity price data from CSV"""
-    df = pd.read_csv('data/commodity_prices.csv')
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(script_dir, 'data', 'commodity_prices.csv')
+    df = pd.read_csv(csv_path)
     df['date'] = pd.to_datetime(df['date'])
     return df
 
