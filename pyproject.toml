@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "croppulse"
+version = "1.0.0"
+description = "Agricultural Market Intelligence Dashboard with Risk Analysis & AI Insights"
+authors = [{name = "CropPulse Team"}]
+requires-python = ">=3.9"
+dependencies = [
+    "streamlit>=1.28.1",
+    "pandas>=2.1.0",
+    "plotly>=5.17.0",
+    "numpy>=1.26.0"
+]
+
+[tool.pylint]
+disable = [
+    "C0111",  # missing-docstring
+    "R0913",  # too-many-arguments
+    "R0914",  # too-many-locals
+    "R0915",  # too-many-statements
+    "C0301",  # line-too-long
+    "W0212",  # protected-access
+]
+
+max-line-length = 120
+good-names = ["i", "j", "k", "ex", "Run", "_", "df", "x", "y", "fig"]
+
+[tool.black]
+line-length = 120
+target-version = ['py39', 'py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 120
+skip_gitignore = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "--strict-markers -v"
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
