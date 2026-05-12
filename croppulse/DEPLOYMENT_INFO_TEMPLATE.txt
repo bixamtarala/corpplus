@@ -1,0 +1,186 @@
+# DEPLOYMENT INFORMATION
+## CropPulse - May 12, 2026
+
+---
+
+## 👤 ACCOUNT INFORMATION
+
+**GitHub Username:** _______________________  
+**GitHub Password/Token:** (keep secure, don't share)  
+**Email Associated:** _______________________
+
+---
+
+## 🔗 REPOSITORY DETAILS
+
+**Repository Name:** croppulse  
+**Repository URL:** https://github.com/[YOUR_USERNAME]/croppulse  
+**Repository Visibility:** PUBLIC ✓  
+**Branch:** main  
+**Main File:** croppulse_app.py
+
+---
+
+## ☁️ DEPLOYMENT INFORMATION
+
+**Deployed to:** Streamlit Cloud  
+**Live App URL:** _______________________  
+**Deployment Date:** May 12, 2026  
+**Deployment Time:** _______ AM/PM
+
+**Note:** Your live URL will look like one of:
+- https://croppulse.streamlit.app
+- https://croppulse-abc123.streamlit.app
+- https://[custom-url].streamlit.app
+
+---
+
+## ✅ DEPLOYMENT CHECKLIST
+
+### GitHub Setup:
+- [ ] GitHub account created at github.com
+- [ ] Git installed on Windows (git-scm.com)
+- [ ] Repository "croppulse" created
+- [ ] Repository set to PUBLIC
+- [ ] All code pushed to GitHub
+- [ ] Verified files appear on GitHub.com
+
+### Streamlit Deployment:
+- [ ] Streamlit account created at share.streamlit.io
+- [ ] Repository connected to Streamlit Cloud
+- [ ] Branch selected: main
+- [ ] Main file path: croppulse_app.py
+- [ ] Deployment completed (green checkmark)
+- [ ] Live app URL obtained
+
+---
+
+## 🧪 VERIFICATION TESTS
+
+### Commodity Testing:
+
+**Rice:**
+- [ ] Loads without errors
+- [ ] Price: ₹3,200 (approximately)
+- [ ] KPI cards visible and displaying data
+- [ ] Price chart renders correctly
+- [ ] Risk score displays (around 45/100)
+- [ ] Insights show with confidence badges (75-90%)
+- [ ] Alerts display if any
+
+**Wheat:**
+- [ ] Sidebar commodity selector works
+- [ ] Switches to Wheat data
+- [ ] Price: ₹2,150 (approximately)
+- [ ] All charts and metrics update
+- [ ] Risk score: approximately 38/100
+- [ ] Different insights generate based on Wheat data
+
+**Cotton:**
+- [ ] Commodity selector shows Cotton option
+- [ ] Switches to Cotton data
+- [ ] Price: ₹5,900 (approximately)
+- [ ] All features work correctly
+
+### Feature Testing:
+
+**Export Functions:**
+- [ ] "📊 Export CSV" button visible
+- [ ] CSV download works when clicked
+- [ ] "📝 Export Summary" button visible
+- [ ] Summary download works when clicked
+
+**Mobile Responsiveness:**
+- [ ] Open DevTools (F12)
+- [ ] Switch to mobile view
+- [ ] No horizontal scrolling
+- [ ] All elements readable
+- [ ] Buttons/inputs accessible
+
+**Performance:**
+- [ ] App loads in < 5 seconds
+- [ ] Charts render smoothly
+- [ ] No console errors (F12 → Console)
+- [ ] Data updates responsive
+
+---
+
+## 📊 DATA VERIFICATION
+
+**Data File:** `data/commodity_prices.csv`  
+**Status:** ✓ Uploaded to GitHub  
+**Rows in File:** 30 days (for historical data)
+
+**Columns present:**
+- [ ] date
+- [ ] commodity
+- [ ] ticker
+- [ ] price
+- [ ] high_30d
+- [ ] low_30d
+- [ ] volatility
+- [ ] demand
+- [ ] supply
+
+---
+
+## 🎯 NEXT STEPS
+
+### Day 1 Complete When:
+- ✓ All items in checklist above are checked
+- ✓ Live app URL is saved
+- ✓ All commodities tested successfully
+- ✓ No errors in console
+
+### Day 2 Preparation:
+- [ ] Save live app URL
+- [ ] Prepare screenshot tools (Chrome DevTools)
+- [ ] Create `screenshots/` folder
+- [ ] Review EXECUTION_DAY2.md
+
+---
+
+## 📱 QUICK LINKS (Save These)
+
+**GitHub Repository:**
+```
+https://github.com/[YOUR_USERNAME]/croppulse
+```
+
+**Live App (Main):**
+```
+[PASTE YOUR LIVE URL HERE]
+```
+
+**Streamlit Cloud Dashboard:**
+```
+https://share.streamlit.io/
+```
+
+**Support Resources:**
+- Git Docs: https://git-scm.com/doc
+- Streamlit Docs: https://docs.streamlit.io
+- GitHub Docs: https://docs.github.com
+
+---
+
+## 📝 NOTES
+
+**Day 1 Completion Time:** _________ (should be ~1.5 hours)
+
+**Any Issues Encountered:**
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+
+**Errors/Solutions:**
+_________________________________________________________________
+_________________________________________________________________
+
+**Ready for Day 2:** ☐ YES ☐ NO
+
+---
+
+**Status:** ✅ READY FOR DAY 2  
+**Date Completed:** _______________________  
+**Signature:** _______________________
