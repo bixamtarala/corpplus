@@ -12,8 +12,13 @@ st.set_page_config(
     page_title="CropPulse - Agricultural Market Intelligence",
     page_icon="🌾",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="auto"
 )
+
+# Mobile-friendly viewport
+st.markdown("""
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+""", unsafe_allow_html=True)
 
 # Custom styling - Enhanced for Phase 2
 st.markdown("""
@@ -137,8 +142,196 @@ st.markdown("""
         margin: 24px 0;
         border: 1px solid #e0e0e0;
     }
+
+    /* ===== MOBILE RESPONSIVENESS ===== */
+    
+    /* Mobile: Tablets (768px and below) */
+    @media (max-width: 768px) {
+        .main {
+            padding: 0.5rem;
+        }
+        
+        .metric-card {
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #2ecc71;
+        }
+        
+        .risk-card {
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .insight-card {
+            padding: 16px;
+            margin: 8px 0;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin: 16px 0 12px 0;
+        }
+        
+        /* Stack columns vertically */
+        [data-testid="column"] {
+            width: 100% !important;
+        }
+        
+        /* Improve spacing */
+        .stButton > button {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+        }
+        
+        /* Responsive charts */
+        [data-testid="stPlotlyChart"] {
+            padding: 0 !important;
+        }
+    }
+    
+    /* Mobile: Small phones (480px and below) */
+    @media (max-width: 480px) {
+        .main {
+            padding: 0.25rem;
+        }
+        
+        .metric-card {
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .risk-card {
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .insight-card {
+            padding: 12px;
+            margin: 6px 0;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            margin: 12px 0 8px 0;
+        }
+        
+        .header-section {
+            padding: 12px 0;
+        }
+        
+        /* Full-width buttons on small screens */
+        .stButton > button {
+            width: 100%;
+            padding: 10px;
+            font-size: 12px;
+        }
+        
+        /* Smaller fonts for small screens */
+        .metric-card span {
+            font-size: 14px;
+        }
+        
+        /* Reduce trend badge size */
+        .trend-badge {
+            padding: 3px 8px;
+            font-size: 11px;
+        }
+    }
+    
+    /* Sidebar adjustments for mobile */
+    @media (max-width: 768px) {
+        [data-testid="stSidebar"] {
+            width: 100% !important;
+        }
+    }
+    
+    /* Table responsiveness */
+    @media (max-width: 768px) {
+        [data-testid="stDataFrame"] {
+            font-size: 12px;
+        }
+        
+        table {
+            font-size: 12px;
+        }
+        
+        th, td {
+            padding: 8px 4px !important;
+        }
+    }
+    
+    /* Export button responsiveness */
+    @media (max-width: 768px) {
+        .stDownloadButton > button {
+            width: 100%;
+        }
+    }
+    
+    /* Selectbox and Radio button responsiveness */
+    @media (max-width: 768px) {
+        [data-testid="stSelectbox"] {
+            font-size: 14px;
+        }
+        
+        [data-testid="stRadio"] {
+            font-size: 14px;
+        }
+        
+        .stRadio > label > div {
+            padding: 8px 0;
+        }
+    }
+    
+    /* Metric value responsiveness */
+    @media (max-width: 480px) {
+        .metric-value {
+            font-size: 18px;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+        }
+    }
+    
+    /* Alert and error message responsiveness */
+    @media (max-width: 768px) {
+        [data-testid="stAlert"] {
+            padding: 12px;
+            font-size: 13px;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
+
+# ============================================================================
+# MOBILE RESPONSIVENESS UTILITIES
+# ============================================================================
+
+def create_responsive_metric_cards(metrics: dict, columns: int = 4):
+    """
+    Create responsive metric cards that stack on mobile devices.
+    
+    Args:
+        metrics: Dictionary with metric names as keys and values as dicts with 'value' and 'label'
+        columns: Number of columns for desktop (will auto-adjust for mobile)
+    """
+    # For mobile, reduce to 1-2 columns; for tablet, 2-3 columns
+    if columns == 4:
+        cols = st.columns(4, gap="medium")
+    elif columns == 3:
+        cols = st.columns(3, gap="medium")
+    else:
+        cols = st.columns(columns, gap="medium")
+    
+    for idx, (metric_name, metric_data) in enumerate(metrics.items()):
+        with cols[idx % len(cols)]:
+            st.metric(
+                label=metric_data.get('label', metric_name),
+                value=metric_data.get('value', '—'),
+                delta=metric_data.get('delta', None),
+                help=metric_data.get('help', None)
+            )
 
 # ============================================================================
 # DATA LOADING & CACHING
