@@ -1,0 +1,35 @@
+name: Deploy Status
+
+on:
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    types:
+      - completed
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check deployment status
+      run: |
+        if [ "${{ github.event.workflow_run.conclusion }}" == "success" ]; then
+          echo "✓ CI/CD Pipeline passed successfully"
+          echo "✓ Changes will be deployed to Streamlit Cloud"
+          echo ""
+          echo "📱 Application URL: https://corpplus.streamlit.app"
+          echo ""
+          echo "🔍 Check deployment status at:"
+          echo "   https://share.streamlit.io/bixamtarala/corpplus/main/croppulse/croppulse_app.py"
+        else
+          echo "✗ CI/CD Pipeline failed"
+          echo "❌ Deployment cancelled"
+          echo ""
+          echo "📋 Review logs: https://github.com/${{ github.repository }}/actions"
+        fi
+
+    - name: Create deployment badge
+      if: github.event.workflow_run.conclusion == 'success'
+      run: |
+        echo "<!-- CI/CD Badge -->"
+        echo "[![CI/CD Status](https://github.com/${{ github.repository }}/actions/workflows/ci-cd.yml/badge.svg?branch=main)](https://github.com/${{ github.repository }}/actions)"
