@@ -1027,20 +1027,16 @@ st.markdown("---")
 data = load_data()
 
 # ============================================================================
-# COMMODITY SELECTOR (Secondary Control)
+# ============================================================================
+# COMMODITY SELECTOR (Moved to Sidebar)
 # ============================================================================
 
-col_comm, col_space = st.columns([1.2, 2], gap="medium")
-
-with col_comm:
-    commodity = st.selectbox(
-        "📦 Commodity",
-        options=["Rice", "Wheat", "Cotton"],
-        index=0,
-        key="commodity_selector"
-    )
-
-st.markdown("---")
+commodity = st.sidebar.selectbox(
+    "📦 Commodity",
+    options=["Rice", "Wheat", "Cotton"],
+    index=0,
+    key="commodity_selector"
+)
 
 # ============================================================================
 # LANDING PAGE - Home View
