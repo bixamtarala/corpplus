@@ -139,7 +139,7 @@ class SignalType(str, Enum):
 class UserProfile(BaseModel):
     """User profile schema with strict validation"""
     id: Optional[int] = None
-    phone: str = Field(..., min_length=10, max_length=10, regex="^[0-9]{10}$")  # Indian phone
+    phone: str = Field(..., min_length=10, max_length=10, pattern="^[0-9]{10}$")  # Indian phone
     name: str = Field(..., min_length=2, max_length=100)
     email: Optional[EmailStr] = None
     user_type: UserType
@@ -209,13 +209,13 @@ class MarketplaceOrder(BaseModel):
 
 class OTPRequest(BaseModel):
     """OTP request validation"""
-    phone: str = Field(..., min_length=10, max_length=10, regex="^[0-9]{10}$")
+    phone: str = Field(..., min_length=10, max_length=10, pattern="^[0-9]{10}$")
 
 
 class OTPVerify(BaseModel):
     """OTP verification validation"""
-    phone: str = Field(..., min_length=10, max_length=10, regex="^[0-9]{10}$")
-    otp: str = Field(..., min_length=6, max_length=6, regex="^[0-9]{6}$")
+    phone: str = Field(..., min_length=10, max_length=10, pattern="^[0-9]{10}$")
+    otp: str = Field(..., min_length=6, max_length=6, pattern="^[0-9]{6}$")
 
 
 # ============================================================================
