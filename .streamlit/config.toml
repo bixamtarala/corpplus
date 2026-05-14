@@ -19,6 +19,6 @@ gatherUsageStats = false
 port = 8501
 headless = true
 runOnSave = true
-enableCORS = false
+enableCORS = true
 enableXsrfProtection = true
 maxUploadSize = 200
