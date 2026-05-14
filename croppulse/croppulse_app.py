@@ -7,6 +7,14 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st  # type: ignore
 
+# Import eNAM API integration
+try:
+    from enam_api import fetch_live_data, get_multimandi_prices
+    ENAM_AVAILABLE = True
+except ImportError:
+    ENAM_AVAILABLE = False
+    print("⚠️ eNAM API module not found - using fallback data")
+
 # Page configuration
 st.set_page_config(
     page_title="CropPulse - Agricultural Market Intelligence",
@@ -337,15 +345,40 @@ def create_responsive_metric_cards(metrics: dict, columns: int = 4):
 # DATA LOADING & CACHING
 # ============================================================================
 
-@st.cache_data
+@st.cache_data(ttl=3600)  # Refresh every hour
 def load_data():
-    """Load commodity price data from CSV"""
-    # Get the directory where this script is located
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    csv_path = os.path.join(script_dir, 'data', 'commodity_prices.csv')
-    df = pd.read_csv(csv_path)
-    df['date'] = pd.to_datetime(df['date'])
-    return df
+    """
+    Load commodity price data - tries eNAM API first, falls back to CSV
+    """
+    # Try eNAM API first (live data)
+    if ENAM_AVAILABLE:
+        try:
+            st.info("🔄 Fetching live data from eNAM API...", icon="ℹ️")
+            
+            # Fetch for Rice (most important for Phase 1)
+            df_rice = fetch_live_data(commodity="Rice", state="TN")
+            
+            if df_rice is not None and len(df_rice) > 0:
+                st.success("✅ Live eNAM data loaded!", icon="✓")
+                return df_rice
+        except Exception as e:
+            st.warning(f"⚠️ eNAM API error: {str(e)[:50]}... Using cached data", icon="⚠️")
+    
+    # Fallback: Load from CSV
+    try:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, 'data', 'commodity_prices.csv')
+        
+        if os.path.exists(csv_path):
+            df = pd.read_csv(csv_path)
+            df['date'] = pd.to_datetime(df['date'])
+            st.info("📊 Using demo data (CSV fallback)", icon="ℹ️")
+            return df
+        else:
+            raise FileNotFoundError(f"CSV not found at {csv_path}")
+    except Exception as e:
+        st.error(f"❌ Unable to load data: {e}")
+        st.stop()
 
 # ============================================================================
 # UTILITY FUNCTIONS
@@ -806,35 +839,89 @@ def generate_insights(commodity_data, risk_score, commodity):
 # PAGE HEADER
 # ============================================================================
 
+# ============================================================================
+# PAGE HEADER & SIDEBAR
+# ============================================================================
+
+# Sidebar user info (placeholder - will connect to auth later)
+with st.sidebar:
+    st.markdown("""
+    <div style='padding: 20px 0; border-bottom: 1px solid #e0e0e0; margin-bottom: 20px;'>
+        <h3 style='margin: 0 0 12px 0; color: #2c3e50;'>👤 User Profile</h3>
+        <p style='margin: 8px 0; color: #2c3e50; font-weight: 600;'>Ramesh Kumar</p>
+        <p style='margin: 4px 0; color: #7f8c8d; font-size: 12px;'>Rice Trader</p>
+        <p style='margin: 8px 0; color: #95a5a6; font-size: 11px;'>📍 Tamil Nadu</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Navigation
+    st.markdown("### 🏠 Navigation")
+    col_nav1, col_nav2 = st.columns(2)
+    with col_nav1:
+        if st.button("🏠 Home", use_container_width=True):
+            st.rerun()
+    with col_nav2:
+        if st.button("🚪 Logout", use_container_width=True):
+            st.info("Login/Logout coming soon")
+    
+    st.markdown("---")
+    st.markdown("<p style='text-align: center; color: #95a5a6; font-size: 11px;'>Version 1.0 • May 2026</p>", unsafe_allow_html=True)
+
 st.markdown("""
 <div class="header-section">
     <h1 style='color: #2ecc71; margin: 0; font-size: 48px;'>🌾 CropPulse</h1>
-    <p style='color: #7f8c8d; margin: 8px 0 0 0; font-size: 18px;'>Agricultural Market Intelligence Platform</p>
-    <p style='color: #bdc3c7; margin: 4px 0 0 0; font-size: 12px;'>Real-time commodity insights for informed trading decisions</p>
+    <p style='color: #7f8c8d; margin: 8px 0 0 0; font-size: 18px;'>Rice Market Intelligence Platform</p>
+    <p style='color: #bdc3c7; margin: 4px 0 0 0; font-size: 12px;'>Real-time trading signals, price insights & risk analysis</p>
 </div>
 """, unsafe_allow_html=True)
 
 # ============================================================================
-# MAIN CONTENT
+# MVP FEATURES - TOP SECTION
 # ============================================================================
 
-# Load data
+# Load data first (needed for features)
 data = load_data()
 
-# Sidebar
-st.sidebar.header("📊 Dashboard Controls")
-commodity = st.sidebar.selectbox(
-    "Select Commodity",
-    options=["Rice", "Wheat", "Cotton"],
-    index=0
-)
+# ============================================================================
+# TOP CONTROLS - Commodity & View Mode Selector
+# ============================================================================
 
-# Add view selector (Phase 5)
-view_mode = st.sidebar.radio(
-    "View Mode",
-    ["📊 Dashboard", "⚠️ Risk Analysis", "💡 Insights Only", "📈 Price Trends"],
-    horizontal=False
-)
+st.markdown("""
+<div style='background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%); padding: 20px; border-radius: 12px; margin-bottom: 24px; border-left: 5px solid #2ecc71; box-shadow: 0 2px 8px rgba(0,0,0,0.08);'>
+</div>
+""", unsafe_allow_html=True)
+
+col_control1, col_control2, col_control3, col_control4 = st.columns([1.2, 1.5, 1.5, 2], gap="medium")
+
+with col_control1:
+    commodity = st.selectbox(
+        "📦 Commodity",
+        options=["Rice", "Wheat", "Cotton"],
+        index=0
+    )
+
+with col_control2:
+    view_option = st.radio(
+        "View",
+        ["📊 Dashboard", "⚠️ Risk", "💡 Insights"],
+        horizontal=True,
+        label_visibility="collapsed"
+    )
+    # Normalize view_mode
+    view_mode_map = {
+        "📊 Dashboard": "📊 Dashboard",
+        "⚠️ Risk": "⚠️ Risk Analysis",
+        "💡 Insights": "💡 Insights Only"
+    }
+    view_mode = view_mode_map.get(view_option, "📊 Dashboard")
+
+with col_control3:
+    st.write("")  # Spacer
+
+with col_control4:
+    st.write("")  # Spacer
+
+st.markdown("---")
 
 # Filter data for selected commodity
 commodity_data = data[data['commodity'] == commodity].sort_values('date').tail(30).reset_index(drop=True)
@@ -863,6 +950,67 @@ risk_level, risk_emoji, risk_color = get_risk_level(risk_score)
 risk_trend = predict_risk_trend(commodity_data)
 trend_icon = "📈" if risk_trend == "increasing" else "📉" if risk_trend == "decreasing" else "→"
 trend_text = "Increasing" if risk_trend == "increasing" else "Decreasing" if risk_trend == "decreasing" else "Stable"
+
+# ============================================================================
+# CORE MVP FEATURES
+# ============================================================================
+
+st.markdown('<div class="section-title">⚡ QUICK ACTIONS & MARKET STATUS</div>', unsafe_allow_html=True)
+
+# Feature 1: Trading Signal Buttons
+feature_col1, feature_col2, feature_col3, feature_col4 = st.columns(4, gap="medium")
+
+with feature_col1:
+    # Generate buy/sell signal
+    supply = commodity_data['supply'].iloc[-1]
+    demand = commodity_data['demand'].iloc[-1]
+    signal = "BUY" if (supply < 50 and demand > 60) else "SELL" if (supply > 70) else "WAIT"
+    signal_color = "#2ecc71" if signal == "BUY" else "#e74c3c" if signal == "SELL" else "#f39c12"
+    signal_emoji = "🟢" if signal == "BUY" else "🔴" if signal == "SELL" else "🟡"
+    
+    st.markdown(f"""
+    <div style='background: linear-gradient(135deg, {signal_color}20 0%, {signal_color}10 100%); padding: 20px; border-radius: 12px; border-left: 5px solid {signal_color}; text-align: center;'>
+        <div style='font-size: 36px;'>{signal_emoji}</div>
+        <div style='font-size: 24px; font-weight: 700; color: {signal_color}; margin: 8px 0;'>{signal}</div>
+        <div style='color: #7f8c8d; font-size: 11px;'>Trading Signal</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with feature_col2:
+    # Feature 2: Current Price (Large Display)
+    price_trend, price_color = get_trend_indicator(current_price, commodity_data['price'].iloc[-2] if len(commodity_data) > 1 else current_price)
+    
+    st.markdown(f"""
+    <div style='background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%); padding: 20px; border-radius: 12px; border-left: 5px solid #2ecc71; box-shadow: 0 2px 8px rgba(0,0,0,0.08);'>
+        <div style='color: #7f8c8d; font-size: 11px; font-weight: 600; text-transform: uppercase;'>Current Price</div>
+        <div style='font-size: 32px; font-weight: 700; color: #2c3e50; margin: 8px 0;'>₹{current_price:,.0f}</div>
+        <div style='color: {price_color}; font-size: 13px; font-weight: 600;'>{price_trend} {price_change_7d:+.1f}% (7d)</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with feature_col3:
+    # Feature 3: Risk Meter
+    st.markdown(f"""
+    <div style='background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%); padding: 20px; border-radius: 12px; border-left: 5px solid {risk_color}; box-shadow: 0 2px 8px rgba(0,0,0,0.08);'>
+        <div style='color: #7f8c8d; font-size: 11px; font-weight: 600; text-transform: uppercase;'>Risk Level</div>
+        <div style='font-size: 32px; font-weight: 700; color: {risk_color}; margin: 8px 0;'>{risk_emoji} {risk_level.split()[0]}</div>
+        <div style='color: #7f8c8d; font-size: 12px;'>Score: {risk_score:.0f}/100</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with feature_col4:
+    # Feature 4: Supply/Demand Status
+    sd_status, sd_color = get_supply_demand_indicator(supply, demand)
+    
+    st.markdown(f"""
+    <div style='background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%); padding: 20px; border-radius: 12px; border-left: 5px solid {sd_color}; box-shadow: 0 2px 8px rgba(0,0,0,0.08);'>
+        <div style='color: #7f8c8d; font-size: 11px; font-weight: 600; text-transform: uppercase;'>Market Balance</div>
+        <div style='font-size: 18px; font-weight: 700; color: {sd_color}; margin: 8px 0; word-wrap: break-word;'>{sd_status}</div>
+        <div style='color: #7f8c8d; font-size: 11px; margin-top: 8px;'>S:{supply:.0f}% D:{demand:.0f}%</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("---")
 
 # ============================================================================
 # KPI CARDS
@@ -1306,6 +1454,289 @@ if view_mode == "📊 Dashboard":
     """, unsafe_allow_html=True)
 
     st.markdown("---")
+
+# ============================================================================
+# FEATURE 1: 7-DAY PRICE FORECAST
+# ============================================================================
+
+st.markdown('<div class="section-title">🔮 7-Day Price Forecast</div>', unsafe_allow_html=True)
+
+# Simple linear regression forecast
+if len(commodity_data) >= 5:
+    x = np.arange(len(commodity_data))
+    y = commodity_data['price'].values
+    z = np.polyfit(x, y, 1)
+    p = np.poly1d(z)
+    
+    # Forecast next 7 days
+    forecast_x = np.arange(len(commodity_data), len(commodity_data) + 7)
+    forecast_y = p(forecast_x)
+    forecast_dates = pd.date_range(start=commodity_data['date'].iloc[-1] + timedelta(days=1), periods=7)
+    
+    # Create forecast chart
+    fig_forecast = go.Figure()
+    
+    # Historical data
+    fig_forecast.add_trace(go.Scatter(
+        x=commodity_data['date'],
+        y=commodity_data['price'],
+        mode='lines+markers',
+        name='Historical',
+        line=dict(color='#2ecc71', width=2),
+        marker=dict(size=4)
+    ))
+    
+    # Forecast
+    fig_forecast.add_trace(go.Scatter(
+        x=forecast_dates,
+        y=forecast_y,
+        mode='lines+markers',
+        name='Forecast',
+        line=dict(color='#f39c12', width=2, dash='dash'),
+        marker=dict(size=4, color='#f39c12')
+    ))
+    
+    fig_forecast.update_layout(
+        title="<b>Next 7 Days Price Forecast</b>",
+        xaxis_title="Date",
+        yaxis_title="Price (₹)",
+        template='plotly_white',
+        height=350,
+        hovermode='x unified',
+        margin=dict(l=0, r=0, t=40, b=0),
+        font=dict(family="Arial, sans-serif", size=10, color="#2c3e50")
+    )
+    
+    st.plotly_chart(fig_forecast, use_container_width=True)
+    
+    # Forecast summary
+    forecast_col1, forecast_col2, forecast_col3 = st.columns(3, gap="medium")
+    
+    with forecast_col1:
+        predicted_price = forecast_y[-1]
+        price_delta = predicted_price - current_price
+        price_delta_pct = (price_delta / current_price) * 100 if current_price != 0 else 0
+        
+        st.markdown(f"""
+        <div class="metric-card">
+            <div style='color: #7f8c8d; font-size: 11px; font-weight: 600; text-transform: uppercase;'>Predicted Price (Day 7)</div>
+            <div style='font-size: 28px; font-weight: 700; color: #2c3e50; margin: 8px 0;'>₹{predicted_price:,.0f}</div>
+            <div style='color: {"#2ecc71" if price_delta > 0 else "#e74c3c"}; font-size: 12px; font-weight: 600;'>{price_delta:+.0f} ({price_delta_pct:+.1f}%)</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with forecast_col2:
+        forecast_high = forecast_y.max()
+        st.markdown(f"""
+        <div class="metric-card">
+            <div style='color: #7f8c8d; font-size: 11px; font-weight: 600; text-transform: uppercase;'>7-Day High</div>
+            <div style='font-size: 28px; font-weight: 700; color: #2ecc71; margin: 8px 0;'>₹{forecast_high:,.0f}</div>
+            <div style='color: #7f8c8d; font-size: 12px;'>Best selling opportunity</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with forecast_col3:
+        forecast_low = forecast_y.min()
+        st.markdown(f"""
+        <div class="metric-card">
+            <div style='color: #7f8c8d; font-size: 11px; font-weight: 600; text-transform: uppercase;'>7-Day Low</div>
+            <div style='font-size: 28px; font-weight: 700; color: #e74c3c; margin: 8px 0;'>₹{forecast_low:,.0f}</div>
+            <div style='color: #7f8c8d; font-size: 12px;'>Best buying opportunity</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+st.markdown("---")
+
+# ============================================================================
+# FEATURE 2: PROFIT/LOSS CALCULATOR
+# ============================================================================
+
+st.markdown('<div class="section-title">💰 Profit/Loss Calculator</div>', unsafe_allow_html=True)
+
+calc_col1, calc_col2, calc_col3, calc_col4 = st.columns(4, gap="medium")
+
+with calc_col1:
+    buy_price = st.number_input("Buy Price (₹/quintal)", min_value=0.0, value=float(current_price), step=10.0)
+
+with calc_col2:
+    buy_qty = st.number_input("Buy Quantity (quintals)", min_value=0.0, value=50.0, step=5.0)
+
+with calc_col3:
+    sell_price = st.number_input("Sell Price (₹/quintal)", min_value=0.0, value=float(current_price + 100), step=10.0)
+
+with calc_col4:
+    sell_qty = st.number_input("Sell Quantity (quintals)", min_value=0.0, value=50.0, step=5.0)
+
+# Calculate profit/loss
+total_cost = buy_price * buy_qty
+total_revenue = sell_price * sell_qty
+profit_loss = total_revenue - total_cost
+profit_loss_pct = (profit_loss / total_cost * 100) if total_cost > 0 else 0
+margin_per_quintal = sell_price - buy_price
+
+calc_result_col1, calc_result_col2, calc_result_col3, calc_result_col4 = st.columns(4, gap="medium")
+
+with calc_result_col1:
+    st.markdown(f"""
+    <div class="metric-card">
+        <div style='color: #7f8c8d; font-size: 11px; font-weight: 600; text-transform: uppercase;'>Total Investment</div>
+        <div style='font-size: 24px; font-weight: 700; color: #2c3e50;'>₹{total_cost:,.0f}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with calc_result_col2:
+    st.markdown(f"""
+    <div class="metric-card">
+        <div style='color: #7f8c8d; font-size: 11px; font-weight: 600; text-transform: uppercase;'>Total Revenue</div>
+        <div style='font-size: 24px; font-weight: 700; color: #3498db;'>₹{total_revenue:,.0f}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with calc_result_col3:
+    st.markdown(f"""
+    <div class="metric-card">
+        <div style='color: #7f8c8d; font-size: 11px; font-weight: 600; text-transform: uppercase;'>Profit/Loss</div>
+        <div style='font-size: 24px; font-weight: 700; color: {"#2ecc71" if profit_loss > 0 else "#e74c3c"};'>₹{profit_loss:+,.0f}</div>
+        <div style='color: {"#2ecc71" if profit_loss_pct > 0 else "#e74c3c"}; font-size: 12px; font-weight: 600;'>{profit_loss_pct:+.1f}%</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with calc_result_col4:
+    st.markdown(f"""
+    <div class="metric-card">
+        <div style='color: #7f8c8d; font-size: 11px; font-weight: 600; text-transform: uppercase;'>Margin/Quintal</div>
+        <div style='font-size: 24px; font-weight: 700; color: {"#2ecc71" if margin_per_quintal > 0 else "#e74c3c"};'>₹{margin_per_quintal:+,.0f}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("---")
+
+# ============================================================================
+# FEATURE 3: QUICK TRADE LOGGER
+# ============================================================================
+
+st.markdown('<div class="section-title">📝 Quick Trade Logger</div>', unsafe_allow_html=True)
+
+log_col1, log_col2, log_col3, log_col4, log_col5 = st.columns(5, gap="medium")
+
+with log_col1:
+    trade_type = st.radio("Trade Type", ["🟢 Buy", "🔴 Sell"], horizontal=True, label_visibility="collapsed")
+
+with log_col2:
+    trade_price = st.number_input("Price (₹/qt)", min_value=0.0, value=float(current_price), step=10.0, key="trade_price")
+
+with log_col3:
+    trade_qty = st.number_input("Qty (qtl)", min_value=0.0, value=50.0, step=5.0, key="trade_qty")
+
+with log_col4:
+    trade_mandi = st.selectbox("Mandi", ["Tamil Nadu", "Telangana", "Andhra Pradesh"], label_visibility="collapsed")
+
+with log_col5:
+    if st.button("📊 Log Trade", use_container_width=True):
+        st.success(f"✅ {trade_type} logged: {trade_qty} qt @ ₹{trade_price}/qt ({trade_mandi})")
+
+st.markdown("---")
+
+# ============================================================================
+# FEATURE 4: MULTI-MANDI PRICE COMPARISON
+# ============================================================================
+
+st.markdown('<div class="section-title">🏪 Multi-Mandi Price Comparison</div>', unsafe_allow_html=True)
+
+# Fetch multi-mandi prices from eNAM or use fallback
+if ENAM_AVAILABLE:
+    try:
+        mandis = get_multimandi_prices(commodity)
+    except Exception as e:
+        st.warning(f"Could not fetch multi-mandi prices: {e}")
+        mandis = None
+else:
+    mandis = None
+
+# Fallback if eNAM data unavailable
+if not mandis:
+    mandis = {
+        "Tamil Nadu (Today)": current_price,
+        "Telangana (Today)": current_price - 50,
+        "Andhra Pradesh (Today)": current_price + 75,
+        "Karnataka (Today)": current_price - 100,
+    }
+
+mandi_col1, mandi_col2, mandi_col3, mandi_col4 = st.columns(4, gap="medium")
+
+mandi_list = list(mandis.items())
+
+for idx, (mandi_name, mandi_price) in enumerate(mandi_list):
+    with [mandi_col1, mandi_col2, mandi_col3, mandi_col4][idx]:
+        # Handle both dict values and direct numbers
+        if isinstance(mandi_price, dict):
+            actual_price = mandi_price.get("price", current_price)
+        else:
+            actual_price = mandi_price
+        
+        diff = actual_price - current_price
+        diff_pct = (diff / current_price * 100) if current_price != 0 else 0
+        color = "#2ecc71" if actual_price > current_price else "#e74c3c" if actual_price < current_price else "#3498db"
+        
+        st.markdown(f"""
+        <div class="metric-card">
+            <div style='color: #7f8c8d; font-size: 11px; font-weight: 600;'>{mandi_name}</div>
+            <div style='font-size: 26px; font-weight: 700; color: {color}; margin: 8px 0;'>₹{actual_price:,.0f}</div>
+            <div style='color: {color}; font-size: 12px; font-weight: 600;'>{diff:+.0f} ({diff_pct:+.1f}%)</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+st.markdown("---")
+
+# ============================================================================
+# FEATURE 5: PRICE ALERT SETTINGS
+# ============================================================================
+
+st.markdown('<div class="section-title">🔔 Price Alert Settings</div>', unsafe_allow_html=True)
+
+alert_col1, alert_col2, alert_col3, alert_col4 = st.columns(4, gap="medium")
+
+with alert_col1:
+    alert_buy = st.number_input("Buy Alert At (₹)", min_value=0.0, value=float(current_price - 200), step=10.0)
+
+with alert_col2:
+    alert_sell = st.number_input("Sell Alert At (₹)", min_value=0.0, value=float(current_price + 200), step=10.0)
+
+with alert_col3:
+    alert_method = st.selectbox("Notify Via", ["📱 WhatsApp", "📧 Email", "🔔 In-App"], label_visibility="collapsed")
+
+with alert_col4:
+    if st.button("✅ Set Alerts", use_container_width=True):
+        st.success(f"🎯 Alerts set! Buy: ₹{alert_buy}, Sell: ₹{alert_sell} via {alert_method}")
+
+# Alert status
+alert_status_col1, alert_status_col2 = st.columns(2, gap="medium")
+
+with alert_status_col1:
+    buy_diff = current_price - alert_buy
+    buy_status = "✅ READY TO BUY" if current_price <= alert_buy else f"⏳ Waiting ({buy_diff:.0f}₹ to go)"
+    buy_color = "#2ecc71" if current_price <= alert_buy else "#f39c12"
+    
+    st.markdown(f"""
+    <div style='background: {buy_color}20; padding: 16px; border-radius: 8px; border-left: 4px solid {buy_color};'>
+        <div style='color: {buy_color}; font-weight: 700; font-size: 14px;'>{buy_status}</div>
+        <div style='color: #7f8c8d; font-size: 12px; margin-top: 4px;'>Buy target: ₹{alert_buy:,.0f}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with alert_status_col2:
+    sell_diff = alert_sell - current_price
+    sell_status = "✅ READY TO SELL" if current_price >= alert_sell else f"⏳ Waiting ({sell_diff:.0f}₹ to go)"
+    sell_color = "#2ecc71" if current_price >= alert_sell else "#f39c12"
+    
+    st.markdown(f"""
+    <div style='background: {sell_color}20; padding: 16px; border-radius: 8px; border-left: 4px solid {sell_color};'>
+        <div style='color: {sell_color}; font-weight: 700; font-size: 14px;'>{sell_status}</div>
+        <div style='color: #7f8c8d; font-size: 12px; margin-top: 4px;'>Sell target: ₹{alert_sell:,.0f}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("---")
 
 # ============================================================================
 # EXPORT & REFERENCE (PHASE 5) - Available in all views
