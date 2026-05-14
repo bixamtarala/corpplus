@@ -1,5 +1,5 @@
 [build]
-  publish = "."
+  publish = "landing_page"
   command = ""
 
 [[redirects]]
