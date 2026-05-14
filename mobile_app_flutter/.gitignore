@@ -1,0 +1,76 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+*.iml
+*.lock
+pubspec.lock
+.pub/
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Build
+build/
+.gradle/
+*.apk
+*.aab
+*.dill
+*.so
+*.dylib
+*.dll
+*.mod
+*.sum
+**/android/gradlew
+**/android/gradlew.bat
+**/android/gradle
+**/android/.gradle
+**/android/captures/
+**/android/intermediates/
+**/android/local.properties
+
+# iOS
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral/
+**/ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+**/ios/.symlinks/
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/ios/Pods/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+.metadata
+
+# Obfuscation related
+app.*.map.json
+
+# Logging
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Firebase
+google-services.json
+GoogleService-Info.plist
+
+# Secrets
+*.jks
+*.keystore
+private_key.pem
