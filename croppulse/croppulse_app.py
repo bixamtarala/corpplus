@@ -1083,9 +1083,9 @@ st.markdown('<div class="section-title">📊 30-Day Price Trend</div>', unsafe_a
 
 fig_price = go.Figure()
 
-    # Calculate moving averages
-    ma_7 = commodity_data['price'].rolling(window=7, min_periods=1).mean()
-    ma_14 = commodity_data['price'].rolling(window=14, min_periods=1).mean()
+# Calculate moving averages
+ma_7 = commodity_data['price'].rolling(window=7, min_periods=1).mean()
+ma_14 = commodity_data['price'].rolling(window=14, min_periods=1).mean()
 
 # Calculate volatility band (mean ± 1 std dev)
 price_mean = commodity_data['price'].mean()
@@ -1095,14 +1095,14 @@ lower_band = price_mean - price_std
 
 # Add volatility band (light fill)
 fig_price.add_trace(go.Scatter(
-        x=commodity_data['date'],
-        y=[upper_band] * len(commodity_data['date']),
-        fill=None,
-        mode='lines',
-        line_color='rgba(0,0,0,0)',
-        showlegend=False,
-        name='Upper Band'
-    ))
+    x=commodity_data['date'],
+    y=[upper_band] * len(commodity_data['date']),
+    fill=None,
+    mode='lines',
+    line_color='rgba(0,0,0,0)',
+    showlegend=False,
+    name='Upper Band'
+))
 
 fig_price.add_trace(go.Scatter(
     x=commodity_data['date'],
