@@ -1806,10 +1806,10 @@ st.markdown('<div class="section-title">🔔 Price Alert Settings</div>', unsafe
 alert_col1, alert_col2, alert_col3, alert_col4 = st.columns(4, gap="medium")
 
 with alert_col1:
-    alert_buy = st.number_input("Buy Alert At (₹)", min_value=0.0, value=float(current_price - 200), step=10.0)
+    alert_buy = st.number_input("Buy Alert At (₹)", min_value=0.0, value=float(max(0.0, current_price - 200)), step=10.0)
 
 with alert_col2:
-    alert_sell = st.number_input("Sell Alert At (₹)", min_value=0.0, value=float(current_price + 200), step=10.0)
+    alert_sell = st.number_input("Sell Alert At (₹)", min_value=0.0, value=float(max(0.0, current_price + 200)), step=10.0)
 
 with alert_col3:
     alert_method = st.selectbox("Notify Via", ["📱 WhatsApp", "📧 Email", "🔔 In-App"], label_visibility="collapsed")
