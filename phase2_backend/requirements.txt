@@ -48,6 +48,10 @@ prometheus-client>=0.18.0  # Metrics
 
 # Security
 python-dotenv>=1.0.0
+slowapi>=0.1.8  # Rate limiting
+requests>=2.31.0  # HTTP client
+python-decouple>=3.8  # Config management
+cryptography>=41.0.0  # Enhanced encryption
 cryptography>=41.0.0
 
 # Testing
