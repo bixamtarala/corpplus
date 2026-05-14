@@ -1,44 +1,39 @@
 #!/usr/bin/env python
 """
-Railway deployment entry point
-Handles environment variable expansion for PORT and starts the app
+Railway deployment entry point - Minimal and reliable
 """
 import os
 import sys
-import uvicorn
 
-def main():
-    # Get environment variables
-    port = int(os.getenv("PORT", "8000"))
-    host = "0.0.0.0"
-    env = os.getenv("ENV", "production")
-    
-    print("=" * 60)
-    print("🚀 CropPulse API - Railway Deployment")
-    print("=" * 60)
-    print(f"✓ Host: {host}")
-    print(f"✓ Port: {port}")
-    print(f"✓ Environment: {env}")
-    print(f"✓ Debug: {env == 'development'}")
-    print("=" * 60)
-    print()
-    
-    try:
-        # Start the FastAPI app with uvicorn
-        uvicorn.run(
-            "phase2_backend.main:app",
-            host=host,
-            port=port,
-            reload=env == "development",
-            log_level="info",
-            access_log=True,
-        )
-    except Exception as e:
-        print(f"\n❌ ERROR: Failed to start app")
-        print(f"Details: {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
+# Get port from environment (Railway will set this)
+PORT = int(os.getenv("PORT", "8000"))
+HOST = "0.0.0.0"
 
-if __name__ == "__main__":
-    main()
+print("=" * 70)
+print("🚀 CropPulse API Starting on Railway")
+print("=" * 70)
+print(f"Host: {HOST}:{PORT}")
+print(f"Environment: {os.getenv('ENV', 'production')}")
+print("=" * 70)
+
+try:
+    # Import app
+    from phase2_backend.main import app
+    import uvicorn
+    
+    # Start server
+    uvicorn.run(
+        app,
+        host=HOST,
+        port=PORT,
+        log_level="info"
+    )
+    
+except ImportError as e:
+    print(f"ERROR: Failed to import app: {e}")
+    sys.exit(1)
+except Exception as e:
+    print(f"ERROR: {e}")
+    import traceback
+    traceback.print_exc()
+    sys.exit(1)
