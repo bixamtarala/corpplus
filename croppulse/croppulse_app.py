@@ -997,13 +997,6 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("<p style='text-align: center; color: #95a5a6; font-size: 11px;'>Version 1.0 • May 2026</p>", unsafe_allow_html=True)
 
-# Main Content Header
-st.markdown("""
-<div style='padding: 20px 0; margin-bottom: 24px;'>
-    <p style='color: #7f8c8d; margin: 0; font-size: 16px;'>Real-time trading signals, price insights & risk analysis</p>
-</div>
-""", unsafe_allow_html=True)
-
 # ============================================================================
 # TOP CONTROLS - View Mode Selector (FIRST - Most Important)
 # ============================================================================
