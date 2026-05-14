@@ -865,10 +865,33 @@ with st.sidebar:
     
     # Navigation
     st.markdown("### 🏠 Navigation")
+    
+    # Home button with proper navigation
+    st.markdown("""
+    <script>
+    function goHome() {
+        window.location.href = "http://localhost:8000";
+    }
+    </script>
+    <button onclick="goHome()" style="
+        width: 48%;
+        padding: 10px;
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        margin-right: 2%;
+        transition: all 0.3s ease;
+    " onmouseover="this.style.boxShadow='0 4px 12px rgba(46, 204, 113, 0.3)'; this.style.transform='translateY(-2px)'" 
+       onmouseout="this.style.boxShadow='none'; this.style.transform='translateY(0)'">
+        🏠 Home
+    </button>
+    """, unsafe_allow_html=True)
+    
     col_nav1, col_nav2 = st.columns(2)
-    with col_nav1:
-        if st.button("🏠 Home", use_container_width=True):
-            st.rerun()
     with col_nav2:
         if st.button("🚪 Logout", use_container_width=True):
             st.info("Login/Logout coming soon")
