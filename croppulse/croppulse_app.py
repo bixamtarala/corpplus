@@ -376,7 +376,7 @@ def load_data_from_api():
         
         if response.status_code == 200:
             data = response.json()
-            st.success("✅ Live data from CropPulse Backend API!", icon="✓")
+            st.success("✅ Live data from CropPulse Backend API!", icon="✅")
             
             # Convert to DataFrame format for compatibility
             df = pd.DataFrame([data])
