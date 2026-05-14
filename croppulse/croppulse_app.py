@@ -843,8 +843,17 @@ def generate_insights(commodity_data, risk_score, commodity):
 # PAGE HEADER & SIDEBAR
 # ============================================================================
 
-# Sidebar user info (placeholder - will connect to auth later)
+# Sidebar - Hero Card at Top + User Info
 with st.sidebar:
+    # Hero Card at Top
+    st.markdown("""
+    <div style='text-align: center; padding: 20px 0; border-bottom: 2px solid #2ecc71; margin-bottom: 20px;'>
+        <h1 style='color: #2ecc71; margin: 0; font-size: 40px;'>🌾 CropPulse</h1>
+        <p style='color: #7f8c8d; margin: 6px 0 0 0; font-size: 14px;'>Market Intelligence</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # User Profile
     st.markdown("""
     <div style='padding: 20px 0; border-bottom: 1px solid #e0e0e0; margin-bottom: 20px;'>
         <h3 style='margin: 0 0 12px 0; color: #2c3e50;'>👤 User Profile</h3>
@@ -867,11 +876,10 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("<p style='text-align: center; color: #95a5a6; font-size: 11px;'>Version 1.0 • May 2026</p>", unsafe_allow_html=True)
 
+# Main Content Header
 st.markdown("""
-<div class="header-section">
-    <h1 style='color: #2ecc71; margin: 0; font-size: 48px;'>🌾 CropPulse</h1>
-    <p style='color: #7f8c8d; margin: 8px 0 0 0; font-size: 18px;'>Rice Market Intelligence Platform</p>
-    <p style='color: #bdc3c7; margin: 4px 0 0 0; font-size: 12px;'>Real-time trading signals, price insights & risk analysis</p>
+<div style='padding: 20px 0; margin-bottom: 24px;'>
+    <p style='color: #7f8c8d; margin: 0; font-size: 16px;'>Real-time trading signals, price insights & risk analysis</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -891,7 +899,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-col_control1, col_control2, col_control3, col_control4 = st.columns([1.2, 1.5, 1.5, 2], gap="medium")
+col_control1, col_control2 = st.columns([1.2, 2], gap="medium")
 
 with col_control1:
     commodity = st.selectbox(
@@ -914,12 +922,6 @@ with col_control2:
         "💡 Insights": "💡 Insights Only"
     }
     view_mode = view_mode_map.get(view_option, "📊 Dashboard")
-
-with col_control3:
-    st.write("")  # Spacer
-
-with col_control4:
-    st.write("")  # Spacer
 
 st.markdown("---")
 
@@ -1013,11 +1015,10 @@ with feature_col4:
 st.markdown("---")
 
 # ============================================================================
-# KPI CARDS
+# KPI CARDS - DISPLAY ALWAYS AT TOP
 # ============================================================================
 
-if view_mode in ["📊 Dashboard", "📈 Price Trends"]:
-    st.markdown('<div class="section-title">📈 Market Overview - ' + commodity + '</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">📈 Market Overview - ' + commodity + '</div>', unsafe_allow_html=True)
 
 col1, col2, col3, col4 = st.columns(4, gap="medium")
 
@@ -1075,13 +1076,12 @@ with col4:
 st.markdown("---")
 
 # ============================================================================
-# PRICE CHART
+# PRICE CHART - DISPLAY ALWAYS AT TOP
 # ============================================================================
 
-if view_mode in ["📊 Dashboard", "📈 Price Trends"]:
-    st.markdown('<div class="section-title">📊 30-Day Price Trend</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">📊 30-Day Price Trend</div>', unsafe_allow_html=True)
 
-    fig_price = go.Figure()
+fig_price = go.Figure()
 
     # Calculate moving averages
     ma_7 = commodity_data['price'].rolling(window=7, min_periods=1).mean()
@@ -1172,52 +1172,56 @@ if view_mode in ["📊 Dashboard", "📈 Price Trends"]:
     st.plotly_chart(fig_price, use_container_width=True)
 
     st.markdown("---")
-if view_mode in ["📊 Dashboard", "⚠️ Risk Analysis"]:
-    st.markdown('<div class="section-title">⚠️ Risk Assessment & Market Conditions</div>', unsafe_allow_html=True)
 
-    # Get risk components
-    components = get_risk_components(commodity_data)
-    risk_alerts = get_alert_messages(commodity_data, risk_score, components)
+# ============================================================================
+# RISK ASSESSMENT - DISPLAY ALWAYS AT TOP
+# ============================================================================
 
-    # Display critical alerts first (Phase 3)
-    if risk_alerts:
-        st.markdown("**⚠️ Real-Time Alerts**")
-        for alert in risk_alerts:
-            if alert['severity'] == 'high':
-                st.error(f"{alert['icon']} **{alert['message']}** — {alert['recommendation']}")
-            else:
-                st.warning(f"{alert['icon']} **{alert['message']}** — {alert['recommendation']}")
-        st.markdown("")
+st.markdown('<div class="section-title">⚠️ Risk Assessment & Market Conditions</div>', unsafe_allow_html=True)
 
-    col_risk1, col_risk2 = st.columns([1, 1], gap="medium")
+# Get risk components
+components = get_risk_components(commodity_data)
+risk_alerts = get_alert_messages(commodity_data, risk_score, components)
 
-    with col_risk1:
-        # Trend color for risk card
-        trend_color_risk = "#e74c3c" if risk_trend == "increasing" else "#2ecc71" if risk_trend == "decreasing" else "#3498db"
-        
-        st.markdown(f"""
-    <div class="risk-card risk-{risk_level.lower().split()[0]}">
-        <div style='text-align: center;'>
-            <div style='font-size: 48px; margin-bottom: 12px;'>{risk_emoji}</div>
-            <div style='font-size: 20px; font-weight: 700; color: #2c3e50; margin-bottom: 8px;'>{risk_level}</div>
-            <div style='font-size: 42px; font-weight: 700; color: {risk_color};'>{risk_score:.0f}</div>
-            <div style='font-size: 12px; color: #7f8c8d; margin-top: 8px;'>Risk Score (0-100)</div>
-            <div style='margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.1);'>
-                <span style='color: {trend_color_risk}; font-size: 14px; font-weight: 600;'>{trend_icon} {trend_text} Trend</span>
-            </div>
+# Display critical alerts first (Phase 3)
+if risk_alerts:
+    st.markdown("**⚠️ Real-Time Alerts**")
+    for alert in risk_alerts:
+        if alert['severity'] == 'high':
+            st.error(f"{alert['icon']} **{alert['message']}** — {alert['recommendation']}")
+        else:
+            st.warning(f"{alert['icon']} **{alert['message']}** — {alert['recommendation']}")
+    st.markdown("")
+
+col_risk1, col_risk2 = st.columns([1, 1], gap="medium")
+
+with col_risk1:
+    # Trend color for risk card
+    trend_color_risk = "#e74c3c" if risk_trend == "increasing" else "#2ecc71" if risk_trend == "decreasing" else "#3498db"
+    
+    st.markdown(f"""
+<div class="risk-card risk-{risk_level.lower().split()[0]}">
+    <div style='text-align: center;'>
+        <div style='font-size: 48px; margin-bottom: 12px;'>{risk_emoji}</div>
+        <div style='font-size: 20px; font-weight: 700; color: #2c3e50; margin-bottom: 8px;'>{risk_level}</div>
+        <div style='font-size: 42px; font-weight: 700; color: {risk_color};'>{risk_score:.0f}</div>
+        <div style='font-size: 12px; color: #7f8c8d; margin-top: 8px;'>Risk Score (0-100)</div>
+        <div style='margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.1);'>
+            <span style='color: {trend_color_risk}; font-size: 14px; font-weight: 600;'>{trend_icon} {trend_text} Trend</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
-    with col_risk2:
-        # Risk breakdown with progress bars - weighted by importance
-        if components:
-            volatility_score = min(components['volatility_score'], 100)
-            price_change_score = min(components['price_change_score'], 100)
-            supply_gap_score = components['supply_gap_score']
-            demand_pressure = components['demand_pressure']
-            
-            st.markdown(f"""<div style='background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);'>
+with col_risk2:
+    # Risk breakdown with progress bars - weighted by importance
+    if components:
+        volatility_score = min(components['volatility_score'], 100)
+        price_change_score = min(components['price_change_score'], 100)
+        supply_gap_score = components['supply_gap_score']
+        demand_pressure = components['demand_pressure']
+        
+        st.markdown(f"""<div style='background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);'>
 <h4 style='margin-top: 0; color: #2c3e50;'>Risk Factors Breakdown</h4>
 <p style='color: #95a5a6; font-size: 11px; margin: 0 0 12px 0;'>Weighted by importance in risk calculation</p>
 <div style='margin: 14px 0;'><div style='display: flex; justify-content: space-between; margin-bottom: 4px;'><span style='color: #7f8c8d; font-size: 11px; font-weight: 600;'>📊 Volatility (35%)</span><span style='color: #e74c3c; font-weight: 600; font-size: 11px;'>{components['volatility']:.1f}%</span></div><div style='background-color: #e0e0e0; border-radius: 10px; height: 8px; overflow: hidden;'><div style='height: 100%; width: {volatility_score}%; background-color: #e74c3c; border-radius: 10px;'></div></div></div>
@@ -1225,101 +1229,100 @@ if view_mode in ["📊 Dashboard", "⚠️ Risk Analysis"]:
 <div style='margin: 14px 0;'><div style='display: flex; justify-content: space-between; margin-bottom: 4px;'><span style='color: #7f8c8d; font-size: 11px; font-weight: 600;'>📦 Supply Gap (20%)</span><span style='color: #3498db; font-weight: 600; font-size: 11px;'>{components['supply_gap']:.0f}%</span></div><div style='background-color: #e0e0e0; border-radius: 10px; height: 8px; overflow: hidden;'><div style='height: 100%; width: {supply_gap_score}%; background-color: #3498db; border-radius: 10px;'></div></div></div>
 <div style='margin: 14px 0;'><div style='display: flex; justify-content: space-between; margin-bottom: 4px;'><span style='color: #7f8c8d; font-size: 11px; font-weight: 600;'>🔥 Demand Pressure (20%)</span><span style='color: #9b59b6; font-weight: 600; font-size: 11px;'>{components['demand']:.0f}%</span></div><div style='background-color: #e0e0e0; border-radius: 10px; height: 8px; overflow: hidden;'><div style='height: 100%; width: {demand_pressure}%; background-color: #9b59b6; border-radius: 10px;'></div></div></div>
 </div>""", unsafe_allow_html=True)
-        else:
-            st.info("Insufficient data to calculate risk components")
+    else:
+        st.info("Insufficient data to calculate risk components")
 
-    # Historical risk trend chart (Phase 3)
-    st.markdown("**Risk Evolution (7-Day History)**")
+# Historical risk trend chart (Phase 3)
+st.markdown("**Risk Evolution (7-Day History)**")
 
-    # Calculate historical risks
-    historical_risks = calculate_historical_risk_scores(commodity_data)
-    risk_dates = commodity_data['date'].iloc[7:].reset_index(drop=True)
+# Calculate historical risks
+historical_risks = calculate_historical_risk_scores(commodity_data)
+risk_dates = commodity_data['date'].iloc[7:].reset_index(drop=True)
 
-    fig_risk_trend = go.Figure()
-    fig_risk_trend.add_trace(go.Scatter(
-        x=risk_dates,
-        y=historical_risks,
-        mode='lines+markers',
-        name='Risk Score',
-        line=dict(color='#e74c3c', width=2),
-        marker=dict(size=5),
-        fill='tozeroy',
-        fillcolor='rgba(231, 76, 60, 0.1)',
-        hovertemplate='<b>%{x|%b %d}</b><br>Risk: %{y:.0f}/100<extra></extra>'
-    ))
+fig_risk_trend = go.Figure()
+fig_risk_trend.add_trace(go.Scatter(
+    x=risk_dates,
+    y=historical_risks,
+    mode='lines+markers',
+    name='Risk Score',
+    line=dict(color='#e74c3c', width=2),
+    marker=dict(size=5),
+    fill='tozeroy',
+    fillcolor='rgba(231, 76, 60, 0.1)',
+    hovertemplate='<b>%{x|%b %d}</b><br>Risk: %{y:.0f}/100<extra></extra>'
+))
 
-    fig_risk_trend.add_hline(
-        y=33, 
-        line_dash="dash", 
-        line_color="#2ecc71",
-        annotation_text="Low Risk",
-        annotation_position="right"
-    )
+fig_risk_trend.add_hline(
+    y=33, 
+    line_dash="dash", 
+    line_color="#2ecc71",
+    annotation_text="Low Risk",
+    annotation_position="right"
+)
 
-    fig_risk_trend.add_hline(
-        y=66, 
-        line_dash="dash", 
-        line_color="#ff9800",
-        annotation_text="High Risk",
-        annotation_position="right"
-    )
+fig_risk_trend.add_hline(
+    y=66, 
+    line_dash="dash", 
+    line_color="#ff9800",
+    annotation_text="High Risk",
+    annotation_position="right"
+)
 
-    fig_risk_trend.update_layout(
-        title="<b>Risk Score Trend</b>",
-        xaxis_title="Date",
-        yaxis_title="Risk Score (0-100)",
-        template='plotly_white',
-        height=250,
-        margin=dict(l=0, r=80, t=40, b=0),
-        hovermode='x unified',
-        font=dict(family="Arial, sans-serif", size=10, color="#2c3e50")
-    )
+fig_risk_trend.update_layout(
+    title="<b>Risk Score Trend</b>",
+    xaxis_title="Date",
+    yaxis_title="Risk Score (0-100)",
+    template='plotly_white',
+    height=250,
+    margin=dict(l=0, r=80, t=40, b=0),
+    hovermode='x unified',
+    font=dict(family="Arial, sans-serif", size=10, color="#2c3e50")
+)
 
-    st.plotly_chart(fig_risk_trend, use_container_width=True)
+st.plotly_chart(fig_risk_trend, use_container_width=True)
 
-    st.markdown("---")
+st.markdown("---")
 
 # ============================================================================
-# AI INSIGHTS
+# AI INSIGHTS - DISPLAY ALWAYS AT TOP
 # ============================================================================
 
-if view_mode in ["📊 Dashboard", "💡 Insights Only"]:
-    st.markdown('<div class="section-title">💡 AI Insights & Recommendations</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">💡 AI Insights & Recommendations</div>', unsafe_allow_html=True)
 
-    insights = generate_insights(commodity_data, risk_score, commodity)
+insights = generate_insights(commodity_data, risk_score, commodity)
 
-    if insights:
-        for idx, insight in enumerate(insights):
-            insight_class = f"insight-{insight['type']}"
-            icon_color = "#2ecc71" if insight['type'] == 'opportunity' else "#ff9800"
-            action_type = "✅ Opportunity" if insight['type'] == 'opportunity' else "⚠️ Caution"
-            confidence = insight.get('confidence', 0.75)
-            
-            st.markdown(f"""
-        <div class="insight-card insight-{insight['type']}">
-            <div style='display: flex; align-items: flex-start; gap: 16px;'>
-                <div style='font-size: 32px; flex-shrink: 0;'>{insight['emoji']}</div>
-                <div style='flex-grow: 1;'>
-                    <div style='display: flex; justify-content: space-between; align-items: center;'>
-                        <h4 style='margin: 0 0 8px 0; color: #2c3e50;'>{insight['title']}</h4>
-                        <span style='background-color: {"#d4edda" if insight["type"] == "opportunity" else "#fff3cd"}; color: {"#155724" if insight["type"] == "opportunity" else "#856404"}; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;'>
-                            Confidence: {confidence*100:.0f}%
-                        </span>
-                    </div>
-                    <p style='margin: 0 0 12px 0; color: #555; font-size: 14px;'>{insight['description']}</p>
-                    <div style='padding: 12px; background-color: rgba(0,0,0,0.02); border-radius: 8px; border-left: 3px solid {icon_color};'>
-                        <span style='color: {icon_color}; font-weight: 600; font-size: 13px;'>{action_type}</span>
-                        <br/>
-                        <span style='color: #555; font-size: 13px;'>{insight['action']}</span>
-                    </div>
+if insights:
+    for idx, insight in enumerate(insights):
+        insight_class = f"insight-{insight['type']}"
+        icon_color = "#2ecc71" if insight['type'] == 'opportunity' else "#ff9800"
+        action_type = "✅ Opportunity" if insight['type'] == 'opportunity' else "⚠️ Caution"
+        confidence = insight.get('confidence', 0.75)
+        
+        st.markdown(f"""
+    <div class="insight-card insight-{insight['type']}">
+        <div style='display: flex; align-items: flex-start; gap: 16px;'>
+            <div style='font-size: 32px; flex-shrink: 0;'>{insight['emoji']}</div>
+            <div style='flex-grow: 1;'>
+                <div style='display: flex; justify-content: space-between; align-items: center;'>
+                    <h4 style='margin: 0 0 8px 0; color: #2c3e50;'>{insight['title']}</h4>
+                    <span style='background-color: {"#d4edda" if insight["type"] == "opportunity" else "#fff3cd"}; color: {"#155724" if insight["type"] == "opportunity" else "#856404"}; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;'>
+                        Confidence: {confidence*100:.0f}%
+                    </span>
+                </div>
+                <p style='margin: 0 0 12px 0; color: #555; font-size: 14px;'>{insight['description']}</p>
+                <div style='padding: 12px; background-color: rgba(0,0,0,0.02); border-radius: 8px; border-left: 3px solid {icon_color};'>
+                    <span style='color: {icon_color}; font-weight: 600; font-size: 13px;'>{action_type}</span>
+                    <br/>
+                    <span style='color: #555; font-size: 13px;'>{insight['action']}</span>
                 </div>
             </div>
         </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.info("📊 No specific insights at this time. Market conditions are stable.")
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    st.info("📊 No specific insights at this time. Market conditions are stable.")
 
-    st.markdown("---")
+st.markdown("---")
 
 # ============================================================================
 # SUPPLY & DEMAND CHART
