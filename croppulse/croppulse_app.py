@@ -953,6 +953,10 @@ risk_trend = predict_risk_trend(commodity_data)
 trend_icon = "📈" if risk_trend == "increasing" else "📉" if risk_trend == "decreasing" else "→"
 trend_text = "Increasing" if risk_trend == "increasing" else "Decreasing" if risk_trend == "decreasing" else "Stable"
 
+# Get risk components and alerts for use throughout the page
+components = get_risk_components(commodity_data)
+risk_alerts = get_alert_messages(commodity_data, risk_score, components)
+
 # ============================================================================
 # CORE MVP FEATURES
 # ============================================================================
