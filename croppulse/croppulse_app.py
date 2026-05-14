@@ -847,10 +847,12 @@ def generate_insights(commodity_data, risk_score, commodity):
 with st.sidebar:
     # Hero Card at Top
     st.markdown("""
-    <div style='text-align: center; padding: 20px 0; border-bottom: 2px solid #2ecc71; margin-bottom: 20px;'>
-        <h1 style='color: #2ecc71; margin: 0; font-size: 40px;'>🌾 CropPulse</h1>
-        <p style='color: #7f8c8d; margin: 6px 0 0 0; font-size: 14px;'>Market Intelligence</p>
-    </div>
+    <a href='https://croppulse.com' target='_self' style='text-decoration: none;'>
+        <div style='text-align: center; padding: 20px 0; border-bottom: 2px solid #2ecc71; margin-bottom: 20px; cursor: pointer;'>
+            <h1 style='color: #2ecc71; margin: 0; font-size: 40px;'>🌾 CropPulse</h1>
+            <p style='color: #7f8c8d; margin: 6px 0 0 0; font-size: 14px;'>Market Intelligence</p>
+        </div>
+    </a>
     """, unsafe_allow_html=True)
     
     # User Profile
@@ -862,39 +864,6 @@ with st.sidebar:
         <p style='margin: 8px 0; color: #95a5a6; font-size: 11px;'>📍 Tamil Nadu</p>
     </div>
     """, unsafe_allow_html=True)
-    
-    # Navigation
-    st.markdown("### 🏠 Navigation")
-    
-    # Home button with proper navigation
-    st.markdown("""
-    <script>
-    function goHome() {
-        window.location.href = "http://localhost:8000";
-    }
-    </script>
-    <button onclick="goHome()" style="
-        width: 48%;
-        padding: 10px;
-        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 14px;
-        margin-right: 2%;
-        transition: all 0.3s ease;
-    " onmouseover="this.style.boxShadow='0 4px 12px rgba(46, 204, 113, 0.3)'; this.style.transform='translateY(-2px)'" 
-       onmouseout="this.style.boxShadow='none'; this.style.transform='translateY(0)'">
-        🏠 Home
-    </button>
-    """, unsafe_allow_html=True)
-    
-    col_nav1, col_nav2 = st.columns(2)
-    with col_nav2:
-        if st.button("🚪 Logout", use_container_width=True):
-            st.info("Login/Logout coming soon")
     
     st.markdown("---")
     st.markdown("<p style='text-align: center; color: #95a5a6; font-size: 11px;'>Version 1.0 • May 2026</p>", unsafe_allow_html=True)
