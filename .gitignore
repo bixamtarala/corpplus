@@ -117,15 +117,12 @@ venv.bak/
 # mypy
 .mypy_cache/
 .dmypy.json
-dmypy.json
-
 # Pyre type checker
 .pyre/
 
-# Streamlit
+# Streamlit - Only ignore secrets and cache, config should be committed for Cloud deployment
 .streamlit/secrets.toml
 .streamlit/cache/
-.streamlit/config.toml
 
 # VS Code
 .vscode/
