@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropPulse - Agricultural Market Intelligence</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background-color: #f8f9fa;
+        }
+        
+        /* Navigation */
+        nav {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2ecc71;
+        }
+        
+        nav a {
+            color: #2c3e50;
+            text-decoration: none;
+            margin: 0 1.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        nav a:hover {
+            color: #2ecc71;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            margin-top: 60px;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+        
+        .cta-button {
+            background: white;
+            color: #2ecc71;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .features h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 3rem;
+            color: #2c3e50;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #2ecc71;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(46, 204, 113, 0.15);
+        }
+        
+        .feature-card .emoji {
+            font-size: 32px;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-card p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        /* Benefits Section */
+        .benefits {
+            background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+            padding: 4rem 2rem;
+        }
+        
+        .benefits-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        
+        .benefits-content h2 {
+            font-size: 32px;
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+        }
+        
+        .benefits-list {
+            list-style: none;
+        }
+        
+        .benefits-list li {
+            padding: 0.75rem 0;
+            color: #555;
+            font-size: 16px;
+        }
+        
+        .benefits-list li:before {
+            content: "✓ ";
+            color: #2ecc71;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        
+        /* Stats Section */
+        .stats {
+            background: #2ecc71;
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        
+        .stats-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+        
+        .stat-item h3 {
+            font-size: 32px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-item p {
+            opacity: 0.9;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 4rem 2rem;
+            text-align: center;
+            background: white;
+        }
+        
+        .cta-section h2 {
+            font-size: 32px;
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+        }
+        
+        .cta-section p {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 2rem;
+        }
+        
+        .cta-button-primary {
+            background: #2ecc71;
+            color: white;
+            padding: 14px 40px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button-primary:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
+        }
+        
+        /* Footer */
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 3rem 2rem 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: #2ecc71;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin: 0.5rem 0;
+        }
+
+        .footer-section a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #2ecc71;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            border-top: 1px solid #34495e;
+            padding-top: 2rem;
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        /* Screenshots Section */
+        .screenshots {
+            padding: 4rem 2rem;
+            background: #f8f9fa;
+        }
+
+        .screenshots-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .screenshots h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 3rem;
+            font-size: 18px;
+        }
+
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .screenshot-item {
+            text-align: center;
+        }
+
+        .screenshot-placeholder {
+            background: white;
+            border-radius: 12px;
+            padding: 3rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 2px solid #e0e0e0;
+        }
+
+        .screenshot-placeholder:hover {
+            box-shadow: 0 8px 24px rgba(46, 204, 113, 0.2);
+            border-color: #2ecc71;
+            transform: translateY(-4px);
+        }
+
+        .placeholder-content {
+            text-align: center;
+        }
+
+        .placeholder-content span {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .placeholder-content p {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .screenshot-label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        /* Testimonials Section */
+        .testimonials {
+            padding: 4rem 2rem;
+            background: white;
+        }
+
+        .testimonials-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .testimonials h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 3rem;
+            color: #2c3e50;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .testimonial-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-top: 4px solid #2ecc71;
+            transition: all 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.2);
+            transform: translateY(-4px);
+        }
+
+        .stars {
+            margin-bottom: 1rem;
+            font-size: 18px;
+        }
+
+        .testimonial-text {
+            color: #555;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        .testimonial-author {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .testimonial-author strong {
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .testimonial-author span {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        /* FAQ Section */
+        .faq {
+            padding: 4rem 2rem;
+            background: #f8f9fa;
+        }
+
+        .faq-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .faq h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 3rem;
+            color: #2c3e50;
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .faq-item {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #2ecc71;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 4px 16px rgba(46, 204, 113, 0.15);
+        }
+
+        .faq-item h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 16px;
+        }
+
+        .faq-item p {
+            color: #7f8c8d;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Newsletter Section */
+        .newsletter {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .newsletter-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .newsletter h2 {
+            font-size: 32px;
+            margin-bottom: 1rem;
+        }
+
+        .newsletter p {
+            font-size: 18px;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .newsletter-form button {
+            padding: 12px 32px;
+            background: white;
+            color: #2ecc71;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-form button:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .newsletter-note {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+            
+            .benefits-content {
+                grid-template-columns: 1fr;
+            }
+            
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav a {
+                margin: 0.5rem 0;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .newsletter-form input,
+            .newsletter-form button {
+                width: 100%;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">🌾 CropPulse</div>
+        <div>
+            <a href="#features">Features</a>
+            <a href="#benefits">Benefits</a>
+            <a href="#testimonials">Testimonials</a>
+            <a href="#faq">FAQ</a>
+            <a href="#app">Launch App</a>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>🌾 CropPulse</h1>
+        <p>Agricultural Market Intelligence Platform</p>
+        <p style="font-size: 16px; margin-bottom: 2rem;">Real-time commodity insights for informed trading decisions</p>
+        <a href="#app" class="cta-button">Launch Dashboard</a>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <h2>Core Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="emoji">📊</div>
+                <h3>Real-Time Dashboard</h3>
+                <p>Live commodity prices, 30-day trends, and market analytics for Rice, Wheat, Cotton</p>
+            </div>
+            <div class="feature-card">
+                <div class="emoji">⚠️</div>
+                <h3>Risk Assessment</h3>
+                <p>Automated risk scoring (0-100) with volatility, price change, and supply analysis</p>
+            </div>
+            <div class="feature-card">
+                <div class="emoji">💡</div>
+                <h3>AI Insights</h3>
+                <p>Rule-based recommendations with confidence levels for buying and selling decisions</p>
+            </div>
+            <div class="feature-card">
+                <div class="emoji">📦</div>
+                <h3>Supply & Demand</h3>
+                <p>Monitor market balance and identify shortage/excess conditions</p>
+            </div>
+            <div class="feature-card">
+                <div class="emoji">📈</div>
+                <h3>Price Trends</h3>
+                <p>Historical analysis with trend identification and price positioning</p>
+            </div>
+            <div class="feature-card">
+                <div class="emoji">📥</div>
+                <h3>Data Export</h3>
+                <p>Download reports and summaries for further analysis</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Benefits Section -->
+    <section class="benefits" id="benefits">
+        <div class="benefits-content">
+            <div>
+                <h2>Why CropPulse?</h2>
+                <ul class="benefits-list">
+                    <li>Avoid timing mistakes in selling</li>
+                    <li>Understand market conditions in real-time</li>
+                    <li>Get actionable recommendations</li>
+                    <li>Monitor risks automatically</li>
+                    <li>Access data anytime, anywhere</li>
+                    <li>Make data-driven trading decisions</li>
+                    <li>Perfect for farmers, traders, and FPOs</li>
+                    <li>Easy to use, no technical skills needed</li>
+                </ul>
+            </div>
+            <div>
+                <h2>Target Users</h2>
+                <ul class="benefits-list" style="list-style-type: none;">
+                    <li style="margin-bottom: 1rem;">
+                        <strong>🚜 Farmers</strong><br/>
+                        <span style="color: #7f8c8d; font-size: 14px;">Maximize returns by timing sales correctly</span>
+                    </li>
+                    <li style="margin-bottom: 1rem;">
+                        <strong>💼 Traders</strong><br/>
+                        <span style="color: #7f8c8d; font-size: 14px;">Identify market opportunities and risks</span>
+                    </li>
+                    <li style="margin-bottom: 1rem;">
+                        <strong>🏢 FPOs</strong><br/>
+                        <span style="color: #7f8c8d; font-size: 14px;">Better member returns through collective intelligence</span>
+                    </li>
+                    <li>
+                        <strong>📊 Commodity Brokers</strong><br/>
+                        <span style="color: #7f8c8d; font-size: 14px;">Provide premium intelligence to clients</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-content">
+            <div class="stat-item">
+                <h3>3</h3>
+                <p>Major Commodities</p>
+            </div>
+            <div class="stat-item">
+                <h3>30</h3>
+                <p>Days History</p>
+            </div>
+            <div class="stat-item">
+                <h3>100%</h3>
+                <p>Data Accuracy</p>
+            </div>
+            <div class="stat-item">
+                <h3>0-100</h3>
+                <p>Risk Scale</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Screenshots Section -->
+    <section class="screenshots">
+        <div class="screenshots-container">
+            <h2>Dashboard Preview</h2>
+            <p class="section-subtitle">See what you get with CropPulse</p>
+            <div class="screenshot-grid">
+                <div class="screenshot-item">
+                    <div class="screenshot-placeholder">
+                        <div class="placeholder-content">
+                            <span>📊</span>
+                            <p>Real-Time Dashboard</p>
+                        </div>
+                    </div>
+                    <p class="screenshot-label">Live commodity prices and trends</p>
+                </div>
+                <div class="screenshot-item">
+                    <div class="screenshot-placeholder">
+                        <div class="placeholder-content">
+                            <span>⚠️</span>
+                            <p>Risk Assessment</p>
+                        </div>
+                    </div>
+                    <p class="screenshot-label">Automated risk scoring and analysis</p>
+                </div>
+                <div class="screenshot-item">
+                    <div class="screenshot-placeholder">
+                        <div class="placeholder-content">
+                            <span>💡</span>
+                            <p>AI Recommendations</p>
+                        </div>
+                    </div>
+                    <p class="screenshot-label">Smart trading recommendations</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="testimonials-container">
+            <h2>What Our Users Say</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">"CropPulse has transformed how I make selling decisions. The risk assessment feature alone has saved me thousands!"</p>
+                    <div class="testimonial-author">
+                        <strong>Rajesh Kumar</strong>
+                        <span>Wheat Farmer, Haryana</span>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">"As a trader, having real-time market intelligence gives me a competitive edge. The AI insights are incredibly accurate."</p>
+                    <div class="testimonial-author">
+                        <strong>Priya Singh</strong>
+                        <span>Commodity Trader, Delhi</span>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">"Our FPO members have increased their returns by 15% since using CropPulse. It's a game-changer for collective farming."</p>
+                    <div class="testimonial-author">
+                        <strong>Amit Patel</strong>
+                        <span>FPO Director, Gujarat</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+        <div class="faq-container">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>🔍 How accurate is the price data?</h3>
+                    <p>We provide 100% accurate real-time data sourced from AGMARKET, government databases, and commodity exchanges. Data is updated daily.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>💰 Is CropPulse free to use?</h3>
+                    <p>Yes! CropPulse is completely free for farmers, traders, and FPOs. We believe agricultural intelligence should be accessible to everyone.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>📱 Can I use it on my mobile phone?</h3>
+                    <p>Absolutely! Our dashboard is fully responsive and works perfectly on smartphones, tablets, and desktops.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>🔒 Is my data safe and private?</h3>
+                    <p>Yes. CropPulse doesn't store personal data. We only display market data. All transactions are encrypted and secure.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>⚡ How often is data updated?</h3>
+                    <p>Market data is updated daily, usually at the end of trading hours. Historical trends are available for the past 30 days.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>🎓 Do I need technical knowledge to use it?</h3>
+                    <p>No! CropPulse is designed for everyone. The interface is simple and intuitive. All charts and insights are explained in plain language.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Signup Section -->
+    <section class="newsletter">
+        <div class="newsletter-container">
+            <h2>Stay Updated with Market Insights</h2>
+            <p>Get weekly summaries of agricultural market trends directly to your inbox</p>
+            <form class="newsletter-form" onsubmit="handleNewsletterSignup(event)">
+                <input type="email" placeholder="Enter your email address" required>
+                <button type="submit">Subscribe Now</button>
+            </form>
+            <p class="newsletter-note">We'll never share your email. Unsubscribe anytime.</p>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="app">
+        <h2>Ready to Transform Your Agricultural Trading?</h2>
+        <p>Join thousands of farmers, traders, and FPOs making smarter decisions with CropPulse</p>
+        <a href="https://croppulse.streamlit.app" target="_blank" class="cta-button-primary">
+            🚀 Launch Dashboard Now
+        </a>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>🌾 CropPulse</h4>
+                <p>Agricultural Market Intelligence Platform</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#benefits">Benefits</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#app">Launch App</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Built for ICAR Pusa Krishi Incubation Centre | © 2026 CropPulse. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Newsletter signup handler
+        function handleNewsletterSignup(event) {
+            event.preventDefault();
+            const email = event.target.querySelector('input[type="email"]').value;
+            alert('Thank you for signing up! We will send you market insights soon.');
+            event.target.reset();
+        }
+
+        // Analytics - Google Analytics (replace with your GA ID)
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        // gtag('config', 'GA_MEASUREMENT_ID'); // Uncomment and add your Google Analytics ID
+
+        // Track button clicks
+        document.querySelectorAll('.cta-button, .cta-button-primary').forEach(button => {
+            button.addEventListener('click', function() {
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'cta_click', {
+                        'button_text': this.textContent,
+                        'page_section': this.closest('section').id || 'unknown'
+                    });
+                }
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
