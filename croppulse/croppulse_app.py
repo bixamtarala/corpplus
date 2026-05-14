@@ -1087,14 +1087,14 @@ fig_price = go.Figure()
     ma_7 = commodity_data['price'].rolling(window=7, min_periods=1).mean()
     ma_14 = commodity_data['price'].rolling(window=14, min_periods=1).mean()
 
-    # Calculate volatility band (mean ± 1 std dev)
-    price_mean = commodity_data['price'].mean()
-    price_std = commodity_data['price'].std()
-    upper_band = price_mean + price_std
-    lower_band = price_mean - price_std
+# Calculate volatility band (mean ± 1 std dev)
+price_mean = commodity_data['price'].mean()
+price_std = commodity_data['price'].std()
+upper_band = price_mean + price_std
+lower_band = price_mean - price_std
 
-    # Add volatility band (light fill)
-    fig_price.add_trace(go.Scatter(
+# Add volatility band (light fill)
+fig_price.add_trace(go.Scatter(
         x=commodity_data['date'],
         y=[upper_band] * len(commodity_data['date']),
         fill=None,
@@ -1104,85 +1104,74 @@ fig_price = go.Figure()
         name='Upper Band'
     ))
 
-    fig_price.add_trace(go.Scatter(
-        x=commodity_data['date'],
-        y=[lower_band] * len(commodity_data['date']),
-        fill='tonexty',
-        mode='lines',
-        line_color='rgba(0,0,0,0)',
-        fillcolor='rgba(52, 152, 219, 0.1)',
-        name='Volatility Band (±1σ)'
-    ))
+fig_price.add_trace(go.Scatter(
+    x=commodity_data['date'],
+    y=[lower_band] * len(commodity_data['date']),
+    fill='tonexty',
+    mode='lines',
+    line_color='rgba(0,0,0,0)',
+    fillcolor='rgba(52, 152, 219, 0.1)',
+    name='Volatility Band (±1σ)'
+))
 
-    # Add main price line (on top)
-    fig_price.add_trace(go.Scatter(
-        x=commodity_data['date'],
-        y=commodity_data['price'],
-        mode='lines+markers',
-        name='Current Price',
-        line=dict(color='#2ecc71', width=3),
-        marker=dict(size=5, opacity=0.8),
-        hovertemplate='<b>%{x|%b %d}</b><br>Price: ₹%{y:,.0f}<extra></extra>'
-    ))
+# Add main price line (on top)
+fig_price.add_trace(go.Scatter(
+    x=commodity_data['date'],
+    y=commodity_data['price'],
+    mode='lines+markers',
+    name='Current Price',
+    line=dict(color='#2ecc71', width=3),
+    marker=dict(size=5, opacity=0.8),
+    hovertemplate='<b>%{x|%b %d}</b><br>Price: ₹%{y:,.0f}<extra></extra>'
+))
 
-    # Add 7-day moving average
-    fig_price.add_trace(go.Scatter(
-        x=commodity_data['date'],
-        y=ma_7,
-        mode='lines',
-        name='7-Day MA',
-        line=dict(color='#f39c12', width=2, dash='dash'),
-        hovertemplate='<b>%{x|%b %d}</b><br>7-Day MA: ₹%{y:,.0f}<extra></extra>'
-    ))
+# Add 7-day moving average
+fig_price.add_trace(go.Scatter(
+    x=commodity_data['date'],
+    y=ma_7,
+    mode='lines',
+    name='7-Day MA',
+    line=dict(color='#f39c12', width=2, dash='dash'),
+    hovertemplate='<b>%{x|%b %d}</b><br>7-Day MA: ₹%{y:,.0f}<extra></extra>'
+))
 
-    # Add 14-day moving average
-    fig_price.add_trace(go.Scatter(
-        x=commodity_data['date'],
-        y=ma_14,
-        mode='lines',
-        name='14-Day MA',
-        line=dict(color='#e74c3c', width=2, dash='dash'),
-        hovertemplate='<b>%{x|%b %d}</b><br>14-Day MA: ₹%{y:,.0f}<extra></extra>'
-    ))
+# Add 14-day moving average
+fig_price.add_trace(go.Scatter(
+    x=commodity_data['date'],
+    y=ma_14,
+    mode='lines',
+    name='14-Day MA',
+    line=dict(color='#e74c3c', width=2, dash='dash'),
+    hovertemplate='<b>%{x|%b %d}</b><br>14-Day MA: ₹%{y:,.0f}<extra></extra>'
+))
 
-    # Add 30-day average line
-    avg_price = commodity_data['price'].mean()
-    fig_price.add_hline(
-        y=avg_price, 
-        line_dash="dot", 
-        line_color="#95a5a6",
-        line_width=2,
-        annotation_text=f"30-Day Avg: ₹{avg_price:.0f}",
-        annotation_position="right",
-        annotation_font_color="#95a5a6"
-    )
+# Add 30-day average line
+avg_price = commodity_data['price'].mean()
+fig_price.add_hline(
+    y=avg_price, 
+    line_dash="dot", 
+    line_color="#95a5a6",
+    line_width=2,
+    annotation_text=f"30-Day Avg: ₹{avg_price:.0f}",
+    annotation_position="right",
+    annotation_font_color="#95a5a6"
+)
 
-    fig_price.update_layout(
-        title=f"<b>{commodity} Price Movement (30-Day History)</b>",
-        xaxis_title="Date",
-        yaxis_title="Price (₹)",
-        hovermode='x unified',
-        template='plotly_white',
-        height=450,
-        margin=dict(l=0, r=80, t=40, b=0),
-        font=dict(family="Arial, sans-serif", size=11, color="#2c3e50"),
-        legend=dict(x=0.02, y=0.98, bgcolor='rgba(255,255,255,0.8)', bordercolor='#e0e0e0', borderwidth=1)
-    )
+fig_price.update_layout(
+    title=f"<b>{commodity} Price Movement (30-Day History)</b>",
+    xaxis_title="Date",
+    yaxis_title="Price (₹)",
+    hovermode='x unified',
+    template='plotly_white',
+    height=450,
+    margin=dict(l=0, r=80, t=40, b=0),
+    font=dict(family="Arial, sans-serif", size=11, color="#2c3e50"),
+    legend=dict(x=0.02, y=0.98, bgcolor='rgba(255,255,255,0.8)', bordercolor='#e0e0e0', borderwidth=1)
+)
 
-    st.plotly_chart(fig_price, use_container_width=True)
+st.plotly_chart(fig_price, use_container_width=True)
 
-    st.markdown("---")
-
-# ============================================================================
-# RISK ASSESSMENT - DISPLAY ALWAYS AT TOP
-# ============================================================================
-
-st.markdown('<div class="section-title">⚠️ Risk Assessment & Market Conditions</div>', unsafe_allow_html=True)
-
-# Get risk components
-components = get_risk_components(commodity_data)
-risk_alerts = get_alert_messages(commodity_data, risk_score, components)
-
+st.markdown("---")
 # Display critical alerts first (Phase 3)
 if risk_alerts:
     st.markdown("**⚠️ Real-Time Alerts**")
