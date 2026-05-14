@@ -569,12 +569,25 @@ def calculate_historical_risk_scores(commodity_data):
 
 def get_risk_components(commodity_data):
     """Get detailed breakdown of risk components"""
+    # Default values for incomplete data
+    default_components = {
+        'volatility': 2.5,
+        'volatility_score': 2.5,
+        'price_change': 0,
+        'price_change_score': 0,
+        'supply': 50,
+        'supply_gap': 50,
+        'supply_gap_score': 50,
+        'demand': 50,
+        'demand_pressure': 50
+    }
+    
     if len(commodity_data) < 7:
-        return {}
+        return default_components
     
     price_mean = commodity_data['price'].mean()
     if price_mean == 0:
-        return {}
+        return default_components
     
     # Normalize volatility to percentage
     volatility_pct = (commodity_data['price'].std() / price_mean) * 100
