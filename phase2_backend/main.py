@@ -57,17 +57,9 @@ def setup_audit_logger():
     logger = logging.getLogger("croppulse_audit")
     logger.setLevel(logging.INFO)
     
-    # Console handler
+    # Console handler (always enabled)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
-    
-    # File handler for audit trail
-    file_handler = logging.handlers.RotatingFileHandler(
-        'logs/audit_trail.log',
-        maxBytes=10485760,  # 10MB
-        backupCount=10
-    )
-    file_handler.setLevel(logging.INFO)
     
     # Formatter
     formatter = logging.Formatter(
@@ -75,15 +67,30 @@ def setup_audit_logger():
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     console_handler.setFormatter(formatter)
-    file_handler.setFormatter(formatter)
     
     logger.addHandler(console_handler)
-    logger.addHandler(file_handler)
+    
+    # File handler for audit trail (only if running locally)
+    # Skip file logging on Railway (ephemeral filesystem) and Docker
+    if os.getenv("ENV") not in ["production", "railway"]:
+        try:
+            os.makedirs('logs', exist_ok=True)
+            file_handler = logging.handlers.RotatingFileHandler(
+                'logs/audit_trail.log',
+                maxBytes=10485760,  # 10MB
+                backupCount=10
+            )
+            file_handler.setLevel(logging.INFO)
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+        except (PermissionError, OSError):
+            # If file logging fails, continue with console-only logging
+            console_handler.setLevel(logging.WARNING)
+            logger.warning("Could not set up file logging, using console only")
     
     return logger
 
-# Create logs directory if it doesn't exist
-os.makedirs('logs', exist_ok=True)
+# Initialize audit logger
 audit_logger = setup_audit_logger()
 
 
