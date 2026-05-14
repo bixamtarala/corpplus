@@ -987,9 +987,9 @@ with st.sidebar:
     st.markdown("""
     <div style='padding: 20px 0; border-bottom: 1px solid #e0e0e0; margin-bottom: 20px;'>
         <h3 style='margin: 0 0 12px 0; color: #2c3e50;'>👤 User Profile</h3>
-        <p style='margin: 8px 0; color: #2c3e50; font-weight: 600;'>Ramesh Kumar</p>
+        <p style='margin: 8px 0; color: #2c3e50; font-weight: 600;'>Bixam Tarala</p>
         <p style='margin: 4px 0; color: #7f8c8d; font-size: 12px;'>Rice Trader</p>
-        <p style='margin: 8px 0; color: #95a5a6; font-size: 11px;'>📍 Tamil Nadu</p>
+        <p style='margin: 8px 0; color: #95a5a6; font-size: 11px;'>📍 Telangana</p>
     </div>
     """, unsafe_allow_html=True)
     
