@@ -39,6 +39,8 @@ class eNAMAPI:
     def __init__(self, api_key=None):
         self.api_key = api_key or ENAM_API_KEY
         self.base_url = ENAM_API_BASE
+        if requests is None:
+            raise ImportError("requests module is required. Install with: pip install requests")
         self.session = requests.Session()
         self.session.headers.update({
             "Authorization": f"Bearer {self.api_key}",
