@@ -1109,13 +1109,6 @@ if view_mode == "🏠 Home":
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, #f3e5f5 0%, #fce4ec 100%); padding: 20px; border-radius: 10px; margin-top: 30px; text-align: center; font-size: 14px; color: #666;">
-        <p>🚀 <strong>Phase 2 Ready:</strong> Marketplace, Farmer OS, and Financial Infrastructure coming soon</p>
-        <p style="margin-top: 10px;">Part of the CropPulse Agricultural OS Vision</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
     st.stop()  # Stop here, don't load data for landing page
 
 # Filter data for selected commodity
