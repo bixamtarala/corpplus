@@ -1216,7 +1216,7 @@ fig_price.update_layout(
     legend=dict(x=0.02, y=0.98, bgcolor='rgba(255,255,255,0.8)', bordercolor='#e0e0e0', borderwidth=1)
 )
 
-st.plotly_chart(fig_price, use_container_width=True)
+st.plotly_chart(fig_price, width='stretch')
 
 st.markdown("---")
 # Display critical alerts first (Phase 3)
@@ -1315,7 +1315,7 @@ fig_risk_trend.update_layout(
     font=dict(family="Arial, sans-serif", size=10, color="#2c3e50")
 )
 
-st.plotly_chart(fig_risk_trend, use_container_width=True)
+st.plotly_chart(fig_risk_trend, width='stretch')
 
 st.markdown("---")
 
@@ -1396,7 +1396,7 @@ if view_mode == "📊 Dashboard":
             yaxis_title="Level (0-100)",
             font=dict(family="Arial, sans-serif", size=10, color="#2c3e50")
         )
-        st.plotly_chart(fig_balance, use_container_width=True)
+        st.plotly_chart(fig_balance, width='stretch')
 
     with col_sd3:
         fig_supply = go.Figure()
@@ -1430,7 +1430,7 @@ if view_mode == "📊 Dashboard":
             hovermode='x unified',
             font=dict(family="Arial, sans-serif", size=10, color="#2c3e50")
         )
-        st.plotly_chart(fig_supply, use_container_width=True)
+        st.plotly_chart(fig_supply, width='stretch')
 
     st.markdown("---")
 
@@ -1546,7 +1546,7 @@ if len(commodity_data) >= 5:
         font=dict(family="Arial, sans-serif", size=10, color="#2c3e50")
     )
     
-    st.plotly_chart(fig_forecast, use_container_width=True)
+    st.plotly_chart(fig_forecast, width='stretch')
     
     # Forecast summary
     forecast_col1, forecast_col2, forecast_col3 = st.columns(3, gap="medium")
@@ -1671,7 +1671,7 @@ with log_col4:
     trade_mandi = st.selectbox("Mandi", ["Tamil Nadu", "Telangana", "Andhra Pradesh"], label_visibility="collapsed")
 
 with log_col5:
-    if st.button("📊 Log Trade", use_container_width=True):
+    if st.button("📊 Log Trade", width='stretch'):
         st.success(f"✅ {trade_type} logged: {trade_qty} qt @ ₹{trade_price}/qt ({trade_mandi})")
 
 st.markdown("---")
@@ -1745,7 +1745,7 @@ with alert_col3:
     alert_method = st.selectbox("Notify Via", ["📱 WhatsApp", "📧 Email", "🔔 In-App"], label_visibility="collapsed")
 
 with alert_col4:
-    if st.button("✅ Set Alerts", use_container_width=True):
+    if st.button("✅ Set Alerts", width='stretch'):
         st.success(f"🎯 Alerts set! Buy: ₹{alert_buy}, Sell: ₹{alert_sell} via {alert_method}")
 
 # Alert status
