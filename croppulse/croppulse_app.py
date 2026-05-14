@@ -382,7 +382,7 @@ def load_data_from_api():
             df = pd.DataFrame([data]) if isinstance(data, dict) else pd.DataFrame(data)
             
             # Ensure required columns exist
-            required_cols = ['commodity', 'date', 'price', 'supply', 'demand']
+            required_cols = ['commodity', 'date', 'price', 'supply', 'demand', 'volatility']
             for col in required_cols:
                 if col not in df.columns:
                     if col == 'commodity':
@@ -393,6 +393,8 @@ def load_data_from_api():
                         df[col] = 0
                     elif col in ['supply', 'demand']:
                         df[col] = 50
+                    elif col == 'volatility':
+                        df[col] = 2.5  # Default volatility value
             
             return df
         else:
@@ -417,11 +419,35 @@ def load_data():
         if df is None:
             return None
         
-        required_cols = ['commodity', 'date', 'price', 'supply', 'demand']
+        required_cols = ['commodity', 'date', 'price', 'supply', 'demand', 'volatility']
         missing_cols = [col for col in required_cols if col not in df.columns]
         
         if missing_cols:
+            # Try to calculate volatility if it's the only missing column
+            if missing_cols == ['volatility'] and 'price' in df.columns:
+                try:
+                    price_mean = df['price'].mean()
+                    if price_mean != 0:
+                        volatility_pct = (df['price'].std() / price_mean) * 100
+                        df['volatility'] = volatility_pct
+                    else:
+                        df['volatility'] = 2.5
+                except Exception:
+                    df['volatility'] = 2.5
+                return df
             return None  # Invalid data
+        
+        # Ensure volatility is calculated for all rows if not present
+        if df['volatility'].isna().any():
+            try:
+                price_mean = df['price'].mean()
+                if price_mean != 0:
+                    volatility_pct = (df['price'].std() / price_mean) * 100
+                    df.loc[df['volatility'].isna(), 'volatility'] = volatility_pct
+                else:
+                    df.loc[df['volatility'].isna(), 'volatility'] = 2.5
+            except Exception:
+                df.loc[df['volatility'].isna(), 'volatility'] = 2.5
         
         return df
     
