@@ -1005,6 +1005,29 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ============================================================================
+# TOP CONTROLS - View Mode Selector (FIRST - Most Important)
+# ============================================================================
+
+view_option = st.radio(
+    "View",
+    ["🏠 Home", "📊 Dashboard", "⚠️ Risk", "💡 Insights"],
+    horizontal=True,
+    label_visibility="collapsed",
+    key="view_selector"
+)
+
+# Normalize view_mode
+view_mode_map = {
+    "🏠 Home": "🏠 Home",
+    "📊 Dashboard": "📊 Dashboard",
+    "⚠️ Risk": "⚠️ Risk Analysis",
+    "💡 Insights": "💡 Insights Only"
+}
+view_mode = view_mode_map.get(view_option, "📊 Dashboard")
+
+st.markdown("---")
+
+# ============================================================================
 # MVP FEATURES - TOP SECTION
 # ============================================================================
 
@@ -1012,38 +1035,18 @@ st.markdown("""
 data = load_data()
 
 # ============================================================================
-# TOP CONTROLS - Commodity & View Mode Selector
+# COMMODITY SELECTOR (Secondary Control)
 # ============================================================================
 
-st.markdown("""
-<div style='background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%); padding: 20px; border-radius: 12px; margin-bottom: 24px; border-left: 5px solid #2ecc71; box-shadow: 0 2px 8px rgba(0,0,0,0.08);'>
-</div>
-""", unsafe_allow_html=True)
+col_comm, col_space = st.columns([1.2, 2], gap="medium")
 
-col_control1, col_control2 = st.columns([1.2, 2], gap="medium")
-
-with col_control1:
+with col_comm:
     commodity = st.selectbox(
         "📦 Commodity",
         options=["Rice", "Wheat", "Cotton"],
-        index=0
+        index=0,
+        key="commodity_selector"
     )
-
-with col_control2:
-    view_option = st.radio(
-        "View",
-        ["🏠 Home", "📊 Dashboard", "⚠️ Risk", "💡 Insights"],
-        horizontal=True,
-        label_visibility="collapsed"
-    )
-    # Normalize view_mode
-    view_mode_map = {
-        "🏠 Home": "🏠 Home",
-        "📊 Dashboard": "📊 Dashboard",
-        "⚠️ Risk": "⚠️ Risk Analysis",
-        "💡 Insights": "💡 Insights Only"
-    }
-    view_mode = view_mode_map.get(view_option, "📊 Dashboard")
 
 st.markdown("---")
 
