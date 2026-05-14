@@ -998,7 +998,7 @@ trend_text = "Increasing" if risk_trend == "increasing" else "Decreasing" if ris
 
 # Get risk components and alerts for use throughout the page
 components = get_risk_components(commodity_data)
-risk_alerts = get_alert_messages(commodity_data, risk_score, components)
+risk_alerts = get_alert_messages(commodity_data, risk_score, components) or []  # Ensure list
 
 # ============================================================================
 # CORE MVP FEATURES
