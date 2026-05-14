@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend
+  api:
+    build: .
+    container_name: croppulse-api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=development
+      - DEBUG=true
+      - DATABASE_URL=postgresql://croppulse_user:croppulse_password@postgres:5432/croppulse_db
+      - REDIS_URL=redis://redis:6379/0
+      - API_KEY_ADMIN=croppulse_admin_secret_key_12345
+      - API_KEY_FARMER=croppulse_farmer_secret_key_12345
+      - API_KEY_TRADER=croppulse_trader_secret_key_12345
+      - JWT_SECRET=your_jwt_secret_change_in_production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+      - ./phase2_backend:/app/phase2_backend
+    networks:
+      - croppulse_network
+    command: uvicorn phase2_backend.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: croppulse-postgres
+    environment:
+      POSTGRES_USER: croppulse_user
+      POSTGRES_PASSWORD: croppulse_password
+      POSTGRES_DB: croppulse_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U croppulse_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - croppulse_network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: croppulse-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis_data:/data
+    networks:
+      - croppulse_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  croppulse_network:
+    driver: bridge
