@@ -381,6 +381,7 @@ def load_data_from_api():
         
         if response.status_code == 200:
             data = response.json()
+            st.sidebar.success("✅ Live data from CropPulse Backend API!", icon="✅")
             
             # Convert to DataFrame format for compatibility
             df = pd.DataFrame([data]) if isinstance(data, dict) else pd.DataFrame(data)
@@ -467,15 +468,15 @@ def load_data():
     # Fallback: Try eNAM API
     if ENAM_AVAILABLE:
         try:
-            st.info("🔄 Trying eNAM API fallback...", icon="ℹ️")
+            st.sidebar.info("🔄 Trying eNAM API fallback...", icon="ℹ️")
             df_rice = fetch_live_data(commodity="Rice", state="TN")
             df_rice = validate_dataframe(df_rice)
             
             if df_rice is not None and len(df_rice) > 0:
-                st.info("📊 Using eNAM API data (fallback)", icon="ℹ️")
+                st.sidebar.info("📊 Using eNAM API data (fallback)", icon="ℹ️")
                 return df_rice
         except Exception as e:
-            st.warning(f"⚠️ eNAM API error: {str(e)[:50]}", icon="⚠️")
+            st.sidebar.warning(f"⚠️ eNAM API error: {str(e)[:50]}", icon="⚠️")
     
     # Final Fallback: Load from CSV
     try:
@@ -487,7 +488,7 @@ def load_data():
             df['date'] = pd.to_datetime(df['date'])
             df = validate_dataframe(df)
             if df is not None:
-                st.info("📊 Using demo data (CSV fallback)", icon="ℹ️")
+                st.sidebar.info("📊 Using demo data (CSV fallback)", icon="ℹ️")
                 return df
         
         raise FileNotFoundError(f"CSV not found at {csv_path}")
