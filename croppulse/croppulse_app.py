@@ -363,15 +363,20 @@ def create_responsive_metric_cards(metrics: dict, columns: int = 4):
 def load_data_from_api():
     """
     Load commodity price data from CropPulse Backend API (Railway)
+    Ensures HTTPS for secure connections
     """
     try:
         headers = {"X-API-Key": API_KEY}
         
-        # Fetch latest commodity prices
+        # Ensure BACKEND_API_URL uses HTTPS (convert http:// to https://)
+        secure_url = BACKEND_API_URL.replace("http://", "https://", 1)
+        
+        # Fetch latest commodity prices with SSL verification
         response = requests.get(
-            f"{BACKEND_API_URL}/api/v1/prices/latest?commodity=rice",
+            f"{secure_url}/api/v1/prices/latest?commodity=rice",
             headers=headers,
-            timeout=10
+            timeout=10,
+            verify=True  # Enable SSL certificate verification for secure connections
         )
         
         if response.status_code == 200:
@@ -403,6 +408,9 @@ def load_data_from_api():
             
     except requests.exceptions.Timeout:
         st.error("❌ API timeout - Backend may be down")
+        return None
+    except requests.exceptions.SSLError:
+        st.warning("⚠️ SSL certificate issue - falling back to demo data")
         return None
     except Exception as e:
         st.error(f"❌ API Error: {str(e)}")
