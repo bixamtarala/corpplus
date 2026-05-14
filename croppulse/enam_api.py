@@ -3,8 +3,18 @@ eNAM API Integration for CropPulse
 Fetches real-time commodity prices from National Agricultural Market (eNAM)
 """
 
-import requests
-import pandas as pd
+try:
+    import requests
+except ImportError:
+    requests = None
+    print("⚠️ Warning: 'requests' module not installed. Install with: pip install requests")
+
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
+    print("⚠️ Warning: 'pandas' module not installed. Install with: pip install pandas")
+
 from datetime import datetime, timedelta
 import json
 
@@ -173,6 +183,10 @@ def fetch_live_data(commodity="Rice", state="TN", use_cache=True):
     Returns:
         DataFrame: Price history with commodity data
     """
+    if pd is None:
+        print("⚠️ pandas module required for this function")
+        return None
+    
     enam = eNAMAPI()
     
     # Try to fetch from eNAM

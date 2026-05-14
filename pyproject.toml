@@ -12,7 +12,8 @@ dependencies = [
     "streamlit>=1.28.1",
     "pandas>=2.1.0",
     "plotly>=5.17.0",
-    "numpy>=1.26.0"
+  "numpy>=1.26.0",
+  "requests>=2.31.0"
 ]
 
 [tool.pylint]
