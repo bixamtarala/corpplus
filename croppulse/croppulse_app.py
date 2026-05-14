@@ -379,7 +379,21 @@ def load_data_from_api():
             st.success("✅ Live data from CropPulse Backend API!", icon="✅")
             
             # Convert to DataFrame format for compatibility
-            df = pd.DataFrame([data])
+            df = pd.DataFrame([data]) if isinstance(data, dict) else pd.DataFrame(data)
+            
+            # Ensure required columns exist
+            required_cols = ['commodity', 'date', 'price', 'supply', 'demand']
+            for col in required_cols:
+                if col not in df.columns:
+                    if col == 'commodity':
+                        df[col] = 'Rice'
+                    elif col == 'date':
+                        df[col] = datetime.now()
+                    elif col == 'price':
+                        df[col] = 0
+                    elif col in ['supply', 'demand']:
+                        df[col] = 50
+            
             return df
         else:
             st.error(f"❌ API Error: {response.status_code}")
@@ -398,8 +412,22 @@ def load_data():
     """
     Load commodity price data - tries CropPulse API first, then fallback
     """
+    def validate_dataframe(df):
+        """Ensure DataFrame has all required columns"""
+        if df is None:
+            return None
+        
+        required_cols = ['commodity', 'date', 'price', 'supply', 'demand']
+        missing_cols = [col for col in required_cols if col not in df.columns]
+        
+        if missing_cols:
+            return None  # Invalid data
+        
+        return df
+    
     # Try CropPulse Backend API first (live data from Railway)
     df_api = load_data_from_api()
+    df_api = validate_dataframe(df_api)
     if df_api is not None and len(df_api) > 0:
         return df_api
     
@@ -408,6 +436,7 @@ def load_data():
         try:
             st.info("🔄 Trying eNAM API fallback...", icon="ℹ️")
             df_rice = fetch_live_data(commodity="Rice", state="TN")
+            df_rice = validate_dataframe(df_rice)
             
             if df_rice is not None and len(df_rice) > 0:
                 st.info("📊 Using eNAM API data (fallback)", icon="ℹ️")
@@ -423,10 +452,12 @@ def load_data():
         if os.path.exists(csv_path):
             df = pd.read_csv(csv_path)
             df['date'] = pd.to_datetime(df['date'])
-            st.info("📊 Using demo data (CSV fallback)", icon="ℹ️")
-            return df
-        else:
-            raise FileNotFoundError(f"CSV not found at {csv_path}")
+            df = validate_dataframe(df)
+            if df is not None:
+                st.info("📊 Using demo data (CSV fallback)", icon="ℹ️")
+                return df
+        
+        raise FileNotFoundError(f"CSV not found at {csv_path}")
     except Exception as e:
         st.error(f"❌ Unable to load data: {e}")
         st.stop()
