@@ -17,7 +17,7 @@ croppulse_dir = project_root / "croppulse"
 sys.path.insert(0, str(croppulse_dir))
 sys.path.insert(0, str(project_root))
 
-# Now we can import from croppulse_app
-# This will run the entire Streamlit application
-import croppulse_app  # noqa: F401
+# Now we can import from croppulse_app_refactored
+# This will run the entire Streamlit application with 9-module architecture
+import croppulse_app_refactored  # noqa: F401
 
