@@ -1032,12 +1032,13 @@ with col_control1:
 with col_control2:
     view_option = st.radio(
         "View",
-        ["📊 Dashboard", "⚠️ Risk", "💡 Insights"],
+        ["🏠 Home", "📊 Dashboard", "⚠️ Risk", "💡 Insights"],
         horizontal=True,
         label_visibility="collapsed"
     )
     # Normalize view_mode
     view_mode_map = {
+        "🏠 Home": "🏠 Home",
         "📊 Dashboard": "📊 Dashboard",
         "⚠️ Risk": "⚠️ Risk Analysis",
         "💡 Insights": "💡 Insights Only"
@@ -1046,7 +1047,84 @@ with col_control2:
 
 st.markdown("---")
 
+# ============================================================================
+# LANDING PAGE - Home View
+# ============================================================================
+if view_mode == "🏠 Home":
+    st.markdown("""
+    <div style="text-align: center; padding: 40px 20px;">
+        <h1 style="color: #2ecc71; font-size: 48px; margin-bottom: 10px;">🌾 CropPulse</h1>
+        <h2 style="color: #2c3e50; font-size: 28px; margin-bottom: 30px;">Agricultural Market Intelligence OS</h2>
+        <p style="color: #555; font-size: 18px; margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto;">
+            Real-time trading signals, price insights & risk analysis for agricultural commodities.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns(3, gap="medium")
+    
+    with col1:
+        st.markdown("""
+        <div class="metric-card">
+            <h3>📊 Live Market Data</h3>
+            <p>Real-time commodity prices from CropPulse Backend API with 24/7 monitoring</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div class="metric-card">
+            <h3>⚠️ Risk Analysis</h3>
+            <p>Advanced risk scoring with volatility tracking and supply-demand monitoring</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown("""
+        <div class="metric-card">
+            <h3>💡 Smart Insights</h3>
+            <p>Actionable insights and trading recommendations based on market patterns</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%); padding: 30px; border-radius: 10px; margin: 30px 0;">
+        <h3 style="color: #2c3e50;">🎯 Key Features</h3>
+        <ul style="font-size: 16px; line-height: 2;">
+            <li><strong>Commodity Tracking:</strong> Monitor Rice, Wheat, Cotton prices in real-time</li>
+            <li><strong>Price Alerts:</strong> Get notified via WhatsApp, Email, or In-App when prices hit your targets</li>
+            <li><strong>Risk Scoring:</strong> Understand market volatility and supply-demand dynamics</li>
+            <li><strong>Trade Logging:</strong> Record and analyze your trading activities</li>
+            <li><strong>Market Insights:</strong> Get AI-powered recommendations based on market trends</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%); padding: 30px; border-radius: 10px; margin: 30px 0; text-align: center;">
+        <h3 style="color: #1b5e20;">✅ Getting Started</h3>
+        <p style="font-size: 16px; margin: 15px 0;">
+            👉 Select a commodity and switch to <strong>Dashboard</strong> view to see live market data
+        </p>
+        <p style="font-size: 14px; color: #666;">
+            Currently supporting: Rice, Wheat, Cotton
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #f3e5f5 0%, #fce4ec 100%); padding: 20px; border-radius: 10px; margin-top: 30px; text-align: center; font-size: 14px; color: #666;">
+        <p>🚀 <strong>Phase 2 Ready:</strong> Marketplace, Farmer OS, and Financial Infrastructure coming soon</p>
+        <p style="margin-top: 10px;">Part of the CropPulse Agricultural OS Vision</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.stop()  # Stop here, don't load data for landing page
+
 # Filter data for selected commodity
+
 commodity_data = data[data['commodity'] == commodity].sort_values('date').tail(30).reset_index(drop=True)
 
 if len(commodity_data) == 0:
