@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import os
+import requests
 
 import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
@@ -7,13 +8,26 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st  # type: ignore
 
-# Import eNAM API integration
+# ============================================================================
+# API Configuration
+# ============================================================================
+
+# Railway FastAPI Backend URL
+BACKEND_API_URL = os.getenv(
+    "BACKEND_API_URL", 
+    "https://web-production-7295a.up.railway.app"
+)
+
+# API Key for authentication
+API_KEY = os.getenv("API_KEY", "croppulse_admin_secret_key_12345")
+
+# Import eNAM API integration (optional fallback)
 try:
     from enam_api import fetch_live_data, get_multimandi_prices
     ENAM_AVAILABLE = True
 except ImportError:
     ENAM_AVAILABLE = False
-    print("⚠️ eNAM API module not found - using fallback data")
+    st.warning("⚠️ eNAM API module not found - using CropPulse backend API instead")
 
 # Page configuration
 st.set_page_config(
@@ -345,26 +359,63 @@ def create_responsive_metric_cards(metrics: dict, columns: int = 4):
 # DATA LOADING & CACHING
 # ============================================================================
 
+@st.cache_data(ttl=300)  # Refresh every 5 minutes (faster than CSV)
+def load_data_from_api():
+    """
+    Load commodity price data from CropPulse Backend API (Railway)
+    """
+    try:
+        headers = {"X-API-Key": API_KEY}
+        
+        # Fetch latest commodity prices
+        response = requests.get(
+            f"{BACKEND_API_URL}/api/v1/prices/latest?commodity=rice",
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            st.success("✅ Live data from CropPulse Backend API!", icon="✓")
+            
+            # Convert to DataFrame format for compatibility
+            df = pd.DataFrame([data])
+            return df
+        else:
+            st.error(f"❌ API Error: {response.status_code}")
+            return None
+            
+    except requests.exceptions.Timeout:
+        st.error("❌ API timeout - Backend may be down")
+        return None
+    except Exception as e:
+        st.error(f"❌ API Error: {str(e)}")
+        return None
+
+
 @st.cache_data(ttl=3600)  # Refresh every hour
 def load_data():
     """
-    Load commodity price data - tries eNAM API first, falls back to CSV
+    Load commodity price data - tries CropPulse API first, then fallback
     """
-    # Try eNAM API first (live data)
+    # Try CropPulse Backend API first (live data from Railway)
+    df_api = load_data_from_api()
+    if df_api is not None and len(df_api) > 0:
+        return df_api
+    
+    # Fallback: Try eNAM API
     if ENAM_AVAILABLE:
         try:
-            st.info("🔄 Fetching live data from eNAM API...", icon="ℹ️")
-            
-            # Fetch for Rice (most important for Phase 1)
+            st.info("🔄 Trying eNAM API fallback...", icon="ℹ️")
             df_rice = fetch_live_data(commodity="Rice", state="TN")
             
             if df_rice is not None and len(df_rice) > 0:
-                st.success("✅ Live eNAM data loaded!", icon="✓")
+                st.info("📊 Using eNAM API data (fallback)", icon="ℹ️")
                 return df_rice
         except Exception as e:
-            st.warning(f"⚠️ eNAM API error: {str(e)[:50]}... Using cached data", icon="⚠️")
+            st.warning(f"⚠️ eNAM API error: {str(e)[:50]}", icon="⚠️")
     
-    # Fallback: Load from CSV
+    # Final Fallback: Load from CSV
     try:
         script_dir = os.path.dirname(os.path.abspath(__file__))
         csv_path = os.path.join(script_dir, 'data', 'commodity_prices.csv')
