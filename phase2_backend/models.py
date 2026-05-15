@@ -1,53 +1,381 @@
 """
-CropPulse Phase 2 Database Models
-SQLAlchemy ORM models for PostgreSQL
+CropPulse Phase 2 - SQLAlchemy Database Models
+Complete schema: Users, Profiles, Crops, Listings, Offers, Deals, Transactions, Prices, Schemes
 """
 
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Enum, Text
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, Enum, ForeignKey, Text, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
+import uuid
 
 Base = declarative_base()
 
+# ============================================================================
+# ENUMS
+# ============================================================================
 
-class UserType(enum.Enum):
-    """User type enumeration"""
+class UserRole(str, enum.Enum):
     FARMER = "farmer"
     TRADER = "trader"
-    GOVERNMENT = "government"
+    FPO = "fpo"
+    ADMIN = "admin"
 
+class KYCStatus(str, enum.Enum):
+    PENDING = "pending"
+    VERIFIED = "verified"
+    REJECTED = "rejected"
 
-class OrderStatus(enum.Enum):
-    """Order status enumeration"""
-    OPEN = "open"
-    MATCHED = "matched"
+class CropStatus(str, enum.Enum):
+    GROWING = "growing"
+    HARVESTED = "harvested"
+    SOLD = "sold"
+
+class ListingStatus(str, enum.Enum):
+    ACTIVE = "active"
+    SOLD = "sold"
+    EXPIRED = "expired"
+
+class OfferStatus(str, enum.Enum):
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    EXPIRED = "expired"
+
+class DealStatus(str, enum.Enum):
+    ACTIVE = "active"
+    PAYMENT_PENDING = "payment_pending"
+    PAYMENT_COMPLETED = "payment_completed"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
 
-
-class SignalType(enum.Enum):
-    """Trading signal type"""
-    BUY = "buy"
-    SELL = "sell"
-
-
 # ============================================================================
-# USERS & AUTHENTICATION
+# CORE TABLES
 # ============================================================================
 
 class User(Base):
-    """User profile table"""
+    """User account (Farmer, Trader, FPO)"""
     __tablename__ = "users"
     
-    id = Column(Integer, primary_key=True, index=True)
-    phone = Column(String(15), unique=True, index=True, nullable=False)  # Primary ID
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    phone = Column(String(20), unique=True, nullable=False, index=True)
+    role = Column(Enum(UserRole), nullable=False, default=UserRole.FARMER)
+    
+    # Auth
+    password_hash = Column(String(255), nullable=True)
+    is_active = Column(Boolean, default=True)
+    last_login = Column(DateTime, nullable=True)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    farmer_profile = relationship("FarmerProfile", back_populates="user", uselist=False)
+    trader_profile = relationship("TraderProfile", back_populates="user", uselist=False)
+    crops = relationship("Crop", back_populates="user", cascade="all, delete-orphan")
+    listings = relationship("Listing", back_populates="user", cascade="all, delete-orphan")
+    offers_made = relationship("Offer", foreign_keys="Offer.trader_id", back_populates="trader")
+    deals_as_farmer = relationship("Deal", foreign_keys="Deal.farmer_id", back_populates="farmer")
+    deals_as_trader = relationship("Deal", foreign_keys="Deal.trader_id", back_populates="trader")
+    transactions = relationship("Transaction", back_populates="user")
+
+
+class FarmerProfile(Base):
+    """Farmer-specific profile information"""
+    __tablename__ = "farmer_profiles"
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String(36), ForeignKey("users.id"), unique=True, nullable=False)
+    
+    # Personal Info
     name = Column(String(100), nullable=False)
-    user_type = Column(String(20), nullable=False)  # farmer, trader, government
+    age = Column(Integer, nullable=True)
     
     # Location
-    state = Column(String(50), nullable=False)
+    state = Column(String(50), nullable=False, index=True)
+    district = Column(String(50), nullable=False)
+    village = Column(String(100), nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+    
+    # Farm Details
+    land_size_acres = Column(Float, nullable=False)
+    soil_type = Column(String(50))
+    irrigation_type = Column(String(50))
+    
+    # Banking
+    bank_account = Column(String(20), nullable=True)
+    bank_ifsc = Column(String(15), nullable=True)
+    
+    # KYC
+    kyc_status = Column(Enum(KYCStatus), default=KYCStatus.PENDING)
+    kyc_document_url = Column(String(255), nullable=True)
+    
+    # Reputation
+    total_deals = Column(Integer, default=0)
+    successful_deals = Column(Integer, default=0)
+    rating = Column(Float, default=0.0)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User", back_populates="farmer_profile")
+
+
+class TraderProfile(Base):
+    """Trader-specific profile information"""
+    __tablename__ = "trader_profiles"
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String(36), ForeignKey("users.id"), unique=True, nullable=False)
+    
+    # Business Details
+    business_name = Column(String(100), nullable=False)
+    location = Column(String(255), nullable=False)
+    
+    # License & Registration
+    business_license = Column(String(50), nullable=True)
+    gstin = Column(String(15), nullable=True)
+    
+    # Reputation
+    total_deals = Column(Integer, default=0)
+    successful_deals = Column(Integer, default=0)
+    rating = Column(Float, default=0.0)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User", back_populates="trader_profile")
+
+
+class Crop(Base):
+    """Farmer's crop records"""
+    __tablename__ = "crops"
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    
+    # Crop Details
+    name = Column(String(50), nullable=False, index=True)
+    variety = Column(String(50), nullable=False)
+    area_acres = Column(Float, nullable=False)
+    
+    # Dates
+    sowing_date = Column(DateTime, nullable=False)
+    expected_harvest_date = Column(DateTime, nullable=False)
+    actual_harvest_date = Column(DateTime, nullable=True)
+    
+    # Farming Details
+    irrigation_type = Column(String(50))
+    fertilizer_used = Column(String(255), nullable=True)
+    pesticide_used = Column(String(255), nullable=True)
+    
+    # Status
+    status = Column(Enum(CropStatus), default=CropStatus.GROWING, index=True)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User", back_populates="crops")
+    listings = relationship("Listing", back_populates="crop")
+
+
+class Listing(Base):
+    """Crop listing for sale (Marketplace)"""
+    __tablename__ = "listings"
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    crop_id = Column(String(36), ForeignKey("crops.id"), nullable=False)
+    
+    # Listing Details
+    quantity_kg = Column(Float, nullable=False)
+    quality_grade = Column(String(20), nullable=False)
+    price_per_kg = Column(Float, nullable=False)
+    description = Column(Text, nullable=True)
+    
+    # Availability
+    available_date = Column(DateTime, nullable=False)
+    available_until_date = Column(DateTime, nullable=True)
+    
+    # Status & Tracking
+    status = Column(Enum(ListingStatus), default=ListingStatus.ACTIVE, index=True)
+    views = Column(Integer, default=0)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User", back_populates="listings")
+    crop = relationship("Crop", back_populates="listings")
+    offers = relationship("Offer", back_populates="listing", cascade="all, delete-orphan")
+
+
+class Offer(Base):
+    """Trader's offer on listing"""
+    __tablename__ = "offers"
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    listing_id = Column(String(36), ForeignKey("listings.id"), nullable=False, index=True)
+    trader_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    
+    # Offer Details
+    offered_price_per_kg = Column(Float, nullable=False)
+    quantity_kg = Column(Float, nullable=False)
+    pickup_location = Column(String(255), nullable=False)
+    message = Column(Text, nullable=True)
+    
+    # Status
+    status = Column(Enum(OfferStatus), default=OfferStatus.PENDING, index=True)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    accepted_at = Column(DateTime, nullable=True)
+    
+    # Relationships
+    listing = relationship("Listing", back_populates="offers")
+    trader = relationship("User", foreign_keys=[trader_id], back_populates="offers_made")
+
+
+class Deal(Base):
+    """Completed deal (Offer Accepted)"""
+    __tablename__ = "deals"
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    listing_id = Column(String(36), ForeignKey("listings.id"), nullable=False)
+    farmer_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    trader_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    
+    # Deal Details
+    quantity_kg = Column(Float, nullable=False)
+    price_per_kg = Column(Float, nullable=False)
+    total_amount = Column(Float, nullable=False)
+    
+    # Status
+    status = Column(Enum(DealStatus), default=DealStatus.ACTIVE, index=True)
+    
+    # Payment
+    payment_id = Column(String(100), nullable=True)
+    payment_method = Column(String(50), nullable=True)
+    payment_status = Column(String(50), default="pending")
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    payment_completed_at = Column(DateTime, nullable=True)
+    delivery_completed_at = Column(DateTime, nullable=True)
+    
+    # Relationships
+    farmer = relationship("User", foreign_keys=[farmer_id], back_populates="deals_as_farmer")
+    trader = relationship("User", foreign_keys=[trader_id], back_populates="deals_as_trader")
+
+
+class Transaction(Base):
+    """Payment transaction record"""
+    __tablename__ = "transactions"
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    deal_id = Column(String(36), ForeignKey("deals.id"), nullable=True)
+    
+    # Transaction Details
+    amount = Column(Float, nullable=False)
+    type = Column(String(20), nullable=False)
+    status = Column(String(50), default="pending")
+    
+    # External References
+    payment_gateway_id = Column(String(100), nullable=True)
+    reference_number = Column(String(100), nullable=True)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    completed_at = Column(DateTime, nullable=True)
+    
+    # Relationships
+    user = relationship("User", back_populates="transactions")
+
+
+class MarketPrice(Base):
+    """Live market prices (from eNAM API)"""
+    __tablename__ = "market_prices"
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    
+    # Crop & Location
+    crop_name = Column(String(50), nullable=False, index=True)
+    mandi_name = Column(String(100), nullable=False, index=True)
+    state = Column(String(50), nullable=False, index=True)
+    
+    # Price Data
+    price_per_kg = Column(Float, nullable=False)
+    min_price = Column(Float, nullable=True)
+    max_price = Column(Float, nullable=True)
+    volume_traded_kg = Column(Float, nullable=True)
+    
+    # Timestamp
+    recorded_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+
+class GovernmentScheme(Base):
+    """Government schemes database"""
+    __tablename__ = "government_schemes"
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    
+    # Scheme Details
+    name = Column(String(255), nullable=False, index=True)
+    description = Column(Text, nullable=False)
+    ministry = Column(String(100), nullable=False)
+    
+    # Eligibility
+    target_states = Column(JSON)
+    crop_types = Column(JSON)
+    farmer_size_min_acres = Column(Float, nullable=True)
+    farmer_size_max_acres = Column(Float, nullable=True)
+    
+    # Benefits
+    subsidy_amount = Column(Float, nullable=True)
+    loan_amount = Column(Float, nullable=True)
+    other_benefits = Column(Text, nullable=True)
+    
+    # Application
+    application_deadline = Column(DateTime, nullable=True)
+    application_url = Column(String(500), nullable=True)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class AlertLog(Base):
+    """Alert sent to users"""
+    __tablename__ = "alert_logs"
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    
+    # Alert Details
+    type = Column(String(50), nullable=False)
+    title = Column(String(255), nullable=False)
+    message = Column(Text, nullable=False)
+    
+    # Delivery
+    sent_via = Column(String(50))
+    status = Column(String(50), default="sent")
+    
+    # Timestamp
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    delivered_at = Column(DateTime, nullable=True)
     district = Column(String(50))
     village = Column(String(100), nullable=False)
     
