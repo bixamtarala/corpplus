@@ -5,7 +5,8 @@ Complete API for Farmer Dashboard + Marketplace + AI Intelligence
 
 from fastapi import FastAPI, HTTPException, Depends, Header, Request, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, EmailStr, validator, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timedelta
@@ -279,6 +280,24 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ============================================================================
+# STATIC FILES (Landing Page)
+# ============================================================================
+
+# Mount static files (landing page, CSS, etc.)
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+if os.path.exists(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+# Serve landing page at root
+@app.get("/")
+async def root():
+    """Serve landing page"""
+    static_index = os.path.join(static_dir, "index.html")
+    if os.path.exists(static_index):
+        return FileResponse(static_index, media_type="text/html")
+    return {"message": "CropPulse Phase 2 API - Landing page not found, use /docs for API documentation"}
 
 # ============================================================================
 # HEALTH & INFO
