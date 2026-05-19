@@ -2329,16 +2329,27 @@ def page_login():
 def page_dashboard():
     """Main Dashboard for Farmers/Traders"""
     # Top Navigation
-    header_col, lang_col, logout_col = st.columns([4.6, 1.6, 1.0])
+    header_col, lang_col, logout_col = st.columns([4.0, 1.2, 1.0])
 
     with header_col:
         st.markdown(tr("dashboard_title"))
 
     with lang_col:
-        render_language_switcher("dashboard", show_label=False)
+        current_lang = get_language()
+        widget_state_key = "dashboard_language_choice"
+        selected_lang = st.selectbox(
+            tr("language_label"),
+            options=["en", "te"],
+            key=widget_state_key,
+            label_visibility="collapsed",
+            format_func=lambda code: tr("language_english") if code == "en" else tr("language_telugu"),
+        )
+        if selected_lang != current_lang:
+            set_language(selected_lang)
+            sync_language_query_param(selected_lang)
+            st.rerun()
 
     with logout_col:
-        st.markdown("<div style='padding-top: 0.15rem;'></div>", unsafe_allow_html=True)
         if st.button(tr("logout"), key="dashboard_logout", use_container_width=True):
             st.session_state.user = None
             st.session_state.page = "landing"
