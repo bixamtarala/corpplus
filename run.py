@@ -18,7 +18,7 @@ print("=" * 70)
 
 try:
     # Import app
-    from phase2_backend.main import app
+    from phase2_backend.main_phase2 import app
     import uvicorn
     
     # Start server

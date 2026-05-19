@@ -144,7 +144,7 @@ class UserRole(str, Enum):
 
 # Auth Models
 class PhoneOTPRequest(BaseModel):
-    phone: str = Field(..., regex=r"^\+91[0-9]{10}$", description="Phone with +91 prefix")
+    phone: str = Field(..., pattern=r"^\+91[0-9]{10}$", description="Phone with +91 prefix")
 
 class OTPVerifyRequest(BaseModel):
     phone: str
@@ -286,17 +286,35 @@ app.add_middleware(
 # ============================================================================
 
 # Mount static files (landing page, CSS, etc.)
-static_dir = os.path.join(os.path.dirname(__file__), "static")
+backend_dir = os.path.dirname(__file__)
+project_root = os.path.dirname(backend_dir)
+static_dir = os.path.join(backend_dir, "static")
+landing_page_dir = os.path.join(project_root, "landing_page")
+
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+
+def get_landing_page_path() -> Optional[str]:
+    """Resolve the best available landing page file for production."""
+    candidates = [
+        os.path.join(landing_page_dir, "index.html"),
+        os.path.join(static_dir, "index.html"),
+    ]
+
+    for candidate in candidates:
+        if os.path.exists(candidate):
+            return candidate
+
+    return None
 
 # Serve landing page at root
 @app.get("/")
 async def root():
     """Serve landing page"""
-    static_index = os.path.join(static_dir, "index.html")
-    if os.path.exists(static_index):
-        return FileResponse(static_index, media_type="text/html")
+    landing_page_path = get_landing_page_path()
+    if landing_page_path:
+        return FileResponse(landing_page_path, media_type="text/html")
     return {"message": "CropPulse Phase 2 API - Landing page not found, use /docs for API documentation"}
 
 # ============================================================================
@@ -305,7 +323,7 @@ async def root():
 
 @app.get("/health")
 @limiter.limit("100/minute")
-async def health_check():
+async def health_check(request: Request):
     """API health check"""
     return {
         "status": "healthy",
@@ -336,41 +354,41 @@ async def app_info():
 
 @app.post(f"{API_PREFIX}/auth/request-otp")
 @limiter.limit("5/minute")
-async def request_otp(request: PhoneOTPRequest):
+async def request_otp(request: Request, payload: PhoneOTPRequest):
     """Request OTP for phone number"""
     # In production: Send OTP via Twilio SMS
     # For now: Return mock OTP
     otp = "123456"  # Mock OTP
     
     # Store in Redis (10 min expiry)
-    # await redis_client.setex(f"otp:{request.phone}", 600, otp)
+    # await redis_client.setex(f"otp:{payload.phone}", 600, otp)
     
     return {
         "message": "OTP sent to phone",
-        "phone": request.phone,
+        "phone": payload.phone,
         "expires_in_seconds": 600
     }
 
 @app.post(f"{API_PREFIX}/auth/verify-otp", response_model=TokenResponse)
 @limiter.limit("10/minute")
-async def verify_otp(request: OTPVerifyRequest):
+async def verify_otp(request: Request, payload: OTPVerifyRequest):
     """Verify OTP and return JWT token"""
     # In production: Check OTP from Redis
     # For now: Accept any 6-digit OTP
     
-    if len(request.otp) != 6 or not request.otp.isdigit():
+    if len(payload.otp) != 6 or not payload.otp.isdigit():
         raise HTTPException(status_code=400, detail="Invalid OTP")
     
     # Generate token
     access_token = create_access_token(
-        data={"sub": "user_id_here", "phone": request.phone}
+        data={"sub": "user_id_here", "phone": payload.phone}
     )
     
     return {
         "access_token": access_token,
         "token_type": "bearer",
         "user_id": "user_id_here",
-        "phone": request.phone
+        "phone": payload.phone
     }
 
 # ============================================================================
@@ -517,6 +535,7 @@ async def create_listing(
 @app.get(f"{API_PREFIX}/marketplace/search")
 @limiter.limit("30/minute")
 async def search_listings(
+    request: Request,
     crop: str,
     state: Optional[str] = None,
     quality: Optional[str] = None,
@@ -549,6 +568,7 @@ async def search_listings(
 @app.post(f"{API_PREFIX}/marketplace/offers", response_model=OfferResponse)
 @limiter.limit("30/minute")
 async def make_offer(
+    request: Request,
     offer: OfferRequest,
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)

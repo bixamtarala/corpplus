@@ -13,7 +13,7 @@ echo "📌 Port: $PORT"
 echo "📌 Environment: $ENV"
 
 # Start the app
-exec uvicorn phase2_backend.main:app \
+exec uvicorn phase2_backend.main_phase2:app \
     --host 0.0.0.0 \
     --port $PORT \
     --timeout-keep-alive 65 \
