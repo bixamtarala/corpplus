@@ -111,17 +111,7 @@ st.markdown("""
     }
 
     .landing-header-spacer {
-        height: 132px;
-    }
-
-    .promo-bar {
-        background: linear-gradient(90deg, #0a2f1f 0%, #0f3c29 100%);
-        color: rgba(255, 255, 255, 0.92);
-        text-align: center;
-        font-size: 14px;
-        font-weight: 600;
-        padding: 10px 24px;
-        margin: 0;
+        height: 102px;
     }
 
     .landing-header-shell a,
@@ -145,11 +135,6 @@ st.markdown("""
     .demo-shell a:visited,
     .landing-footer a:visited {
         text-decoration: none !important;
-    }
-
-    .promo-bar a {
-        color: #ffffff;
-        font-weight: 800;
     }
 
     .landing-nav {
@@ -779,7 +764,7 @@ st.markdown("""
         }
 
         .landing-header-spacer {
-            height: 116px;
+            height: 108px;
         }
 
         .nav-brand,
@@ -840,14 +825,6 @@ st.markdown("""
             padding: 11px 20px;
         }
 
-        .promo-bar {
-            margin-left: -2rem;
-            margin-right: -2rem;
-            padding-left: 2rem;
-            padding-right: 2rem;
-            font-size: 12px;
-        }
-
         .floating-card,
         .floating-card.secondary {
             position: static;
@@ -900,12 +877,6 @@ st.markdown("""
 
         .landing-header-spacer {
             height: 124px;
-        }
-
-        .promo-bar {
-            margin-left: -0.75rem;
-            margin-right: -0.75rem;
-            padding: 9px 0.9rem;
         }
 
         .nav-mark {
@@ -1833,10 +1804,6 @@ def page_landing():
 
     st.markdown(f"""
     <div class="landing-header-shell">
-    <div class="promo-bar">
-        {tr('promo_bar')} <a href="#demo">{tr('invite_link')}</a> {tr('promo_suffix')}
-    </div>
-
     <div class="landing-nav">
         <div class="nav-brand">
             <div class="nav-mark">🌾</div>
