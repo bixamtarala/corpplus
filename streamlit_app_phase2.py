@@ -112,6 +112,29 @@ st.markdown("""
         margin: 0;
     }
 
+    .landing-header-shell a,
+    .hero-section a,
+    .section-shell a,
+    .demo-shell a,
+    .landing-footer a,
+    .landing-header-shell a:hover,
+    .hero-section a:hover,
+    .section-shell a:hover,
+    .demo-shell a:hover,
+    .landing-footer a:hover,
+    .landing-header-shell a:focus,
+    .hero-section a:focus,
+    .section-shell a:focus,
+    .demo-shell a:focus,
+    .landing-footer a:focus,
+    .landing-header-shell a:visited,
+    .hero-section a:visited,
+    .section-shell a:visited,
+    .demo-shell a:visited,
+    .landing-footer a:visited {
+        text-decoration: none !important;
+    }
+
     .promo-bar a {
         color: #ffffff;
         font-weight: 800;
