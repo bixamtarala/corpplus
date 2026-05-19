@@ -1544,6 +1544,27 @@ def set_language(lang_code):
         st.session_state.language = lang_code
 
 
+def sync_language_query_param(lang_code=None):
+    active_lang = lang_code or get_language()
+    if active_lang in TRANSLATIONS:
+        st.query_params["lang"] = active_lang
+
+
+def clear_action_query_param():
+    current_lang = st.query_params.get("lang", get_language())
+    st.query_params.clear()
+    if current_lang in TRANSLATIONS:
+        st.query_params["lang"] = current_lang
+
+
+def initialize_language_from_query():
+    query_lang = st.query_params.get("lang")
+    if query_lang in TRANSLATIONS:
+        set_language(query_lang)
+    else:
+        sync_language_query_param(get_language())
+
+
 def get_language():
     return st.session_state.get("language", "en")
 
@@ -1645,6 +1666,7 @@ def render_language_switcher(widget_key, show_label=True):
         ):
             if current_lang != "en":
                 set_language("en")
+                sync_language_query_param("en")
                 st.rerun()
 
     with col_te:
@@ -1656,11 +1678,13 @@ def render_language_switcher(widget_key, show_label=True):
         ):
             if current_lang != "te":
                 set_language("te")
+                sync_language_query_param("te")
                 st.rerun()
 
 
 def go_to_page(page_name):
     """Centralized page switch helper."""
+    sync_language_query_param()
     st.session_state.page = page_name
     st.rerun()
 
@@ -1781,21 +1805,19 @@ def get_farmer_dashboard(user_id):
 
 def page_landing():
     """Public landing page for the Streamlit deployment."""
-    landing_lang = st.query_params.get("lang")
-    if landing_lang in TRANSLATIONS:
-        set_language(landing_lang)
+    initialize_language_from_query()
 
     landing_action = st.query_params.get("action")
     if landing_action == "login":
-        st.query_params.clear()
+        clear_action_query_param()
         reset_auth_flow()
         go_to_page("login")
     if landing_action == "register":
-        st.query_params.clear()
+        clear_action_query_param()
         reset_auth_flow()
         go_to_page("register")
     if landing_action == "demo":
-        st.query_params.clear()
+        clear_action_query_param()
         enter_demo_mode()
 
     current_lang = get_language()
@@ -2539,6 +2561,7 @@ def main():
     """Main app router"""
     # Initialize schema before serving any page.
     init_database()
+    initialize_language_from_query()
 
     if not test_connection():
         st.error(tr("db_connection_failed"))
