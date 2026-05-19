@@ -821,13 +821,26 @@ def get_farmer_dashboard(user_id):
 
 def page_landing():
     """Public landing page for the Streamlit deployment."""
+    landing_action = st.query_params.get("action")
+    if landing_action == "login":
+        st.query_params.clear()
+        reset_auth_flow()
+        go_to_page("login")
+    if landing_action == "register":
+        st.query_params.clear()
+        reset_auth_flow()
+        go_to_page("register")
+    if landing_action == "demo":
+        st.query_params.clear()
+        enter_demo_mode()
+
     st.markdown("""
     <div class="landing-nav">
         <div class="nav-brand">
             <div class="nav-mark">🌾</div>
             <div>
                 <p class="nav-title">CropPulse</p>
-                <p class="nav-subtitle">Know when to sell, who to reach, and what to do next.</p>
+                <p class="nav-subtitle">Know when to sell and who to reach next.</p>
             </div>
         </div>
         <div class="nav-menu">
@@ -837,8 +850,8 @@ def page_landing():
             <a href="#demo">Demo</a>
         </div>
         <div class="nav-actions">
-            <span class="nav-chip">Login</span>
-            <span class="nav-chip">Try Demo</span>
+            <a class="nav-chip" href="?action=login">Login</a>
+            <a class="nav-chip" href="?action=register">Create Account</a>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -896,19 +909,6 @@ def page_landing():
         </div>
     </div>
     """, unsafe_allow_html=True)
-
-    action_col1, action_col2, action_col3 = st.columns([1, 1, 1])
-    with action_col1:
-        if st.button("Create farmer account", key="landing_register", use_container_width=True):
-            reset_auth_flow()
-            go_to_page("register")
-    with action_col2:
-        if st.button("Sign in", key="landing_login", use_container_width=True):
-            reset_auth_flow()
-            go_to_page("login")
-    with action_col3:
-        if st.button("Try live demo", key="landing_demo", use_container_width=True):
-            enter_demo_mode()
 
     st.markdown("""
     <div id="features" class="section-shell">
