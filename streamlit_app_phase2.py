@@ -85,103 +85,485 @@ st.markdown("""
         margin: 2px 0 0 0;
     }
 
-    /* Landing Page Hero */
-    .hero-section {
-        background: linear-gradient(135deg, #1f8f4d 0%, #2ecc71 100%);
+    /* Landing Page */
+    .landing-nav {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr auto;
+        align-items: center;
+        gap: 24px;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid #d9e7ef;
+        border-radius: 28px;
+        padding: 18px 24px;
+        margin: 8px 0 22px 0;
+        box-shadow: 0 16px 40px rgba(31, 45, 61, 0.08);
+        backdrop-filter: blur(10px);
+    }
+
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .nav-mark {
+        width: 68px;
+        height: 68px;
+        border-radius: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
         color: white;
-        padding: 34px 32px;
-        border-radius: 20px;
-        margin: 16px 0 22px 0;
-        box-shadow: 0 10px 40px rgba(46, 204, 113, 0.2);
+        background: linear-gradient(135deg, #123a68 0%, #2ecc71 100%);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+
+    .nav-title {
+        font-size: 18px;
+        font-weight: 800;
+        color: #17324d;
+        margin: 0;
+    }
+
+    .nav-subtitle {
+        font-size: 13px;
+        color: #6c8196;
+        margin: 4px 0 0 0;
+    }
+
+    .nav-menu {
+        display: flex;
+        justify-content: center;
+        gap: 28px;
+        flex-wrap: wrap;
+    }
+
+    .nav-menu a {
+        color: #50657c;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .nav-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .nav-chip {
+        background: linear-gradient(135deg, #17b57d 0%, #0f9e6b 100%);
+        color: white;
+        border-radius: 999px;
+        padding: 12px 20px;
+        font-size: 14px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 120px;
+        box-shadow: 0 10px 24px rgba(23, 181, 125, 0.2);
+    }
+
+    .hero-section {
+        background: linear-gradient(180deg, #ffffff 0%, #f4fbff 100%);
+        border: 1px solid #e1eef5;
+        border-radius: 34px;
+        padding: 28px;
+        margin: 0 0 26px 0;
+        box-shadow: 0 22px 48px rgba(20, 52, 84, 0.08);
     }
 
     .hero-grid {
         display: grid;
-        grid-template-columns: 1fr;
-        gap: 20px;
+        grid-template-columns: 1.05fr 1fr;
+        gap: 34px;
         align-items: center;
     }
 
     .section-kicker {
         text-transform: uppercase;
         letter-spacing: 0.12em;
-        font-size: 11px;
-        font-weight: 700;
-        opacity: 0.85;
-        margin-bottom: 10px;
+        font-size: 12px;
+        font-weight: 800;
+        color: #1b8d59;
+        margin-bottom: 14px;
     }
     
     .hero-title {
-        font-size: 36px;
+        font-size: 64px;
         font-weight: 800;
-        line-height: 1.12;
-        margin: 0 0 12px 0;
+        line-height: 1.02;
+        color: #193259;
+        margin: 0 0 18px 0;
+        max-width: 620px;
     }
     
     .hero-subtitle {
-        font-size: 18px;
-        font-weight: 400;
-        margin: 0 0 12px 0;
-        opacity: 0.94;
+        font-size: 20px;
+        font-weight: 500;
+        line-height: 1.6;
+        margin: 0 0 18px 0;
+        color: #51657d;
+        max-width: 600px;
     }
 
     .hero-copy {
-        font-size: 15px;
-        line-height: 1.55;
-        opacity: 0.95;
-        margin-bottom: 10px;
-        max-width: 680px;
+        font-size: 17px;
+        line-height: 1.7;
+        color: #61768d;
+        margin: 0 0 20px 0;
+        max-width: 620px;
     }
 
-    .cta-row {
+    .hero-tags {
         display: flex;
-        gap: 14px;
+        gap: 12px;
         flex-wrap: wrap;
-        margin-top: 18px;
+        margin-top: 12px;
     }
 
-    .metric-strip {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 14px;
-        margin: 10px 0 24px 0;
+    .hero-tag {
+        background: #eaf4ff;
+        color: #325a8a;
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 700;
     }
 
-    .hero-stat {
-        background: #ffffff;
-        border: 1px solid #e5ece7;
-        border-radius: 16px;
+    .hero-visual {
+        position: relative;
+        background: linear-gradient(180deg, #16233a 0%, #1d2d49 100%);
+        border-radius: 24px;
         padding: 18px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+        min-height: 360px;
+        box-shadow: 0 20px 50px rgba(10, 18, 34, 0.22);
+        overflow: hidden;
     }
 
-    .hero-stat-value {
-        font-size: 28px;
+    .hero-visual::after {
+        content: "";
+        position: absolute;
+        inset: auto -80px -120px auto;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(46,204,113,0.45) 0%, rgba(46,204,113,0) 70%);
+    }
+
+    .visual-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #8fa1bb;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 14px;
+    }
+
+    .visual-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .dot-red { background: #ff5f57; }
+    .dot-yellow { background: #febc2e; }
+    .dot-green { background: #28c840; }
+
+    .visual-chart {
+        background: linear-gradient(180deg, #284a79 0%, #233d63 100%);
+        border: 1px solid rgba(140, 182, 235, 0.18);
+        border-radius: 20px;
+        padding: 20px;
+        height: 140px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 16px;
+    }
+
+    .visual-chart::before {
+        content: "";
+        position: absolute;
+        inset: 20px 18px 18px 18px;
+        border-radius: 14px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+    }
+
+    .chart-line {
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        top: 24px;
+        height: 4px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #7aa3d5 0%, #2ed0a1 45%, #8bb8f5 100%);
+    }
+
+    .chart-area {
+        position: absolute;
+        left: 18px;
+        right: 18px;
+        bottom: 18px;
+        height: 68px;
+        background: linear-gradient(180deg, rgba(46, 204, 113, 0.15), rgba(46, 204, 113, 0.04));
+        clip-path: polygon(0% 85%, 14% 83%, 28% 80%, 42% 88%, 58% 60%, 74% 70%, 88% 38%, 100% 24%, 100% 100%, 0% 100%);
+        border-radius: 12px;
+    }
+
+    .visual-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 14px;
+    }
+
+    .visual-card,
+    .floating-card {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        padding: 16px;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
+
+    .visual-label {
+        font-size: 14px;
+        color: #9db2ce;
+        margin-bottom: 8px;
+    }
+
+    .visual-value {
+        font-size: 34px;
         font-weight: 800;
-        color: #1f2d3d;
+        line-height: 1.1;
         margin: 0 0 6px 0;
     }
 
-    .hero-stat-label {
+    .visual-note {
         font-size: 13px;
-        color: #607080;
+        color: #b8cae2;
         margin: 0;
     }
-    
-    /* Feature Cards */
-    .feature-card {
-        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-        border-left: 5px solid #2ecc71;
-        padding: 24px;
-        border-radius: 12px;
-        margin: 16px 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        transition: all 0.3s ease;
+
+    .floating-card {
+        position: absolute;
+        right: -18px;
+        top: 160px;
+        width: 190px;
+        background: linear-gradient(180deg, #2fa84a 0%, #2c9c46 100%);
+        box-shadow: 0 16px 30px rgba(25, 64, 25, 0.25);
     }
-    
-    .feature-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(46, 204, 113, 0.15);
+
+    .floating-card.secondary {
+        top: 264px;
+        right: -8px;
+        background: white;
+        color: #1f2d3d;
+    }
+
+    .floating-card.secondary .visual-label,
+    .floating-card.secondary .visual-note {
+        color: #5f7286;
+    }
+
+    .action-bar {
+        margin: 18px 0 34px 0;
+    }
+
+    .section-shell {
+        background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+        border: 1px solid #e2edf5;
+        border-radius: 32px;
+        padding: 34px;
+        margin: 0 0 26px 0;
+        box-shadow: 0 18px 44px rgba(20, 52, 84, 0.06);
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .section-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: #1c365c;
+        margin: 0 0 10px 0;
+    }
+
+    .section-description {
+        font-size: 18px;
+        line-height: 1.7;
+        color: #72859b;
+        max-width: 860px;
+        margin: 0 auto;
+    }
+
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+    }
+
+    .mini-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 22px;
+    }
+
+    .workflow-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px;
+    }
+
+    .section-card,
+    .workflow-card,
+    .detail-card,
+    .mini-card {
+        background: white;
+        border: 1px solid #dfeaf3;
+        border-radius: 26px;
+        padding: 28px;
+        box-shadow: 0 14px 34px rgba(20, 52, 84, 0.06);
+    }
+
+    .section-card {
+        min-height: 250px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .icon-badge {
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        background: linear-gradient(180deg, #eaf4ff 0%, #d8ebff 100%);
+        margin-bottom: 16px;
+    }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        width: fit-content;
+        border-radius: 999px;
+        background: #eaf4ff;
+        color: #40658f;
+        padding: 8px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 14px;
+    }
+
+    .section-card h3,
+    .workflow-card h3,
+    .detail-card h3,
+    .mini-card h3 {
+        font-size: 20px;
+        color: #17324d;
+        margin: 0 0 12px 0;
+    }
+
+    .section-card p,
+    .workflow-card p,
+    .detail-card p,
+    .mini-card p {
+        color: #5f7286;
+        line-height: 1.75;
+        font-size: 16px;
+        margin: 0;
+    }
+
+    .section-card ul,
+    .workflow-card ul,
+    .detail-card ul {
+        padding-left: 22px;
+        margin: 16px 0 0 0;
+        color: #4d6176;
+        line-height: 1.85;
+    }
+
+    .workflow-card {
+        border-top: 6px solid #44b2e8;
+    }
+
+    .workflow-card.alt {
+        border-top-color: #d9a73a;
+    }
+
+    .feedback-card {
+        background: white;
+        border: 1px solid #dfeaf3;
+        border-radius: 28px;
+        padding: 26px;
+        box-shadow: 0 14px 34px rgba(20, 52, 84, 0.06);
+    }
+
+    .feedback-row {
+        display: grid;
+        grid-template-columns: 1.4fr 0.8fr;
+        gap: 22px;
+        align-items: center;
+    }
+
+    .demo-shell {
+        background: linear-gradient(135deg, #173d70 0%, #3387df 100%);
+        border-radius: 32px;
+        padding: 38px 34px;
+        color: white;
+        box-shadow: 0 20px 46px rgba(23, 61, 112, 0.24);
+        margin-top: 8px;
+    }
+
+    .demo-title {
+        font-size: 22px;
+        font-weight: 800;
+        margin: 0 0 12px 0;
+        text-align: center;
+    }
+
+    .demo-copy {
+        font-size: 17px;
+        line-height: 1.75;
+        max-width: 780px;
+        margin: 0 auto 18px auto;
+        text-align: center;
+        color: rgba(255,255,255,0.86);
+    }
+
+    .demo-pills {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .demo-pill {
+        background: rgba(255,255,255,0.14);
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .landing-footer {
+        text-align: center;
+        color: #6a7f95;
+        font-size: 14px;
+        margin-top: 20px;
     }
     
     /* Dashboard Card */
@@ -252,11 +634,17 @@ st.markdown("""
     }
 
     @media (max-width: 900px) {
+        .landing-nav,
         .hero-grid,
-        .metric-strip {
+        .card-grid,
+        .mini-grid,
+        .workflow-grid,
+        .feedback-row,
+        .visual-grid {
             grid-template-columns: 1fr;
         }
 
+        .landing-nav,
         .top-strip {
             flex-direction: column;
             align-items: flex-start;
@@ -268,6 +656,24 @@ st.markdown("""
 
         .hero-section {
             padding: 32px 24px;
+        }
+
+        .nav-menu,
+        .nav-actions {
+            justify-content: flex-start;
+        }
+
+        .floating-card,
+        .floating-card.secondary {
+            position: static;
+            width: auto;
+            margin-top: 14px;
+        }
+
+        .section-shell,
+        .feedback-card,
+        .demo-shell {
+            padding: 24px;
         }
     }
 </style>
@@ -303,6 +709,15 @@ def reset_auth_flow():
     """Clear transient OTP state when leaving auth screens."""
     st.session_state.otp_code = None
     st.session_state.phone_temp = None
+
+
+def enter_demo_mode():
+    """Open the dashboard in lightweight demo mode."""
+    reset_auth_flow()
+    st.session_state.user = -1
+    st.session_state.user_role = "farmer"
+    st.session_state.page = "dashboard"
+    st.rerun()
 
 # ============================================================================
 # DATABASE HELPER FUNCTIONS
@@ -407,13 +822,23 @@ def get_farmer_dashboard(user_id):
 def page_landing():
     """Public landing page for the Streamlit deployment."""
     st.markdown("""
-    <div class="top-strip">
-        <div class="brand-lockup">
-            <div class="brand-mark">🌾</div>
+    <div class="landing-nav">
+        <div class="nav-brand">
+            <div class="nav-mark">🌾</div>
             <div>
-                <h1 class="brand-title">CropPulse</h1>
-                <p class="brand-subtitle">Agricultural Operating System</p>
+                <p class="nav-title">CropPulse</p>
+                <p class="nav-subtitle">Know when to sell, who to reach, and what to do next.</p>
             </div>
+        </div>
+        <div class="nav-menu">
+            <a href="#features">Features</a>
+            <a href="#workflows">Workflows</a>
+            <a href="#trust">Trust</a>
+            <a href="#demo">Demo</a>
+        </div>
+        <div class="nav-actions">
+            <span class="nav-chip">Login</span>
+            <span class="nav-chip">Try Demo</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -423,98 +848,294 @@ def page_landing():
         <div class="hero-grid">
             <div>
                 <div class="section-kicker">Agricultural intelligence and market coordination</div>
-                <div class="hero-title">Smarter farming and trading, in one place.</div>
-                <div class="hero-subtitle">Track prices, manage crops, and connect with buyers faster.</div>
+                <div class="hero-title">Know when to sell. Find supply faster. Coordinate every farm move.</div>
+                <div class="hero-subtitle">CropPulse brings price visibility, crop planning, marketplace activity, and deal coordination into one clean operating surface.</div>
                 <p class="hero-copy">
-                    CropPulse gives farmers, traders, and agri teams a simpler way to monitor markets and move deals forward.
+                    Built for farmers, traders, and agricultural teams that need faster decisions, fewer calls, clearer market signals, and stronger execution across the value chain.
                 </p>
+                <div class="hero-tags">
+                    <span class="hero-tag">Best time to sell</span>
+                    <span class="hero-tag">Verified trader access</span>
+                    <span class="hero-tag">Crop and listing management</span>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="visual-top">
+                    <span class="visual-dot dot-red"></span>
+                    <span class="visual-dot dot-yellow"></span>
+                    <span class="visual-dot dot-green"></span>
+                    <span>LIVE MARKET WORKSPACE</span>
+                </div>
+                <div class="visual-chart">
+                    <div class="chart-line"></div>
+                    <div class="chart-area"></div>
+                </div>
+                <div class="visual-grid">
+                    <div class="visual-card">
+                        <div class="visual-label">Best selling window</div>
+                        <p class="visual-value">48 hrs</p>
+                        <p class="visual-note">Demand is strongest for premium rice in nearby districts.</p>
+                    </div>
+                    <div class="visual-card">
+                        <div class="visual-label">Buyer activity</div>
+                        <p class="visual-value">High</p>
+                        <p class="visual-note">More verified traders are actively searching today.</p>
+                    </div>
+                </div>
+                <div class="floating-card">
+                    <div class="visual-label">Signal confidence</div>
+                    <p class="visual-value">Active</p>
+                    <p class="visual-note">Price momentum and buying interest are aligned.</p>
+                </div>
+                <div class="floating-card secondary">
+                    <div class="visual-label">Watchlist priority</div>
+                    <p class="visual-value" style="font-size: 24px; color: #17324d;">Rice buyers</p>
+                    <p class="visual-note">Shortlist refreshed with stronger district demand.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    action_col1, action_col2, action_col3 = st.columns([1, 1, 1])
+    with action_col1:
+        if st.button("Create farmer account", key="landing_register", use_container_width=True):
+            reset_auth_flow()
+            go_to_page("register")
+    with action_col2:
+        if st.button("Sign in", key="landing_login", use_container_width=True):
+            reset_auth_flow()
+            go_to_page("login")
+    with action_col3:
+        if st.button("Try live demo", key="landing_demo", use_container_width=True):
+            enter_demo_mode()
+
+    st.markdown("""
+    <div id="features" class="section-shell">
+        <div class="section-header">
+            <p class="section-title">Platform features</p>
+            <p class="section-description">Everything needed for daily agricultural decisions, from crop planning and pricing visibility to marketplace action and deal follow-through.</p>
+        </div>
+        <div class="card-grid">
+            <div class="section-card">
+                <div class="icon-badge">📈</div>
+                <h3>Price intelligence</h3>
+                <p>Track market movement, demand spikes, and high-value selling windows without relying on scattered updates.</p>
+                <div class="pill">Live market visibility</div>
+            </div>
+            <div class="section-card">
+                <div class="icon-badge">🌱</div>
+                <h3>Crop planning</h3>
+                <p>Manage crop details, field timelines, and harvest readiness in one place so operational decisions stay current.</p>
+                <div class="pill">Farmer workflow</div>
+            </div>
+            <div class="section-card">
+                <div class="icon-badge">🛒</div>
+                <h3>Marketplace coordination</h3>
+                <p>Create listings, receive offers, compare buyers, and keep negotiations moving inside a shared workflow.</p>
+                <div class="pill">Listing to deal flow</div>
+            </div>
+            <div class="section-card">
+                <div class="icon-badge">📍</div>
+                <h3>Trader sourcing</h3>
+                <p>Help traders discover supply faster through verified listings, location context, and crop availability visibility.</p>
+                <div class="pill">Verified network</div>
+            </div>
+            <div class="section-card">
+                <div class="icon-badge">🤝</div>
+                <h3>Deal management</h3>
+                <p>Keep active deals visible from first offer to final coordination so follow-up and payment steps do not get lost.</p>
+                <div class="pill">Execution support</div>
+            </div>
+            <div class="section-card">
+                <div class="icon-badge">🌦️</div>
+                <h3>Weather and scheme alerts</h3>
+                <p>Surface field-relevant weather events, subsidy programs, and action-ready updates that affect real decisions.</p>
+                <div class="pill">Action-ready alerts</div>
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div class="metric-strip">
-        <div class="hero-stat">
-            <p class="hero-stat-value">500+</p>
-            <p class="hero-stat-label">Traders already validated in the network</p>
+    <div id="workflows" class="section-shell">
+        <div class="section-header">
+            <p class="section-title">Built for both sides of the market</p>
+            <p class="section-description">CropPulse supports farmer action, trader sourcing, and agri-team coordination without forcing everyone into the same workflow.</p>
         </div>
-        <div class="hero-stat">
-            <p class="hero-stat-value">Live</p>
-            <p class="hero-stat-label">Market prices, crop tracking, and buyer discovery</p>
-        </div>
-        <div class="hero-stat">
-            <p class="hero-stat-value">Faster</p>
-            <p class="hero-stat-label">Farmer onboarding and listing management</p>
-        </div>
-        <div class="hero-stat">
-            <p class="hero-stat-value">Better</p>
-            <p class="hero-stat-label">Visibility for decisions, negotiations, and deals</p>
+        <div class="workflow-grid">
+            <div class="workflow-card">
+                <div class="pill">👨‍🌾 Simplified farmer view</div>
+                <h3>Farmer workflow</h3>
+                <p>Designed for producers who need clear next steps, cleaner market visibility, and an easier path from crop readiness to buyer connection.</p>
+                <ul>
+                    <li>Best-time-to-sell guidance</li>
+                    <li>Crop and harvest planning</li>
+                    <li>Simple listing and offer flow</li>
+                    <li>Clear alerts and next actions</li>
+                </ul>
+            </div>
+            <div class="workflow-card alt">
+                <div class="pill">🧑‍💼 Trader and agri team desk</div>
+                <h3>Buyer and coordination workflow</h3>
+                <p>Designed for professionals who need stronger sourcing visibility, easier supply discovery, and a structured way to track ongoing opportunities.</p>
+                <ul>
+                    <li>Verified supply discovery</li>
+                    <li>Regional demand and price context</li>
+                    <li>Deal follow-up and coordination</li>
+                    <li>Faster buyer shortlisting</li>
+                </ul>
+            </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Feature Overview
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.markdown("""
-        <div class="feature-card">
-            <h3>📍 Farmer Dashboard</h3>
-            <p>
-            Manage crops, track prices, choose the best time to sell, and connect directly
-            with buyers from a single workspace.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("""
-        <div class="feature-card">
-            <h3>🛒 Smart Marketplace</h3>
-            <p>
-            Create listings, receive offers, negotiate prices, and coordinate deals
-            in one simple marketplace flow.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col3:
-        st.markdown("""
-        <div class="feature-card">
-            <h3>💡 Intelligence Feed</h3>
-            <p>
-            Daily weather forecasts, price trends, scheme visibility, and action-ready
-            market guidance for field users.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-
-    # Call to Action
-    c1, c2 = st.columns([1.2, 1.2])
-    with c1:
-        if st.button("👨‍🌾 Create farmer account", use_container_width=True):
-            reset_auth_flow()
-            go_to_page("register")
-    with c2:
-        if st.button("🔐 Sign in to CropPulse", use_container_width=True):
-            reset_auth_flow()
-            go_to_page("login")
-
-    # Closing section
     st.markdown("""
-    ### Why teams use CropPulse
-    
-    CropPulse reduces friction across the agriculture value chain.
-    Farmers get clearer selling signals, traders get faster access to supply,
-    and agricultural teams get one place to coordinate action.
-    
-    Start with onboarding, move into market discovery, and keep daily work moving
-    through pricing intelligence, listings, and deal coordination.
-    
-    ---
-    *©2026 CropPulse. Making agriculture smarter, fairer, and more profitable.*
-    """)
+    <div id="trust" class="section-shell">
+        <div class="section-header">
+            <p class="section-title">Trusted and structured for real agricultural operations</p>
+            <p class="section-description">The landing experience should feel credible. These are the pillars that make CropPulse useful for serious field, market, and operational use.</p>
+        </div>
+        <div class="card-grid">
+            <div class="section-card">
+                <div class="icon-badge">✅</div>
+                <h3>Verified participants</h3>
+                <p>Profiles, listings, and interactions are built around trust so buyers and sellers can work with stronger confidence.</p>
+            </div>
+            <div class="section-card">
+                <div class="icon-badge">🔐</div>
+                <h3>Protected access</h3>
+                <p>Authentication and account flows are structured to support reliable access for production users and future scaling.</p>
+            </div>
+            <div class="section-card">
+                <div class="icon-badge">📋</div>
+                <h3>Decision records</h3>
+                <p>Listings, crop entries, offers, and market signals stay visible in one system instead of disappearing across calls and chats.</p>
+            </div>
+            <div class="section-card">
+                <div class="icon-badge">🛡️</div>
+                <h3>Privacy aware</h3>
+                <p>Farmer and marketplace data should be easy to use operationally without exposing more than the workflow actually needs.</p>
+            </div>
+            <div class="section-card">
+                <div class="icon-badge">📡</div>
+                <h3>Field-relevant intelligence</h3>
+                <p>Weather, schemes, demand, and pricing signals are placed inside the workflow so users can act instead of just reading updates.</p>
+            </div>
+            <div class="section-card">
+                <div class="icon-badge">⚙️</div>
+                <h3>Operational focus</h3>
+                <p>The product is organized around daily action: monitor, list, negotiate, coordinate, and decide faster with less friction.</p>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="section-shell">
+        <div class="section-header">
+            <p class="section-title">Why choose CropPulse?</p>
+            <p class="section-description">The landing page in your screenshots is strong because it layers proof, workflows, trust, and calls to action. CropPulse now follows that same structure with agriculture-specific value.</p>
+        </div>
+        <div class="mini-grid">
+            <div class="mini-card">
+                <h3>Action-first</h3>
+                <p>Decision support is tied to pricing, crops, and live marketplace movement.</p>
+            </div>
+            <div class="mini-card">
+                <h3>Market-aware</h3>
+                <p>Context is built around buyers, supply, timing, and negotiation readiness.</p>
+            </div>
+            <div class="mini-card">
+                <h3>Operationally useful</h3>
+                <p>The homepage leads directly into real workflows instead of static marketing copy.</p>
+            </div>
+        </div>
+        <div class="card-grid">
+            <div class="detail-card">
+                <div class="pill">Better selling signals</div>
+                <h3>Know what to do next</h3>
+                <p>Move beyond generic price tables with signals that help farmers and teams understand when the market is strong and why timing matters.</p>
+                <ul>
+                    <li>Explainable market confidence</li>
+                    <li>Cleaner next-step guidance</li>
+                    <li>Less noise, more usable clarity</li>
+                </ul>
+            </div>
+            <div class="detail-card">
+                <div class="pill">Stronger negotiation discipline</div>
+                <h3>Avoid weak deals</h3>
+                <p>See opportunities in context with demand, location, crop readiness, and supply signals before making a pricing move.</p>
+                <ul>
+                    <li>Buyer and supply awareness</li>
+                    <li>District-level market context</li>
+                    <li>Smarter offer comparison</li>
+                </ul>
+            </div>
+            <div class="detail-card">
+                <div class="pill">Faster coordination</div>
+                <h3>Move opportunities sooner</h3>
+                <p>Compress scattered communication into one cleaner loop so listings, offers, and follow-up actions stay aligned.</p>
+                <ul>
+                    <li>Quicker marketplace response</li>
+                    <li>Less manual follow-up overhead</li>
+                    <li>More time spent closing deals</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="section-shell">
+        <div class="section-header">
+            <p class="section-title">Help shape CropPulse</p>
+            <p class="section-description">A strong landing page should not end with static testimonials. It should show how users can respond, give feedback, and move directly into the product.</p>
+        </div>
+        <div class="feedback-card">
+            <div class="feedback-row">
+                <div>
+                    <div class="pill">Feedback channel</div>
+                    <h3 style="margin-top: 0;">Tell us what should improve next</h3>
+                    <p>Use this channel to share where the workflow feels strong, where clarity is missing, and which farmer, trader, or intelligence tools you want improved next.</p>
+                </div>
+                <div>
+                    <div class="pill">Product improvement</div>
+                    <p style="margin-bottom: 16px;">Email the team at <strong>support@croppulse.ai</strong> or continue directly into the live product flow below.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div id="demo" class="demo-shell">
+        <div class="pill" style="margin: 0 auto 16px auto; background: rgba(255,255,255,0.14); color: white;">Step into the live product flow</div>
+        <p class="demo-title">Explore the interactive CropPulse demo</p>
+        <p class="demo-copy">See how CropPulse turns crop data, market prices, buyer activity, and field alerts into clearer agricultural decisions without leaving the homepage experience.</p>
+        <div class="demo-pills">
+            <span class="demo-pill">No signup required for demo</span>
+            <span class="demo-pill">Fast dashboard access</span>
+            <span class="demo-pill">Built for farmers and traders</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    demo_left, demo_center, demo_right = st.columns([1.2, 1.4, 1.2])
+    with demo_center:
+        st.markdown("### Continue into the live demo")
+        st.caption("Add your email if you want it carried into future follow-up, or continue directly to explore the product workflow.")
+        st.text_input("Work email", placeholder="your@email.com", key="landing_demo_email")
+        demo_action1, demo_action2 = st.columns(2)
+        with demo_action1:
+            if st.button("Continue to demo", key="landing_demo_continue", use_container_width=True):
+                enter_demo_mode()
+        with demo_action2:
+            if st.button("Create account", key="landing_demo_register", use_container_width=True):
+                reset_auth_flow()
+                go_to_page("register")
+
+    st.markdown('<p class="landing-footer">©2026 CropPulse. Agricultural intelligence, marketplace visibility, and operational coordination in one platform.</p>', unsafe_allow_html=True)
 
 def page_register():
     """Farmer Registration"""
@@ -674,6 +1295,45 @@ def page_dashboard():
         
         if st.session_state.user_role == "farmer":
             dashboard_data = get_farmer_dashboard(st.session_state.user)
+
+            if st.session_state.user == -1:
+                st.info("You are viewing CropPulse in demo mode. Create an account to save crops, listings, and deals.")
+
+                demo_col1, demo_col2, demo_col3 = st.columns(3)
+
+                with demo_col1:
+                    st.markdown("""
+                    <div class="dashboard-card">
+                        <h4>📈 Best Time to Sell</h4>
+                        <p style="font-size: 28px; color: #27ae60;">Next 48 hours</p>
+                        <p>Buyer demand is strongest for premium rice.</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                with demo_col2:
+                    st.markdown("""
+                    <div class="dashboard-card">
+                        <h4>🛒 Active Buyer Interest</h4>
+                        <p style="font-size: 28px; color: #3498db;">12 traders</p>
+                        <p>Verified buyers are watching nearby supply.</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                with demo_col3:
+                    st.markdown("""
+                    <div class="dashboard-card">
+                        <h4>🌦️ Weather Watch</h4>
+                        <p style="font-size: 28px; color: #f39c12;">Rain alert</p>
+                        <p>Prepare harvest logistics in the next 3 days.</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                st.markdown("""
+                <div class="dashboard-card">
+                    <h4>Demo overview</h4>
+                    <p>Use the tabs above to explore crop management, marketplace listings, intelligence alerts, and deal tracking in the current Streamlit flow.</p>
+                </div>
+                """, unsafe_allow_html=True)
             
             if dashboard_data["profile"]:
                 profile = dashboard_data["profile"]
