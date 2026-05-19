@@ -98,6 +98,26 @@ st.markdown("""
         margin: 2px 0 0 0;
     }
 
+    .dashboard-home-link,
+    .dashboard-home-link:hover,
+    .dashboard-home-link:focus,
+    .dashboard-home-link:visited {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #1f3151 !important;
+        text-decoration: none !important;
+        font-size: 1.9rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 0.85rem;
+    }
+
+    .dashboard-home-mark {
+        font-size: 1.95rem;
+        line-height: 1;
+    }
+
     /* Landing Page */
     .landing-header-shell {
         position: fixed;
@@ -2273,7 +2293,18 @@ def page_login():
 
 def page_dashboard():
     """Main Dashboard for Farmers/Traders"""
-    st.markdown(tr("dashboard_title"))
+    dashboard_action = st.query_params.get("action")
+    if dashboard_action == "home":
+        clear_action_query_param()
+        go_to_page("landing")
+
+    st.markdown(
+        f'<a class="dashboard-home-link" href="{build_query_href(lang=get_language(), action="home")}">'
+        '<span class="dashboard-home-mark">🌾</span>'
+        '<span>CropPulse</span>'
+        '</a>',
+        unsafe_allow_html=True,
+    )
     
     # Tabs
     tab1, tab2, tab3, tab4 = st.tabs([
