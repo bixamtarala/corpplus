@@ -1,10 +1,10 @@
-# CropPulse Phase 2: Deploy to Streamlit Cloud + Railway (15 minutes)
+# CropPulse Phase 2: Deploy Streamlit-Only on Streamlit Cloud (15 minutes)
 
 ## 🎯 Goal
 Get your Phase 2 app live in 15 minutes with:
 - **Frontend**: Streamlit Cloud (free)
-- **Database**: Railway PostgreSQL (free tier)
-- **Auth**: OTP-based login
+- **Database**: PostgreSQL via `DATABASE_URL` or local SQLite
+- **App**: One Streamlit app for landing page, onboarding, and dashboard
 
 ---
 
@@ -12,7 +12,7 @@ Get your Phase 2 app live in 15 minutes with:
 
 1. **GitHub account** - If you don't have one, create at https://github.com/signup
 2. **Streamlit account** - Sign up at https://streamlit.io/cloud (free)
-3. **Railway account** - Sign up at https://railway.app/ (free with $5/month credits)
+3. **Optional PostgreSQL host** - Railway PostgreSQL works well if you want production data persistence
 
 ---
 
@@ -48,25 +48,22 @@ Confirm you see:
 
 ---
 
-## ✅ Step 2: Setup Railway PostgreSQL (3 minutes)
+## ✅ Step 2: Setup PostgreSQL for Production (Optional, 3 minutes)
 
-### 2a. Create Railway Account & PostgreSQL
+### 2a. Create PostgreSQL Database
 
-1. Go to https://railway.app/
-2. Click "New Project"
-3. Select "Provision PostgreSQL"
-4. Name it: `croppulse-phase2`
-5. Click "Deploy"
+1. Go to your PostgreSQL provider. Railway is fine for this setup.
+2. Create a PostgreSQL database.
+3. Copy the full connection string.
 
 ### 2b. Get Connection String
 
-1. Click on the PostgreSQL database in your project
-2. Click "Connect" tab
-3. Copy the **Database URL** (looks like):
+1. Open your database dashboard.
+2. Copy the **Database URL** (looks like):
    ```
    postgresql://postgres:[PASSWORD]@[HOST]:5432/[DATABASE]
    ```
-4. **Save this somewhere safe** - you'll need it next
+3. **Save this somewhere safe** - you'll need it next
 
 ---
 
@@ -84,24 +81,22 @@ Confirm you see:
 
 4. Click "Deploy"
 
-### 3b. Add Environment Variables (Critical!)
+### 3b. Add Streamlit Secrets (Critical)
 
 While your app is deploying:
 
 1. On Streamlit Cloud dashboard, click your app
 2. Click **Settings** (gear icon, top right)
 3. Click **Secrets**
-4. Paste this (replace with your Railway DATABASE_URL):
+4. Paste this:
 
 ```toml
 # .streamlit/secrets.toml
 DATABASE_URL = "postgresql://postgres:[YOUR_PASSWORD]@[YOUR_HOST]:5432/[YOUR_DATABASE]"
-SECRET_KEY = "your_random_secret_key_here_12345"
-API_KEY = "croppulse_admin_secret_key_12345"
 ```
 
 **Where to get DATABASE_URL:**
-- Railway project → PostgreSQL → Connect tab → "PostgreSQL" → Copy full URL
+- Your PostgreSQL provider → connection details → copy full URL
 
 Example:
 ```
@@ -123,7 +118,7 @@ DATABASE_URL = "postgresql://postgres:abc123xyz@containers-us-west-123.railway.a
    - ✅ Feature cards (Farmer Dashboard, Marketplace, Intelligence)
    - ✅ Two buttons: "Register as Farmer" + "Trader Login"
 
-### 4b. Test Farmer Registration
+### 4b. Test Landing + Registration
 
 1. Click "👨‍🌾 Register as Farmer"
 2. Enter phone: `9876543210`
@@ -134,6 +129,7 @@ DATABASE_URL = "postgresql://postgres:abc123xyz@containers-us-west-123.railway.a
 7. See farmer dashboard ✅
 
 **What this tests:**
+- ✅ Landing page is public inside Streamlit
 - ✅ Frontend loads
 - ✅ Database connection works
 - ✅ Tables created successfully
@@ -160,10 +156,10 @@ People can access it from anywhere in the world.
 │                                                             │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│  Streamlit Cloud                     Railway               │
-│  ├─ streamlit_app_phase2.py  ←→  PostgreSQL Database      │
-│  ├─ db_config.py             ←→  (croppulse_phase2)       │
-│  └─ All static assets              Connection: 100% Secure│
+│  Streamlit Cloud                   PostgreSQL/SQLite      │
+│  ├─ streamlit_app_phase2.py  ←→  Production database      │
+│  ├─ db_config.py             ←→  or local SQLite          │
+│  └─ Landing + auth + dashboard    Connection: 100% Secure│
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -175,7 +171,7 @@ People can access it from anywhere in the world.
 - [ ] DATABASE_URL is in `.streamlit/secrets.toml` (NOT in code)
 - [ ] `.env.example.streamlit` shown in repo (no real secrets)
 - [ ] `.env` file is in `.gitignore` (never commit real secrets)
-- [ ] Railway PostgreSQL has strong password
+- [ ] PostgreSQL database has strong password
 - [ ] Streamlit app enforces HTTPS (automatic)
 - [ ] OTP feature ready for SMS (Twilio integration later)
 
@@ -205,19 +201,17 @@ People can access it from anywhere in the world.
 
 ### Error: "Database connection failed"
 
-**Cause**: DATABASE_URL not set or wrong format
+**Cause**: `DATABASE_URL` not set or wrong format
 
 **Fix**:
-1. Go to Railway dashboard
-2. Click PostgreSQL
-3. Click "Connect"
-4. Copy the exact URL under "PostgreSQL"
-5. Paste into Streamlit Cloud secrets (replace old one)
-6. Rerun the app
+1. Go to your database dashboard
+2. Copy the exact PostgreSQL URL
+3. Paste it in Streamlit Cloud secrets
+4. Save and rerun the app
 
 ### Error: "Table 'users' does not exist"
 
-**Cause**: Database tables not initialized
+**Cause**: First-run database initialization did not complete
 
 **Fix**:
 1. Open terminal

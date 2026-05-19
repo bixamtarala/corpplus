@@ -1,8 +1,4 @@
-"""
-CropPulse Phase 2 - Streamlit Upgrade
-Agricultural Operating System with PostgreSQL Backend
-Full-featured Farmer OS + Marketplace + Intelligence
-"""
+"""CropPulse Phase 2 - Streamlit-first public app."""
 
 import streamlit as st
 import pandas as pd
@@ -52,29 +48,155 @@ st.markdown("""
         max-width: 1400px;
         margin: 0 auto;
     }
+
+    .block-container {
+        padding-top: 1.25rem;
+        padding-bottom: 2rem;
+    }
+
+    .top-strip {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .brand-lockup {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .brand-mark {
+        font-size: 40px;
+        line-height: 1;
+    }
+
+    .brand-title {
+        font-size: 30px;
+        font-weight: 800;
+        color: #1f2d3d;
+        margin: 0;
+    }
+
+    .brand-subtitle {
+        font-size: 14px;
+        color: #5f6c7b;
+        margin: 2px 0 0 0;
+    }
+
+    .top-badge {
+        display: inline-block;
+        padding: 8px 14px;
+        background: #eef8f1;
+        border: 1px solid #cfe8d7;
+        border-radius: 999px;
+        color: #1d6b3a;
+        font-size: 13px;
+        font-weight: 600;
+    }
     
     /* Landing Page Hero */
     .hero-section {
-        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        background: linear-gradient(135deg, #1f8f4d 0%, #2ecc71 100%);
         color: white;
-        padding: 80px 40px;
-        border-radius: 20px;
-        margin: 40px 0;
-        text-align: center;
+        padding: 56px 44px;
+        border-radius: 24px;
+        margin: 24px 0 28px 0;
         box-shadow: 0 10px 40px rgba(46, 204, 113, 0.2);
+    }
+
+    .hero-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 28px;
+        align-items: center;
+    }
+
+    .section-kicker {
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 12px;
+        font-weight: 700;
+        opacity: 0.85;
+        margin-bottom: 14px;
     }
     
     .hero-title {
-        font-size: 48px;
+        font-size: 52px;
         font-weight: 800;
-        margin: 20px 0;
+        line-height: 1.05;
+        margin: 0 0 18px 0;
     }
     
     .hero-subtitle {
-        font-size: 24px;
+        font-size: 21px;
         font-weight: 400;
-        margin: 20px 0;
+        margin: 0 0 18px 0;
+        opacity: 0.94;
+    }
+
+    .hero-copy {
+        font-size: 16px;
+        line-height: 1.7;
         opacity: 0.95;
+        margin-bottom: 24px;
+        max-width: 760px;
+    }
+
+    .hero-panel {
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 20px;
+        padding: 24px;
+        backdrop-filter: blur(8px);
+    }
+
+    .hero-panel h3 {
+        margin: 0 0 14px 0;
+        font-size: 20px;
+    }
+
+    .hero-panel ul {
+        margin: 0;
+        padding-left: 18px;
+        line-height: 1.8;
+    }
+
+    .cta-row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+    }
+
+    .metric-strip {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin: 10px 0 24px 0;
+    }
+
+    .hero-stat {
+        background: #ffffff;
+        border: 1px solid #e5ece7;
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    }
+
+    .hero-stat-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: #1f2d3d;
+        margin: 0 0 6px 0;
+    }
+
+    .hero-stat-label {
+        font-size: 13px;
+        color: #607080;
+        margin: 0;
     }
     
     /* Feature Cards */
@@ -159,6 +281,26 @@ st.markdown("""
         background: #cfe2ff;
         color: #084298;
     }
+
+    @media (max-width: 900px) {
+        .hero-grid,
+        .metric-strip {
+            grid-template-columns: 1fr;
+        }
+
+        .top-strip {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .hero-title {
+            font-size: 38px;
+        }
+
+        .hero-section {
+            padding: 32px 24px;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -179,6 +321,18 @@ if "otp_code" not in st.session_state:
     st.session_state.otp_code = None
 
 if "phone_temp" not in st.session_state:
+    st.session_state.phone_temp = None
+
+
+def go_to_page(page_name):
+    """Centralized page switch helper."""
+    st.session_state.page = page_name
+    st.rerun()
+
+
+def reset_auth_flow():
+    """Clear transient OTP state when leaving auth screens."""
+    st.session_state.otp_code = None
     st.session_state.phone_temp = None
 
 # ============================================================================
@@ -282,23 +436,66 @@ def get_farmer_dashboard(user_id):
 # ============================================================================
 
 def page_landing():
-    """Landing Page - First impression"""
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
-    with col2:
-        st.markdown("""
-        <div class="hero-section">
-            <div style="font-size: 80px; margin: 20px 0;">🌾</div>
-            <div class="hero-title">CropPulse</div>
-            <div class="hero-subtitle">Agricultural Operating System</div>
-            <p style="font-size: 16px; margin: 30px 0; opacity: 0.95;">
-            The complete platform for farmers, traders, and agricultural businesses.
-            </p>
+    """Public landing page for the Streamlit deployment."""
+    st.markdown("""
+    <div class="top-strip">
+        <div class="brand-lockup">
+            <div class="brand-mark">🌾</div>
+            <div>
+                <h1 class="brand-title">CropPulse</h1>
+                <p class="brand-subtitle">Agricultural Operating System</p>
+            </div>
         </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown("---")
-    
+        <div class="top-badge">Streamlit-first public app</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="hero-section">
+        <div class="hero-grid">
+            <div>
+                <div class="section-kicker">Agricultural intelligence and market coordination</div>
+                <div class="hero-title">One public entry point for farmers, traders, and agri teams.</div>
+                <div class="hero-subtitle">Landing page, onboarding, and working dashboards in a single Streamlit app.</div>
+                <p class="hero-copy">
+                    CropPulse helps farmers get market visibility, helps traders find supply faster, and gives agricultural teams
+                    a single operating surface for crop intelligence, listings, and deal coordination.
+                </p>
+            </div>
+            <div class="hero-panel">
+                <h3>What you can do here</h3>
+                <ul>
+                    <li>Register farmers and traders from the same public app</li>
+                    <li>Use one-host Streamlit deployment for landing, auth, and dashboard</li>
+                    <li>Connect directly to SQLite locally or Railway PostgreSQL in production</li>
+                    <li>Run without the FastAPI service in the active user path</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="metric-strip">
+        <div class="hero-stat">
+            <p class="hero-stat-value">500+</p>
+            <p class="hero-stat-label">Traders validated in Phase 1</p>
+        </div>
+        <div class="hero-stat">
+            <p class="hero-stat-value">1 app</p>
+            <p class="hero-stat-label">Landing, auth, and dashboard together</p>
+        </div>
+        <div class="hero-stat">
+            <p class="hero-stat-value">2 DB modes</p>
+            <p class="hero-stat-label">SQLite local, PostgreSQL in production</p>
+        </div>
+        <div class="hero-stat">
+            <p class="hero-stat-value">0 API</p>
+            <p class="hero-stat-label">Required in the active Streamlit path</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
     # Feature Overview
     col1, col2, col3 = st.columns(3)
     
@@ -307,8 +504,8 @@ def page_landing():
         <div class="feature-card">
             <h3>📍 Farmer Dashboard</h3>
             <p>
-            Manage crops, track prices, find best time to sell, and connect directly 
-            with traders. Get real-time market intelligence.
+            Manage crops, track prices, find the best time to sell, and connect directly
+            with buyers using one public app.
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -318,8 +515,8 @@ def page_landing():
         <div class="feature-card">
             <h3>🛒 Smart Marketplace</h3>
             <p>
-            List crops for sale, receive trader offers, negotiate prices, and complete 
-            deals. Direct buyer-seller matching.
+            Create listings, receive offers, negotiate prices, and coordinate deals
+            without leaving the Streamlit flow.
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -329,46 +526,36 @@ def page_landing():
         <div class="feature-card">
             <h3>💡 Intelligence Feed</h3>
             <p>
-            Daily weather forecasts, price trends, government schemes, disease alerts, 
-            and AI-powered recommendations.
+            Daily weather forecasts, price trends, scheme visibility, and action-ready
+            market guidance for field users.
             </p>
         </div>
         """, unsafe_allow_html=True)
-    
-    st.markdown("---")
-    
+
     # Call to Action
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.write("")
-        st.write("")
-        c1, c2 = st.columns(2)
-        
-        with c1:
-            if st.button("👨‍🌾 Register as Farmer", use_container_width=True):
-                st.session_state.page = "register"
-                st.rerun()
-        
-        with c2:
-            if st.button("🧑‍💼 Trader Login", use_container_width=True):
-                st.session_state.page = "login"
-                st.rerun()
-    
-    st.write("")
-    st.write("")
-    
+    c1, c2, c3 = st.columns([1.2, 1.2, 1])
+    with c1:
+        if st.button("👨‍🌾 Create farmer account", use_container_width=True):
+            reset_auth_flow()
+            go_to_page("register")
+    with c2:
+        if st.button("🔐 Sign in to CropPulse", use_container_width=True):
+            reset_auth_flow()
+            go_to_page("login")
+    with c3:
+        st.caption("Deploy this file directly on Streamlit Cloud.")
+
     # Phase Info
     st.markdown("""
-    ### 🚀 Phase 2 Ready
+    ### Public deployment notes
     
-    **CropPulse is transforming agriculture:**
-    - 500+ rice traders already using Phase 1
-    - Scaling to 50,000+ farmers in Phase 2
-    - Real-time market prices & AI recommendations
-    - Direct farmer-trader marketplace
-    - Government scheme integration
+    **This Streamlit app is the recommended public entrypoint:**
+    - Landing page, onboarding, and dashboard live in one app
+    - No FastAPI service is required in the active user journey
+    - Database auto-initializes on first run
+    - Ready for Streamlit Cloud with Railway PostgreSQL or local SQLite
     
-    **By 2027:** Become the operating system for agriculture across India
+    **Recommended deployment:** Streamlit Cloud for the app, PostgreSQL only for data.
     
     ---
     *©2026 CropPulse. Making agriculture smarter, fairer, and more profitable.*
@@ -376,7 +563,7 @@ def page_landing():
 
 def page_register():
     """Farmer Registration"""
-    st.markdown("## 👨‍🌾 Register as Farmer")
+    st.markdown("## 👨‍🌾 Create Farmer Account")
     
     col1, col2, col3 = st.columns([1, 2, 1])
     
@@ -399,7 +586,7 @@ def page_register():
                     st.session_state.otp_code = otp
                     st.session_state.phone_temp = phone
                     st.success(f"✅ OTP sent! (Demo: {otp})")
-                    st.info("In production, SMS would be sent via Twilio")
+                    st.info("This Streamlit-only build shows a demo OTP on screen instead of using an API service.")
             else:
                 st.error("❌ Please enter a valid 10-digit phone number")
         
@@ -466,12 +653,12 @@ def page_register():
         st.markdown('</div>', unsafe_allow_html=True)
         
         if st.button("← Back to Landing"):
-            st.session_state.page = "landing"
-            st.rerun()
+            reset_auth_flow()
+            go_to_page("landing")
 
 def page_login():
     """Login Page"""
-    st.markdown("## 🧑‍💼 Trader Login")
+    st.markdown("## 🔐 Sign In")
     
     col1, col2, col3 = st.columns([1, 2, 1])
     
@@ -505,8 +692,8 @@ def page_login():
         st.markdown('</div>', unsafe_allow_html=True)
         
         if st.button("← Back to Landing"):
-            st.session_state.page = "landing"
-            st.rerun()
+            reset_auth_flow()
+            go_to_page("landing")
 
 def page_dashboard():
     """Main Dashboard for Farmers/Traders"""
@@ -696,10 +883,12 @@ def page_dashboard():
 
 def main():
     """Main app router"""
-    # Initialize database on first run
+    # Initialize schema before serving any page.
+    init_database()
+
     if not test_connection():
         st.error("❌ Database connection failed. Please check your database configuration.")
-        st.info("Using SQLite for local testing. For production, use PostgreSQL with Railway.")
+        st.info("Use local SQLite for development or set DATABASE_URL for Streamlit Cloud production.")
         return
     
     # Route to appropriate page

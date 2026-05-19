@@ -1,4 +1,28 @@
-# 🌾 CropPulse Landing Page - Complete Package
+# 🌾 CropPulse - Streamlit-First Deployment
+
+## Current Recommended Deployment
+
+Use Streamlit Cloud with [streamlit_app_phase2.py](streamlit_app_phase2.py) as the main file.
+
+This app already includes:
+- a public landing page
+- farmer registration and sign-in flows
+- dashboard and marketplace screens
+- SQLite for local development
+- PostgreSQL support through `DATABASE_URL` in Streamlit Cloud secrets
+
+You do not need a separate FastAPI service for the active public app path.
+
+### Streamlit Cloud Setup
+
+1. Push the repo to GitHub.
+2. In Streamlit Cloud, create a new app.
+3. Set the main file path to `streamlit_app_phase2.py`.
+4. Add `DATABASE_URL` in Streamlit secrets if you want PostgreSQL in production.
+
+---
+
+# Legacy Static Landing Page Notes
 
 ## ✅ What's Included
 

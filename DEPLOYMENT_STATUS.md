@@ -37,7 +37,7 @@ Status: 🎉 ALL SYSTEMS GO FOR PRODUCTION
 - Market Volatility: **4.07%**
 
 ### Deployment Configuration ✅
-- **streamlit_app.py** - Cloud entry point configured
+- **streamlit_app_phase2.py** - Cloud entry point configured
 - **requirements.txt** - Root level with all dependencies
 - **.streamlit/config.toml** - Streamlit settings optimized
 - **.gitignore** - Properly configured for commits
@@ -65,11 +65,14 @@ URL: https://corpplus.streamlit.app
 Timeline: Should be live in 2-5 minutes
 ```
 
-### Landing Page
+**Current recommended app file:** `streamlit_app_phase2.py`
+**Public path:** landing page + onboarding + dashboard in one Streamlit app
+
+### Landing Experience
 ```
-Status: READY
-URL: https://croppulse.com (after DNS/SSL configuration)
-Currently: Points to Streamlit app correctly
+Status: INCLUDED IN STREAMLIT APP
+URL: https://corpplus.streamlit.app
+Currently: Use the Streamlit app itself as the public landing page
 ```
 
 ---
@@ -199,7 +202,7 @@ Overall Readiness:   ██████████ 99% ✅
 **Test Results:** See `SAAS_TEST_REPORT.md`  
 **Test Script:** Run `python test_saas.py` to re-run tests  
 **Configuration:** Check `.streamlit/config.toml`  
-**Entry Points:** `streamlit_app.py` (cloud), `croppulse/croppulse_app.py` (main)  
+**Entry Points:** `streamlit_app_phase2.py` (cloud), `croppulse/croppulse_app.py` (legacy app)  
 **Data:** `croppulse/data/commodity_prices.csv`  
 
 ---
