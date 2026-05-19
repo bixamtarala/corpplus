@@ -2256,11 +2256,7 @@ def page_register():
 
 def page_login():
     """Login Page"""
-    header_col, switcher_col = st.columns([4, 1.6])
-    with header_col:
-        st.markdown(tr("sign_in"))
-    with switcher_col:
-        render_language_switcher("login", show_label=True)
+    st.markdown(tr("sign_in"))
     
     col1, col2, col3 = st.columns([1, 2, 1])
     
