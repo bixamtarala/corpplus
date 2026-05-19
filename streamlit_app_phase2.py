@@ -857,6 +857,9 @@ if "phone_temp" not in st.session_state:
 if "language" not in st.session_state:
     st.session_state.language = "en"
 
+if "landing_panel" not in st.session_state:
+    st.session_state.landing_panel = None
+
 
 TRANSLATIONS = {
     "en": {
@@ -1623,6 +1626,7 @@ def reset_auth_flow():
     """Clear transient OTP state when leaving auth screens."""
     st.session_state.otp_code = None
     st.session_state.phone_temp = None
+    st.session_state.landing_panel = None
 
 
 def enter_demo_mode():
@@ -1741,11 +1745,11 @@ def page_landing():
     if landing_action == "login":
         clear_action_query_param()
         reset_auth_flow()
-        go_to_page("login")
+        st.session_state.landing_panel = "login"
     if landing_action == "register":
         clear_action_query_param()
         reset_auth_flow()
-        go_to_page("register")
+        st.session_state.landing_panel = "register"
     if landing_action == "demo":
         clear_action_query_param()
         enter_demo_mode()
@@ -1755,7 +1759,7 @@ def page_landing():
     st.markdown(f"""
     <div class="landing-header-shell">
     <div class="promo-bar">
-        {tr('promo_bar')} <a href="{build_query_href(action='demo', lang=current_lang)}">{tr('invite_link')}</a> {tr('promo_suffix')}
+        {tr('promo_bar')} <a href="#demo">{tr('invite_link')}</a> {tr('promo_suffix')}
     </div>
 
     <div class="landing-nav">
@@ -1850,8 +1854,8 @@ def page_landing():
             </div>
         </div>
         <div class="nav-actions">
-            <a class="nav-chip primary" href="{build_query_href(action='demo', lang=current_lang)}">&#8981;</a>
-            <a class="nav-chip secondary" href="{build_query_href(action='login', lang=current_lang)}"><span>{tr('login')}</span></a>
+            <a class="nav-chip primary" href="#demo">&#8981;</a>
+            <a class="nav-chip secondary" href="{build_query_href(action='login', lang=current_lang)}#auth"><span>{tr('login')}</span></a>
         </div>
     </div>
     </div>
@@ -1877,6 +1881,13 @@ def page_landing():
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+    if st.session_state.landing_panel:
+        st.markdown('<div id="auth"></div>', unsafe_allow_html=True)
+        if st.session_state.landing_panel == "login":
+            page_login()
+        elif st.session_state.landing_panel == "register":
+            page_register()
 
     st.markdown(f"""
     <div id="features" class="section-shell">
