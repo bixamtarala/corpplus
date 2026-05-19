@@ -184,6 +184,15 @@ st.markdown("""
         align-items: center;
     }
 
+    .nav-item::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        height: 14px;
+    }
+
     .nav-link {
         color: #182635;
         font-size: 13px;
@@ -211,7 +220,7 @@ st.markdown("""
 
     .nav-dropdown {
         position: absolute;
-        top: calc(100% + 20px);
+        top: calc(100% + 8px);
         left: 50%;
         transform: translateX(-50%) translateY(10px);
         min-width: 300px;
