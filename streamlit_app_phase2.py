@@ -324,7 +324,7 @@ st.markdown("""
         padding: 11px 20px;
         font-size: 14px;
         font-weight: 700;
-        text-decoration: none;
+        text-decoration: none !important;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -332,6 +332,14 @@ st.markdown("""
         border: 1px solid #d6e4ee;
         background: #ffffff;
         box-shadow: 0 8px 20px rgba(31, 45, 61, 0.05);
+    }
+
+    .nav-chip:hover,
+    .nav-chip:focus,
+    .nav-chip:active,
+    .nav-chip:visited,
+    .nav-chip span {
+        text-decoration: none !important;
     }
 
     .nav-chip.primary {
