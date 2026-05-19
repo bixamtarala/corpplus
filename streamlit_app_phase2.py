@@ -86,6 +86,23 @@ st.markdown("""
     }
 
     /* Landing Page */
+    .promo-bar {
+        background: linear-gradient(90deg, #0a2f1f 0%, #0f3c29 100%);
+        color: rgba(255, 255, 255, 0.92);
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 9px 20px;
+        margin: -1.25rem -999px 0 -999px;
+        padding-left: 999px;
+        padding-right: 999px;
+    }
+
+    .promo-bar a {
+        color: #ffffff;
+        font-weight: 800;
+    }
+
     .landing-nav {
         display: grid;
         grid-template-columns: auto 1fr auto;
@@ -162,9 +179,18 @@ st.markdown("""
         white-space: nowrap;
     }
 
+    .nav-menu a.active {
+        color: #1f8f4d;
+        font-weight: 700;
+    }
+
     .nav-menu-caret {
         font-size: 11px;
         color: #182635;
+    }
+
+    .nav-menu a.active .nav-menu-caret {
+        color: #1f8f4d;
     }
 
     .nav-actions {
@@ -212,6 +238,71 @@ st.markdown("""
         gap: 10px;
         border-color: #edf1f5;
         box-shadow: 0 10px 24px rgba(31, 45, 61, 0.06);
+    }
+
+    .industry-panel-wrap {
+        position: relative;
+        margin-bottom: 18px;
+    }
+
+    .industry-panel {
+        background: #ffffff;
+        border: 1px solid #e8eff4;
+        border-top: none;
+        box-shadow: 0 16px 34px rgba(31, 45, 61, 0.08);
+        padding: 36px 40px 28px 40px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 28px 38px;
+    }
+
+    .industry-card {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .industry-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #edf8f1;
+        color: #1f8f4d;
+        font-size: 28px;
+        flex: 0 0 auto;
+    }
+
+    .industry-card h4 {
+        font-size: 18px;
+        color: #1b2c3a;
+        margin: 0 0 8px 0;
+        font-weight: 700;
+    }
+
+    .industry-card p {
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.5;
+        color: #556979;
+    }
+
+    .schedule-demo-tab {
+        position: absolute;
+        right: -18px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #6e9d2f;
+        color: white;
+        text-decoration: none;
+        font-weight: 700;
+        padding: 18px 14px;
+        border-radius: 10px 10px 0 0;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        box-shadow: 0 14px 26px rgba(110, 157, 47, 0.28);
     }
 
     .hero-section {
@@ -680,6 +771,7 @@ st.markdown("""
     }
 
     @media (max-width: 900px) {
+        .industry-panel,
         .landing-nav,
         .hero-grid,
         .card-grid,
@@ -720,6 +812,18 @@ st.markdown("""
         .nav-chip.secondary {
             height: auto;
             padding: 11px 20px;
+        }
+
+        .promo-bar {
+            margin-left: -2rem;
+            margin-right: -2rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            font-size: 12px;
+        }
+
+        .schedule-demo-tab {
+            display: none;
         }
 
         .floating-card,
@@ -894,6 +998,10 @@ def page_landing():
         enter_demo_mode()
 
     st.markdown("""
+    <div class="promo-bar">
+        Turn farm data into ROI. <a href="?action=demo">Invite CropPulse</a> to your AI and digital transformation workflow.
+    </div>
+
     <div class="landing-nav">
         <div class="nav-brand">
             <div class="nav-mark">🌾</div>
@@ -904,7 +1012,7 @@ def page_landing():
         </div>
         <div class="nav-menu">
             <a href="#features">Products <span class="nav-menu-caret">&#9662;</span></a>
-            <a href="#workflows">Industry <span class="nav-menu-caret">&#9662;</span></a>
+            <a class="active" href="#industry-panel">Industry <span class="nav-menu-caret">&#9662;</span></a>
             <a href="#trust">Solutions <span class="nav-menu-caret">&#9662;</span></a>
             <a href="#demo">Crop Knowledge Grid</a>
             <a href="#demo">Resources <span class="nav-menu-caret">&#9662;</span></a>
@@ -914,6 +1022,47 @@ def page_landing():
             <a class="nav-chip primary" href="?action=demo">&#8981;</a>
             <a class="nav-chip secondary" href="?action=login">&#127760; <span>Login</span> <span class="nav-menu-caret">&#9662;</span></a>
         </div>
+    </div>
+
+    <div class="industry-panel-wrap" id="industry-panel">
+        <div class="industry-panel">
+            <div class="industry-card">
+                <div class="industry-icon">&#127806;</div>
+                <div>
+                    <h4>Food Retail</h4>
+                    <p>Intelligent sourcing for a smarter, more sustainable food retail future.</p>
+                </div>
+            </div>
+            <div class="industry-card">
+                <div class="industry-icon">&#128230;</div>
+                <div>
+                    <h4>CPG/FMCG</h4>
+                    <p>Powering the future of food with AI for CPG and FMCG supply leaders.</p>
+                </div>
+            </div>
+            <div class="industry-card">
+                <div class="industry-icon">&#127793;</div>
+                <div>
+                    <h4>Seed Manufacturing</h4>
+                    <p>Smarter seed production with field intelligence, forecasting, and scale-ready operations.</p>
+                </div>
+            </div>
+            <div class="industry-card">
+                <div class="industry-icon">&#127970;</div>
+                <div>
+                    <h4>Development Agencies &amp; Governments</h4>
+                    <p>Programs for governments and institutions that need traceable agricultural visibility at scale.</p>
+                </div>
+            </div>
+            <div class="industry-card">
+                <div class="industry-icon">&#127981;</div>
+                <div>
+                    <h4>Other Industries</h4>
+                    <p>Digitize farm operations and create end-to-end food processing traceability across regions.</p>
+                </div>
+            </div>
+        </div>
+        <a class="schedule-demo-tab" href="?action=register">Schedule a demo</a>
     </div>
     """, unsafe_allow_html=True)
 
