@@ -395,7 +395,7 @@ st.markdown("""
         background: linear-gradient(180deg, #ffffff 0%, #f4fbff 100%);
         border: 1px solid #e1eef5;
         border-radius: 34px;
-        padding: 28px;
+        padding: 24px;
         margin: 0 0 26px 0;
         box-shadow: 0 22px 48px rgba(20, 52, 84, 0.08);
     }
@@ -410,36 +410,36 @@ st.markdown("""
     .section-kicker {
         text-transform: uppercase;
         letter-spacing: 0.12em;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 800;
         color: #1b8d59;
-        margin-bottom: 14px;
+        margin-bottom: 12px;
     }
     
     .hero-title {
-        font-size: 64px;
+        font-size: 48px;
         font-weight: 800;
-        line-height: 1.02;
+        line-height: 1.08;
         color: #193259;
-        margin: 0 0 18px 0;
-        max-width: 620px;
+        margin: 0 0 14px 0;
+        max-width: 560px;
     }
     
     .hero-subtitle {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 500;
-        line-height: 1.6;
-        margin: 0 0 18px 0;
+        line-height: 1.55;
+        margin: 0 0 14px 0;
         color: #51657d;
-        max-width: 600px;
+        max-width: 560px;
     }
 
     .hero-copy {
-        font-size: 17px;
-        line-height: 1.7;
+        font-size: 15px;
+        line-height: 1.65;
         color: #61768d;
-        margin: 0 0 20px 0;
-        max-width: 620px;
+        margin: 0 0 18px 0;
+        max-width: 560px;
     }
 
     .hero-tags {
@@ -453,8 +453,8 @@ st.markdown("""
         background: #eaf4ff;
         color: #325a8a;
         border-radius: 999px;
-        padding: 10px 16px;
-        font-size: 13px;
+        padding: 8px 14px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -462,8 +462,8 @@ st.markdown("""
         position: relative;
         background: linear-gradient(180deg, #16233a 0%, #1d2d49 100%);
         border-radius: 24px;
-        padding: 18px;
-        min-height: 360px;
+        padding: 16px;
+        min-height: 330px;
         box-shadow: 0 20px 50px rgba(10, 18, 34, 0.22);
         overflow: hidden;
     }
@@ -483,9 +483,9 @@ st.markdown("""
         align-items: center;
         gap: 8px;
         color: #8fa1bb;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 700;
-        margin-bottom: 14px;
+        margin-bottom: 12px;
     }
 
     .visual-dot {
@@ -503,11 +503,11 @@ st.markdown("""
         background: linear-gradient(180deg, #284a79 0%, #233d63 100%);
         border: 1px solid rgba(140, 182, 235, 0.18);
         border-radius: 20px;
-        padding: 20px;
-        height: 140px;
+        padding: 18px;
+        height: 128px;
         position: relative;
         overflow: hidden;
-        margin-bottom: 16px;
+        margin-bottom: 14px;
     }
 
     .visual-chart::before {
@@ -550,43 +550,43 @@ st.markdown("""
         background: rgba(255, 255, 255, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 18px;
-        padding: 16px;
+        padding: 14px;
         color: white;
         position: relative;
         z-index: 1;
     }
 
     .visual-label {
-        font-size: 14px;
+        font-size: 12px;
         color: #9db2ce;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
 
     .visual-value {
-        font-size: 34px;
+        font-size: 28px;
         font-weight: 800;
         line-height: 1.1;
-        margin: 0 0 6px 0;
+        margin: 0 0 4px 0;
     }
 
     .visual-note {
-        font-size: 13px;
+        font-size: 12px;
         color: #b8cae2;
         margin: 0;
     }
 
     .floating-card {
         position: absolute;
-        right: -18px;
-        top: 160px;
-        width: 190px;
+        right: -12px;
+        top: 148px;
+        width: 172px;
         background: linear-gradient(180deg, #2fa84a 0%, #2c9c46 100%);
         box-shadow: 0 16px 30px rgba(25, 64, 25, 0.25);
     }
 
     .floating-card.secondary {
-        top: 264px;
-        right: -8px;
+        top: 244px;
+        right: -4px;
         background: white;
         color: #1f2d3d;
     }
@@ -1967,7 +1967,7 @@ def page_landing():
                 </div>
                 <div class="floating-card secondary">
                     <div class="visual-label">{tr('watchlist_priority')}</div>
-                    <p class="visual-value" style="font-size: 24px; color: #17324d;">{tr('rice_buyers')}</p>
+                    <p class="visual-value" style="font-size: 20px; color: #17324d;">{tr('rice_buyers')}</p>
                     <p class="visual-note">{tr('watchlist_priority_desc')}</p>
                 </div>
             </div>
