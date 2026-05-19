@@ -1581,7 +1581,7 @@ def render_language_switcher(widget_key, show_label=True):
         st.session_state[widget_state_key] = current_lang
 
     if show_label:
-        label_col, radio_col = st.columns([1.1, 2.2])
+        label_col, select_col = st.columns([1.0, 1.7])
         with label_col:
             st.markdown(
                 "<div style='padding-top: 0.45rem; color: #6b7d90; font-size: 0.95rem; font-weight: 500;'>"
@@ -1589,21 +1589,19 @@ def render_language_switcher(widget_key, show_label=True):
                 + "</div>",
                 unsafe_allow_html=True,
             )
-        with radio_col:
-            selected_lang = st.radio(
+        with select_col:
+            selected_lang = st.selectbox(
                 tr("language_label"),
                 options=["en", "te"],
                 key=widget_state_key,
-                horizontal=True,
                 label_visibility="collapsed",
                 format_func=lambda code: tr("language_english") if code == "en" else tr("language_telugu"),
             )
     else:
-        selected_lang = st.radio(
+        selected_lang = st.selectbox(
             tr("language_label"),
             options=["en", "te"],
             key=widget_state_key,
-            horizontal=True,
             label_visibility="collapsed",
             format_func=lambda code: tr("language_english") if code == "en" else tr("language_telugu"),
         )
@@ -2255,7 +2253,7 @@ def page_login():
 def page_dashboard():
     """Main Dashboard for Farmers/Traders"""
     # Top Navigation
-    col1, col2, col3 = st.columns([4.4, 2.5, 1.4])
+    col1, col2, col3 = st.columns([5.0, 2.2, 1.2])
     
     with col1:
         st.markdown(tr("dashboard_title"))
