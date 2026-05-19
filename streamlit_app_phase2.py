@@ -429,6 +429,138 @@ st.markdown("""
         box-shadow: 0 10px 24px rgba(31, 45, 61, 0.06);
     }
 
+    .mobile-landing-shortcuts,
+    .mobile-dashboard-actions,
+    .mobile-bottom-nav {
+        display: none;
+    }
+
+    .mobile-landing-shortcuts {
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .mobile-shortcut,
+    .dashboard-nav-link,
+    .mobile-dashboard-action,
+    .mobile-bottom-link {
+        text-decoration: none !important;
+    }
+
+    .mobile-shortcut {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 54px;
+        padding: 0 16px;
+        border-radius: 16px;
+        border: 1px solid #dce7ef;
+        background: #f8fbfd;
+        color: #183247;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .dashboard-section-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 0 0 1rem 0;
+    }
+
+    .dashboard-nav-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px;
+        padding: 0 18px;
+        border-radius: 999px;
+        border: 1px solid #dbe6ee;
+        background: #ffffff;
+        color: #183247;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .dashboard-nav-link.active {
+        background: #0f3c29;
+        border-color: #0f3c29;
+        color: #ffffff;
+    }
+
+    .mobile-dashboard-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin: 0 0 1rem 0;
+    }
+
+    .mobile-dashboard-action {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-height: 96px;
+        padding: 16px;
+        border-radius: 18px;
+        background: linear-gradient(180deg, #f7fbf8 0%, #eef7f1 100%);
+        border: 1px solid #d7e9dc;
+        color: #183247;
+    }
+
+    .mobile-dashboard-action strong {
+        font-size: 15px;
+        line-height: 1.3;
+    }
+
+    .mobile-dashboard-action span {
+        font-size: 13px;
+        line-height: 1.45;
+        color: #5b6f7f;
+    }
+
+    .mobile-dashboard-action.active {
+        background: linear-gradient(180deg, #0f3c29 0%, #165238 100%);
+        border-color: #0f3c29;
+        color: #ffffff;
+    }
+
+    .mobile-dashboard-action.active span {
+        color: rgba(255, 255, 255, 0.82);
+    }
+
+    .mobile-bottom-nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1200;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+        background: rgba(255, 255, 255, 0.98);
+        border-top: 1px solid #dfe9f0;
+        box-shadow: 0 -10px 24px rgba(31, 45, 61, 0.08);
+    }
+
+    .mobile-bottom-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        min-height: 54px;
+        border-radius: 16px;
+        background: #f7fafc;
+        color: #4f6475;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .mobile-bottom-link.active {
+        background: #eef7f1;
+        color: #0f3c29;
+    }
+
     .hero-section {
         background: linear-gradient(180deg, #ffffff 0%, #f4fbff 100%);
         border: 1px solid #e1eef5;
@@ -786,9 +918,16 @@ st.markdown("""
         }
 
         .nav-brand,
-        .nav-menu,
         .nav-actions {
             width: 100%;
+        }
+
+        .nav-menu {
+            display: none;
+        }
+
+        .mobile-landing-shortcuts {
+            display: grid;
         }
 
         .hero-title {
@@ -800,14 +939,8 @@ st.markdown("""
             padding: 24px 18px;
         }
 
-        .nav-menu,
         .nav-actions {
             justify-content: flex-start;
-        }
-
-        .nav-menu {
-            flex-wrap: wrap;
-            gap: 14px;
         }
 
         .nav-dropdown,
@@ -883,12 +1016,22 @@ st.markdown("""
         .stNumberInput {
             width: 100%;
         }
+
+        .dashboard-nav-link {
+            min-height: 50px;
+            flex: 1 1 140px;
+        }
+
+        .dashboard-card {
+            padding: 24px 20px;
+            border-radius: 20px;
+        }
     }
 
     @media (max-width: 640px) {
         .block-container {
             padding-top: 0.75rem;
-            padding-bottom: 1.5rem;
+            padding-bottom: 6.25rem;
             padding-left: 0.75rem;
             padding-right: 0.75rem;
         }
@@ -928,6 +1071,30 @@ st.markdown("""
 
         .section-title {
             font-size: 22px;
+        }
+
+        .mobile-dashboard-actions,
+        .mobile-bottom-nav {
+            display: grid;
+        }
+
+        .dashboard-section-nav {
+            display: none;
+        }
+
+        .stButton > button {
+            min-height: 52px;
+            font-size: 16px;
+        }
+
+        div[data-testid="stHorizontalBlock"] {
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        div[data-testid="column"] {
+            width: 100% !important;
+            flex: 1 1 100% !important;
         }
     }
 </style>
@@ -1613,6 +1780,69 @@ def build_query_href(**params):
     return f"?{urlencode(filtered)}" if filtered else "?"
 
 
+def get_dashboard_section():
+    section = st.query_params.get("section", "dashboard")
+    allowed_sections = {"dashboard", "marketplace", "intelligence", "deals"}
+    return section if section in allowed_sections else "dashboard"
+
+
+def dashboard_section_href(section):
+    return build_query_href(lang=get_language(), section=section)
+
+
+def render_dashboard_section_nav(active_section):
+    nav_items = [
+        ("dashboard", tr("tab_dashboard")),
+        ("marketplace", tr("tab_marketplace")),
+        ("intelligence", tr("tab_intelligence")),
+        ("deals", tr("tab_deals")),
+    ]
+    nav_markup = ["<div class=\"dashboard-section-nav\">"]
+    for section, label in nav_items:
+        active_class = " active" if section == active_section else ""
+        nav_markup.append(
+            f'<a class="dashboard-nav-link{active_class}" href="{dashboard_section_href(section)}">{label}</a>'
+        )
+    nav_markup.append("</div>")
+    st.markdown("".join(nav_markup), unsafe_allow_html=True)
+
+
+def render_mobile_dashboard_actions(active_section):
+    cards = [
+        ("dashboard", tr("tab_dashboard"), tr("demo_overview_desc")),
+        ("marketplace", tr("tab_marketplace"), tr("marketplace_info")),
+        ("intelligence", tr("tab_intelligence"), tr("rainfall_alert_body")),
+        ("deals", tr("tab_deals"), tr("active_deals_info")),
+    ]
+    markup = ["<div class=\"mobile-dashboard-actions\">"]
+    for section, title, subtitle in cards:
+        active_class = " active" if section == active_section else ""
+        markup.append(
+            f'<a class="mobile-dashboard-action{active_class}" href="{dashboard_section_href(section)}">'
+            f"<strong>{title}</strong><span>{subtitle}</span></a>"
+        )
+    markup.append("</div>")
+    st.markdown("".join(markup), unsafe_allow_html=True)
+
+
+def render_mobile_bottom_nav(active_section):
+    items = [
+        ("dashboard", "🏠", tr("tab_dashboard")),
+        ("marketplace", "🛒", tr("tab_marketplace")),
+        ("intelligence", "📡", tr("tab_intelligence")),
+        ("deals", "💰", tr("tab_deals")),
+    ]
+    markup = ["<div class=\"mobile-bottom-nav\">"]
+    for section, icon, label in items:
+        active_class = " active" if section == active_section else ""
+        markup.append(
+            f'<a class="mobile-bottom-link{active_class}" href="{dashboard_section_href(section)}">'
+            f"<span>{icon}</span><span>{label}</span></a>"
+        )
+    markup.append("</div>")
+    st.markdown("".join(markup), unsafe_allow_html=True)
+
+
 STATE_OPTIONS = [
     "Tamil Nadu",
     "Andhra Pradesh",
@@ -1913,6 +2143,14 @@ def page_landing():
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="mobile-landing-shortcuts">
+            <a class="mobile-shortcut" href="#features">{tr('nav_products')}</a>
+            <a class="mobile-shortcut" href="#workflows">{tr('nav_industry')}</a>
+            <a class="mobile-shortcut" href="#trust">{tr('nav_solutions')}</a>
+            <a class="mobile-shortcut" href="#demo">{tr('continue_to_demo')}</a>
+            <a class="mobile-shortcut" href="{build_query_href(lang='en')}">{tr('language_english')}</a>
+            <a class="mobile-shortcut" href="{build_query_href(lang='te')}">{tr('language_telugu')}</a>
         </div>
         <div class="nav-actions">
             <a class="nav-chip secondary" href="{build_query_href(lang=current_lang, action='login')}">{tr('login')}</a>
@@ -2293,13 +2531,13 @@ def page_dashboard():
     """Main Dashboard for Farmers/Traders"""
     if st.button("🌾 CropPulse", key="dashboard_home", type="tertiary"):
         go_to_page("landing")
-    
-    # Tabs
-    tab1, tab2, tab3, tab4 = st.tabs([
-        tr("tab_dashboard"), tr("tab_marketplace"), tr("tab_intelligence"), tr("tab_deals")
-    ])
-    
-    with tab1:
+
+    active_section = get_dashboard_section()
+    render_dashboard_section_nav(active_section)
+    render_mobile_dashboard_actions(active_section)
+    render_mobile_bottom_nav(active_section)
+
+    if active_section == "dashboard":
         st.subheader(tr("your_dashboard"))
         
         if st.session_state.user_role == "farmer":
@@ -2401,8 +2639,8 @@ def page_dashboard():
         
         else:  # Trader
             st.info(tr("trader_dashboard_info"))
-    
-    with tab2:
+
+    elif active_section == "marketplace":
         st.subheader(tr("marketplace_title"))
         st.info(tr("marketplace_info"))
         
@@ -2422,8 +2660,8 @@ def page_dashboard():
             
             if st.form_submit_button(tr("create_listing")):
                 st.success(tr("listing_created"))
-    
-    with tab3:
+
+    elif active_section == "intelligence":
         st.subheader(tr("intelligence_feed"))
         
         # Weather Alert
@@ -2450,8 +2688,8 @@ def page_dashboard():
             st.markdown("💰")
         with col2:
             st.markdown(f"{tr('scheme_alert_title')}\n\n{tr('scheme_alert_body')}")
-    
-    with tab4:
+
+    else:
         st.subheader(tr("active_deals_title"))
         st.info(tr("active_deals_info"))
         
