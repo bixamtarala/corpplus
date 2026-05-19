@@ -28,10 +28,6 @@ from passlib.context import CryptContext
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
-# External APIs
-import httpx
-import redis.asyncio as redis
-
 # Environment
 from dotenv import load_dotenv
 
