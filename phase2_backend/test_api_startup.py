@@ -4,7 +4,7 @@ Tests that the FastAPI app initializes and routes are registered correctly
 """
 
 from fastapi.testclient import TestClient
-from main import app
+from phase2_backend.main import app
 import json
 
 # Create test client

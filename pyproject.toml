@@ -53,9 +53,10 @@ line_length = 120
 skip_gitignore = true
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = [".", "phase2_backend"]
 python_files = "test_*.py"
 addopts = "--strict-markers -v"
+norecursedirs = [".git", ".tox", ".venv", "build", "dist", "croppulse", "mobile_app_flutter"]
 
 [tool.mypy]
 python_version = "3.9"
