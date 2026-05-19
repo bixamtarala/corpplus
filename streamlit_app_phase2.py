@@ -428,6 +428,8 @@ st.markdown("""
         grid-template-columns: 1fr;
         gap: 18px;
         align-items: flex-start;
+        max-width: 1040px;
+        margin: 0 auto;
     }
 
     .section-kicker {
@@ -445,7 +447,7 @@ st.markdown("""
         line-height: 1.08;
         color: #193259;
         margin: 0 0 14px 0;
-        max-width: 560px;
+        max-width: none;
     }
     
     .hero-subtitle {
@@ -454,7 +456,7 @@ st.markdown("""
         line-height: 1.55;
         margin: 0 0 14px 0;
         color: #51657d;
-        max-width: 560px;
+        max-width: none;
     }
 
     .hero-copy {
@@ -462,7 +464,7 @@ st.markdown("""
         line-height: 1.65;
         color: #61768d;
         margin: 0 0 18px 0;
-        max-width: 560px;
+        max-width: none;
     }
 
     .hero-tags {
