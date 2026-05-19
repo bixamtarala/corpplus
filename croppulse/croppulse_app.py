@@ -38,7 +38,7 @@ BACKEND_API_URL = os.getenv(
     "BACKEND_API_URL", 
     "https://web-production-7295a.up.railway.app"
 )
-API_KEY = os.getenv("API_KEY", "croppulse_admin_secret_key_12345")
+API_KEY = os.getenv("API_KEY")
 
 # Import eNAM API (optional fallback)
 try:
@@ -242,6 +242,8 @@ st.markdown("""
 def load_data_from_api():
     """Load commodity price data from CropPulse Backend API"""
     try:
+        if not API_KEY:
+            return None
         headers = {"X-API-Key": API_KEY}
         secure_url = BACKEND_API_URL.replace("http://", "https://", 1)
         
@@ -344,6 +346,99 @@ def calculate_risk_score(commodity_data):
                   demand_pressure_score * 0.20)
     
     return min(risk_score, 100)
+
+
+def get_risk_level(risk_score):
+    """Return a human-readable risk label, icon, and color."""
+    if risk_score < 40:
+        return "Low Risk", "🟢", "#2ecc71"
+    if risk_score < 70:
+        return "Medium Risk", "🟡", "#f39c12"
+    return "High Risk", "🔴", "#e74c3c"
+
+
+def get_trend_indicator(current_price, previous_price):
+    """Return a trend indicator and color for consecutive prices."""
+    if previous_price == 0:
+        return "→ Stable", "#7f8c8d"
+
+    change_pct = ((current_price - previous_price) / previous_price) * 100
+    if change_pct > 0.5:
+        return f"📈 Up {change_pct:.1f}%", "#2ecc71"
+    if change_pct < -0.5:
+        return f"📉 Down {abs(change_pct):.1f}%", "#e74c3c"
+    return "→ Stable", "#7f8c8d"
+
+
+def get_price_trend_category(commodity_data):
+    """Classify price direction over a recent window."""
+    if len(commodity_data) < 2:
+        return "stable"
+
+    current_price = commodity_data['price'].iloc[-1]
+    previous_price = commodity_data['price'].iloc[0]
+    if previous_price == 0:
+        return "stable"
+
+    change_pct = ((current_price - previous_price) / previous_price) * 100
+    if change_pct > 2:
+        return "uptrend"
+    if change_pct < -2:
+        return "downtrend"
+    return "stable"
+
+
+def get_supply_demand_indicator(supply, demand):
+    """Summarize supply-demand balance."""
+    gap = demand - supply
+    if gap > 20:
+        return "Demand exceeds supply", "#e74c3c"
+    if gap < -20:
+        return "Supply exceeds demand", "#2ecc71"
+    return "Balanced market", "#f39c12"
+
+
+def predict_risk_trend(commodity_data):
+    """Estimate whether risk is increasing, decreasing, or stable."""
+    if len(commodity_data) < 10:
+        return "stable"
+
+    midpoint = len(commodity_data) // 2
+    early_score = calculate_risk_score(commodity_data.iloc[:midpoint].reset_index(drop=True))
+    recent_score = calculate_risk_score(commodity_data.iloc[midpoint:].reset_index(drop=True))
+    delta = recent_score - early_score
+
+    if delta > 5:
+        return "increasing"
+    if delta < -5:
+        return "decreasing"
+    return "stable"
+
+
+def get_risk_components(commodity_data):
+    """Expose component scores that feed the overall risk model."""
+    if len(commodity_data) == 0:
+        return {}
+
+    price_mean = commodity_data['price'].mean()
+    if price_mean == 0:
+        volatility = 0
+        price_change = 0
+    else:
+        volatility = (commodity_data['price'].std() / price_mean) * 100
+        price_change = ((commodity_data['price'].iloc[-1] - price_mean) / price_mean) * 100
+
+    volatility_score = min(abs(volatility), 100)
+    price_change_score = min(abs(price_change), 100)
+
+    return {
+        'volatility': volatility,
+        'volatility_score': volatility_score,
+        'price_change': price_change,
+        'price_change_score': price_change_score,
+        'supply': commodity_data['supply'].iloc[-1] if 'supply' in commodity_data.columns else None,
+        'demand': commodity_data['demand'].iloc[-1] if 'demand' in commodity_data.columns else None,
+    }
 
 
 def generate_intelligence_feed():

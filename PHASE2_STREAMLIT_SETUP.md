@@ -71,7 +71,7 @@ Example `.env`:
 ```
 DATABASE_URL=postgresql://postgres:your_password@localhost:5432/croppulse_phase2
 SECRET_KEY=your_random_secret_key
-API_KEY=croppulse_admin_secret_key_12345
+API_KEY=<set-a-strong-admin-key>
 ```
 
 ### 4. Initialize Database

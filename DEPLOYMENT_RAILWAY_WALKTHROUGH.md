@@ -60,7 +60,7 @@
 
 ```
 Variable Name          | Value
-API_KEY_ADMIN         | croppulse_admin_secret_key_12345
+API_KEY_ADMIN         | <set-a-strong-admin-key>
 API_KEY_FARMER        | croppulse_farmer_secret_key_12345
 API_KEY_TRADER        | croppulse_trader_secret_key_12345
 JWT_SECRET            | [Generate: python -c "import secrets; print(secrets.token_hex(32))"]

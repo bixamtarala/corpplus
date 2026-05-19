@@ -180,7 +180,7 @@ Status: Pushed to main branch ✅
    - Add:
      ```toml
      BACKEND_API_URL = "https://web-production-7295a.up.railway.app"
-     API_KEY = "croppulse_admin_secret_key_12345"
+   API_KEY = "<set-a-strong-admin-key>"
      ```
 
 3. **Verify:**
@@ -236,21 +236,21 @@ streamlit deploy \
 ### Streamlit Cloud Secrets (in UI)
 ```toml
 BACKEND_API_URL = "https://web-production-7295a.up.railway.app"
-API_KEY = "croppulse_admin_secret_key_12345"
+API_KEY = "<set-a-strong-admin-key>"
 ENVIRONMENT = "production"
 ```
 
 ### Local Development (.streamlit/secrets.toml)
 ```toml
 BACKEND_API_URL = "http://localhost:8000"
-API_KEY = "croppulse_admin_secret_key_12345"
+API_KEY = "<set-a-strong-admin-key>"
 ENVIRONMENT = "development"
 ```
 
 ### Testing Against Live Backend
 ```toml
 BACKEND_API_URL = "https://web-production-7295a.up.railway.app"
-API_KEY = "croppulse_admin_secret_key_12345"
+API_KEY = "<set-a-strong-admin-key>"
 ENVIRONMENT = "testing"
 ```
 

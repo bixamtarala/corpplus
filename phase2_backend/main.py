@@ -16,6 +16,7 @@ import logging.handlers
 import hashlib
 import secrets
 import json
+from jose import JWTError, jwt
 
 # Security & Rate Limiting
 from slowapi import Limiter
@@ -35,17 +36,27 @@ load_dotenv()
 # Rate Limiter Setup
 limiter = Limiter(key_func=get_remote_address, default_limits=["200 per day", "50 per hour"])
 
+
+def _require_env(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise RuntimeError(f"Required environment variable {name} is not set")
+    return value
+
 # API Key Storage (TODO: Move to Redis in production)
 VALID_API_KEYS = {
-    os.getenv("API_KEY_ADMIN", "croppulse_admin_secret_key_12345"),
-    os.getenv("API_KEY_FARMER", "croppulse_farmer_secret_key_12345"),
-    os.getenv("API_KEY_TRADER", "croppulse_trader_secret_key_12345"),
+    _require_env("API_KEY_ADMIN"),
+    _require_env("API_KEY_FARMER"),
+    _require_env("API_KEY_TRADER"),
 }
 
-# JWT Secret (move to environment variable)
-JWT_SECRET = os.getenv("JWT_SECRET", "change_me_in_production_12345678")
+# JWT Secret
+JWT_SECRET = _require_env("JWT_SECRET")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24
+OTP_EXPIRATION_MINUTES = 10
+OTP_MAX_ATTEMPTS = 5
+OTP_STORE: Dict[str, Dict[str, object]] = {}
 
 
 # ============================================================================
@@ -115,6 +126,66 @@ def log_audit(
         "details": details or {}
     }
     audit_logger.info(json.dumps(audit_entry))
+
+
+def mask_phone(phone: str) -> str:
+    return f"***{phone[-4:]}" if len(phone) >= 4 else "***"
+
+
+def generate_secure_otp() -> str:
+    return "".join(str(secrets.randbelow(10)) for _ in range(6))
+
+
+def _hash_otp(otp: str) -> str:
+    return hashlib.sha256(otp.encode("utf-8")).hexdigest()
+
+
+def purge_expired_otps() -> None:
+    now = datetime.utcnow()
+    expired = [phone for phone, record in OTP_STORE.items() if record["expires_at"] <= now]
+    for phone in expired:
+        OTP_STORE.pop(phone, None)
+
+
+def store_otp(phone: str, otp: str) -> None:
+    purge_expired_otps()
+    OTP_STORE[phone] = {
+        "otp_hash": _hash_otp(otp),
+        "expires_at": datetime.utcnow() + timedelta(minutes=OTP_EXPIRATION_MINUTES),
+        "attempts": 0,
+    }
+
+
+def verify_stored_otp(phone: str, otp: str) -> bool:
+    purge_expired_otps()
+    record = OTP_STORE.get(phone)
+    if not record:
+        return False
+
+    if record["attempts"] >= OTP_MAX_ATTEMPTS:
+        OTP_STORE.pop(phone, None)
+        return False
+
+    record["attempts"] += 1
+    if secrets.compare_digest(record["otp_hash"], _hash_otp(otp)):
+        OTP_STORE.pop(phone, None)
+        return True
+
+    if record["attempts"] >= OTP_MAX_ATTEMPTS:
+        OTP_STORE.pop(phone, None)
+    return False
+
+
+def create_access_token(subject: str, extra_claims: Optional[Dict[str, object]] = None) -> str:
+    expires_at = datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS)
+    payload = {
+        "sub": subject,
+        "exp": expires_at,
+        "iat": datetime.utcnow(),
+    }
+    if extra_claims:
+        payload.update(extra_claims)
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
 # ============================================================================
@@ -293,13 +364,19 @@ async def verify_api_key(x_api_key: str = Header(...)):
 
 
 async def verify_jwt_token(authorization: str = Header(...)):
-    """Verify JWT token (placeholder for actual JWT verification)"""
+    """Verify JWT token signature and expiry."""
     if not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Invalid token format")
     
     token = authorization.split(" ")[1]
-    # TODO: Validate JWT signature and expiration
-    return token
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    except JWTError as exc:
+        log_audit("JWT_VERIFICATION_FAILED", resource="jwt", status="FAILED", details={"error": str(exc)})
+        raise HTTPException(status_code=401, detail="Invalid or expired token") from exc
+
+    log_audit("JWT_VERIFIED", resource="jwt", details={"subject": payload.get("sub")})
+    return payload
 
 
 # ============================================================================
@@ -393,15 +470,20 @@ async def request_otp(request: Request, otp_req: OTPRequest):
     Sends 6-digit OTP via SMS
     Rate limited: 10 requests per minute
     """
-    log_audit("OTP_REQUEST", resource=f"phone:{otp_req.phone}")
-    
-    # TODO: Integrate with SMS provider (Twilio, AWS SNS, etc.)
-    # TODO: Store OTP in Redis with 10-minute expiry
-    # TODO: Hash OTP before storing
+    log_audit("OTP_REQUEST", resource=f"phone:{mask_phone(otp_req.phone)}")
+    otp = generate_secure_otp()
+    store_otp(otp_req.phone, otp)
+
+    if os.getenv("ALLOW_DEBUG_OTP_LOG") == "1":
+        log_audit(
+            "OTP_DEBUG_LOGGED",
+            resource=f"phone:{mask_phone(otp_req.phone)}",
+            details={"otp": otp},
+        )
     
     return {
         "message": "OTP sent successfully",
-        "phone": f"***{otp_req.phone[-4:]}",  # Mask phone number in response
+        "phone": mask_phone(otp_req.phone),
         "expires_in": 600,  # 10 minutes
         "timestamp": datetime.utcnow().isoformat(),
     }
@@ -414,18 +496,22 @@ async def verify_otp(request: Request, otp_verify: OTPVerify):
     Verify OTP and return JWT token
     Rate limited: 5 requests per minute
     """
-    log_audit("OTP_VERIFY_ATTEMPT", resource=f"phone:{otp_verify.phone}")
-    
-    # TODO: Verify OTP against Redis store
-    # TODO: Check if OTP expired
-    # TODO: Prevent brute force (max 3 attempts)
-    # TODO: Generate JWT token with user_id
-    # TODO: Create user if first-time login
+    log_audit("OTP_VERIFY_ATTEMPT", resource=f"phone:{mask_phone(otp_verify.phone)}")
+
+    if not verify_stored_otp(otp_verify.phone, otp_verify.otp):
+        log_audit("OTP_VERIFY_FAILED", resource=f"phone:{mask_phone(otp_verify.phone)}", status="FAILED")
+        raise HTTPException(status_code=401, detail="Invalid or expired OTP")
+
+    token = create_access_token(
+        subject=otp_verify.phone,
+        extra_claims={"phone": otp_verify.phone, "scope": "user"},
+    )
     
     return {
         "message": "OTP verified",
-        "token": "jwt_token_here",
-        "user_id": 123,
+        "token": token,
+        "token_type": "bearer",
+        "user_id": otp_verify.phone,
         "timestamp": datetime.utcnow().isoformat(),
     }
 
@@ -436,7 +522,7 @@ async def verify_otp(request: Request, otp_verify: OTPVerify):
 
 @app.get("/api/v1/users/{user_id}")
 @limiter.limit("100/minute")
-async def get_user(request: Request, user_id: int):
+async def get_user(request: Request, user_id: int, token_payload: Dict = Depends(verify_jwt_token)):
     """Get user profile by ID"""
     if user_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid user ID")
@@ -492,7 +578,7 @@ async def create_user(request: Request, user: UserProfile):
 
 @app.put("/api/v1/users/{user_id}")
 @limiter.limit("50/minute")
-async def update_user(request: Request, user_id: int, user: UserProfile):
+async def update_user(request: Request, user_id: int, user: UserProfile, token_payload: Dict = Depends(verify_jwt_token)):
     """Update user profile with authorization check"""
     if user_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid user ID")
@@ -521,7 +607,8 @@ async def update_user(request: Request, user_id: int, user: UserProfile):
 async def get_latest_prices(
     request: Request,
     commodity: Optional[str] = None,
-    mandi: Optional[str] = None
+    mandi: Optional[str] = None,
+    api_key: str = Depends(verify_api_key),
 ):
     """
     Get latest commodity prices
@@ -552,7 +639,7 @@ async def get_latest_prices(
 
 @app.get("/api/v1/prices/history")
 @limiter.limit("100/minute")
-async def get_price_history(request: Request, commodity: str, days: int = 30):
+async def get_price_history(request: Request, commodity: str, days: int = 30, api_key: str = Depends(verify_api_key)):
     """Get historical prices for trend analysis"""
     if days < 1 or days > 365:
         raise HTTPException(status_code=400, detail="Days must be between 1 and 365")
@@ -576,7 +663,7 @@ async def get_price_history(request: Request, commodity: str, days: int = 30):
 
 @app.get("/api/v1/prices/forecast")
 @limiter.limit("100/minute")
-async def get_price_forecast(request: Request, commodity: str, days_ahead: int = 7):
+async def get_price_forecast(request: Request, commodity: str, days_ahead: int = 7, api_key: str = Depends(verify_api_key)):
     """AI price forecast using ARIMA/Prophet"""
     if days_ahead < 1 or days_ahead > 90:
         raise HTTPException(status_code=400, detail="Forecast days must be between 1 and 90")
@@ -600,7 +687,7 @@ async def get_price_forecast(request: Request, commodity: str, days_ahead: int =
 
 @app.get("/api/v1/signals/user/{user_id}")
 @limiter.limit("100/minute")
-async def get_user_signals(request: Request, user_id: int, limit: int = 10):
+async def get_user_signals(request: Request, user_id: int, limit: int = 10, token_payload: Dict = Depends(verify_jwt_token)):
     """Get AI-generated trading signals for a user"""
     if user_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid user ID")
@@ -621,7 +708,7 @@ async def get_user_signals(request: Request, user_id: int, limit: int = 10):
 
 @app.post("/api/v1/signals/generate")
 @limiter.limit("10/minute")  # Stricter limit for heavy operation
-async def generate_signals(request: Request, commodity: str):
+async def generate_signals(request: Request, commodity: str, api_key: str = Depends(verify_api_key)):
     """Manually trigger signal generation"""
     allowed = {'rice', 'wheat', 'cotton', 'maize', 'sugar', 'tea', 'coffee'}
     if commodity.lower() not in allowed:
@@ -647,7 +734,7 @@ async def generate_signals(request: Request, commodity: str):
 
 @app.post("/api/v1/marketplace/orders")
 @limiter.limit("50/minute")
-async def create_order(request: Request, order: MarketplaceOrder):
+async def create_order(request: Request, order: MarketplaceOrder, token_payload: Dict = Depends(verify_jwt_token)):
     """Create buy/sell order in marketplace"""
     log_audit("ORDER_CREATION", user_id=order.seller_id, resource=f"order:new")
     
@@ -672,6 +759,7 @@ async def get_open_orders(
     commodity: Optional[str] = None,
     order_type: Optional[str] = None,
     state: Optional[str] = None,
+    token_payload: Dict = Depends(verify_jwt_token),
 ):
     """Get open buy/sell orders"""
     if commodity:
@@ -694,7 +782,7 @@ async def get_open_orders(
 
 @app.post("/api/v1/marketplace/match")
 @limiter.limit("50/minute")
-async def match_orders(request: Request, seller_order_id: int, buyer_order_id: int):
+async def match_orders(request: Request, seller_order_id: int, buyer_order_id: int, token_payload: Dict = Depends(verify_jwt_token)):
     """Match buyer and seller orders"""
     if seller_order_id <= 0 or buyer_order_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid order IDs")
@@ -721,7 +809,7 @@ async def match_orders(request: Request, seller_order_id: int, buyer_order_id: i
 
 @app.post("/api/v1/farmer/crops")
 @limiter.limit("50/minute")
-async def create_crop_plan(request: Request, user_id: int, crop: str, area_hectares: float):
+async def create_crop_plan(request: Request, user_id: int, crop: str, area_hectares: float, token_payload: Dict = Depends(verify_jwt_token)):
     """Create crop cultivation plan"""
     if user_id <= 0:
         raise HTTPException(status_code=400, detail="Invalid user ID")
@@ -742,7 +830,7 @@ async def create_crop_plan(request: Request, user_id: int, crop: str, area_hecta
 
 @app.get("/api/v1/farmer/best-time-to-sell")
 @limiter.limit("100/minute")
-async def get_best_time_to_sell(request: Request, user_id: int, commodity: str):
+async def get_best_time_to_sell(request: Request, user_id: int, commodity: str, token_payload: Dict = Depends(verify_jwt_token)):
     """
     KILLER FEATURE: Determine best time to sell
     Based on: price forecasts, market trends, demand surge
@@ -777,7 +865,7 @@ async def get_best_time_to_sell(request: Request, user_id: int, commodity: str):
 
 @app.get("/api/v1/analytics/market-trends")
 @limiter.limit("100/minute")
-async def get_market_trends(request: Request, commodity: str, period: str = "30d"):
+async def get_market_trends(request: Request, commodity: str, period: str = "30d", api_key: str = Depends(verify_api_key)):
     """Get market trend analytics"""
     allowed_periods = {"7d", "30d", "90d", "1y"}
     if period not in allowed_periods:

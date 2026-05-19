@@ -68,7 +68,7 @@ Deploy the CropPulse Streamlit-only public app to Streamlit Cloud with optional 
 
 ```toml
 DATABASE_URL = "postgresql://username:password@host:5432/database"
-API_KEY = "croppulse_admin_secret_key_12345"
+API_KEY = "<set-a-strong-admin-key>"
 ENVIRONMENT = "production"
 ```
 
@@ -139,7 +139,7 @@ Add in Dashboard → App settings → Secrets:
 
 ```toml
 BACKEND_API_URL = "https://web-production-7295a.up.railway.app"
-API_KEY = "croppulse_admin_secret_key_12345"
+API_KEY = "<set-a-strong-admin-key>"
 ```
 
 ### For Local Development
@@ -148,7 +148,7 @@ Create `.streamlit/secrets.toml`:
 
 ```toml
 BACKEND_API_URL = "http://localhost:8000"
-API_KEY = "croppulse_admin_secret_key_12345"
+API_KEY = "<set-a-strong-admin-key>"
 ```
 
 ---
@@ -188,7 +188,7 @@ API_KEY = "croppulse_admin_secret_key_12345"
 
 **Solution:**
 1. Verify key in Streamlit Cloud secrets
-2. Ensure key matches: `croppulse_admin_secret_key_12345`
+2. Ensure key matches the secure value you configured for `API_KEY_ADMIN`
 3. Check Railway backend is still running
 
 ---

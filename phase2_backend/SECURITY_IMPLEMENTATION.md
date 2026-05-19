@@ -183,7 +183,7 @@ class UserProfile(BaseModel):
 ```python
 # Hardcoded keys (TODO: Move to secure vault)
 VALID_API_KEYS = {
-    "croppulse_admin_secret_key_12345",
+    "<set-a-strong-admin-key>",
     "croppulse_farmer_secret_key_12345",
     "croppulse_trader_secret_key_12345",
 }

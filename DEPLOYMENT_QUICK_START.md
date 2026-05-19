@@ -30,7 +30,7 @@ In Railway dashboard:
 ### Step 3: Set Environment Variables
 ```
 Go to Variables tab, add:
-- API_KEY_ADMIN=croppulse_admin_secret_key_12345
+- API_KEY_ADMIN=<set-a-strong-admin-key>
 - API_KEY_FARMER=croppulse_farmer_secret_key_12345
 - API_KEY_TRADER=croppulse_trader_secret_key_12345
 - JWT_SECRET=(generate new secure value)

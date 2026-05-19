@@ -10,6 +10,7 @@ import os
 import hashlib
 import secrets
 from urllib.parse import urlencode
+from passlib.context import CryptContext
 from db_config import (
     get_db_connection, test_connection, init_database
 )
@@ -1116,6 +1117,12 @@ if "user_role" not in st.session_state:
 if "otp_code" not in st.session_state:
     st.session_state.otp_code = None
 
+if "otp_requested" not in st.session_state:
+    st.session_state.otp_requested = False
+
+if "otp_verified_phone" not in st.session_state:
+    st.session_state.otp_verified_phone = None
+
 if "phone_temp" not in st.session_state:
     st.session_state.phone_temp = None
 
@@ -1316,8 +1323,9 @@ TRANSLATIONS = {
         "phone_number_10": "📱 Phone Number (10 digits)",
         "send_otp": "Send OTP",
         "phone_registered": "❌ This phone is already registered. Please login instead.",
-        "otp_sent_demo": "✅ OTP sent! (Demo: {otp})",
-        "otp_demo_info": "This Streamlit-only build shows a demo OTP on screen instead of using an API service.",
+        "otp_sent_demo": "✅ OTP sent securely.",
+        "otp_demo_info": "OTP is stored server-side for this demo build. Configure SMS delivery or enable secure debug logs in development.",
+        "invalid_otp": "❌ Invalid or expired OTP",
         "valid_phone_error": "❌ Please enter a valid 10-digit phone number",
         "step_2_verify": "Step 2: Verify OTP",
         "enter_otp": "🔐 Enter OTP",
@@ -1618,8 +1626,9 @@ TRANSLATIONS = {
         "phone_number_10": "📱 ఫోన్ నంబర్ (10 అంకెలు)",
         "send_otp": "OTP పంపండి",
         "phone_registered": "❌ ఈ ఫోన్ ఇప్పటికే నమోదు అయింది. దయచేసి లాగిన్ చేయండి.",
-        "otp_sent_demo": "✅ OTP పంపబడింది! (డెమో: {otp})",
-        "otp_demo_info": "ఈ Streamlit-only build API సేవకు బదులుగా డెమో OTP ను స్క్రీన్‌పై చూపిస్తుంది.",
+        "otp_sent_demo": "✅ OTP సురక్షితంగా పంపబడింది.",
+        "otp_demo_info": "ఈ డెమో build లో OTP సర్వర్-సైడ్‌లో నిల్వ చేయబడుతుంది. డెవలప్‌మెంట్‌లో SMS లేదా secure debug logs ఉపయోగించండి.",
+        "invalid_otp": "❌ OTP చెల్లదు లేదా గడువు ముగిసింది",
         "valid_phone_error": "❌ సరైన 10 అంకెల ఫోన్ నంబర్ నమోదు చేయండి",
         "step_2_verify": "దశ 2: OTP ధృవీకరించండి",
         "enter_otp": "🔐 OTP నమోదు చేయండి",
@@ -1909,6 +1918,12 @@ def translate_status_value(value):
     return tr(STATUS_KEYS.get(normalized, value))
 
 
+PASSWORD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
+OTP_EXPIRATION_MINUTES = 10
+OTP_MAX_ATTEMPTS = 5
+OTP_STORE = {}
+
+
 def go_to_page(page_name):
     """Centralized page switch helper."""
     sync_language_query_param()
@@ -1919,8 +1934,60 @@ def go_to_page(page_name):
 def reset_auth_flow():
     """Clear transient OTP state when leaving auth screens."""
     st.session_state.otp_code = None
+    st.session_state.otp_requested = False
+    st.session_state.otp_verified_phone = None
     st.session_state.phone_temp = None
     st.session_state.landing_panel = None
+
+
+def _hash_otp(otp):
+    return hashlib.sha256(otp.encode("utf-8")).hexdigest()
+
+
+def purge_expired_otps():
+    now = datetime.utcnow()
+    expired_phones = [
+        phone for phone, record in OTP_STORE.items()
+        if record["expires_at"] <= now
+    ]
+    for phone in expired_phones:
+        OTP_STORE.pop(phone, None)
+
+
+def generate_otp():
+    """Generate a cryptographically secure 6-digit OTP."""
+    return "".join(str(secrets.randbelow(10)) for _ in range(6))
+
+
+def issue_server_side_otp(phone):
+    otp = generate_otp()
+    OTP_STORE[phone] = {
+        "otp_hash": _hash_otp(otp),
+        "expires_at": datetime.utcnow() + timedelta(minutes=OTP_EXPIRATION_MINUTES),
+        "attempts": 0,
+    }
+    if os.getenv("ALLOW_DEBUG_OTP_LOG") == "1":
+        logger.warning(f"Debug OTP for {phone[-4:]}: {otp}")
+
+
+def verify_server_side_otp(phone, otp_input):
+    purge_expired_otps()
+    record = OTP_STORE.get(phone)
+    if not record:
+        return False
+
+    if record["attempts"] >= OTP_MAX_ATTEMPTS:
+        OTP_STORE.pop(phone, None)
+        return False
+
+    record["attempts"] += 1
+    if secrets.compare_digest(record["otp_hash"], _hash_otp(otp_input)):
+        OTP_STORE.pop(phone, None)
+        return True
+
+    if record["attempts"] >= OTP_MAX_ATTEMPTS:
+        OTP_STORE.pop(phone, None)
+    return False
 
 
 def enter_demo_mode():
@@ -1937,7 +2004,11 @@ def enter_demo_mode():
 
 def hash_password(password):
     """Hash password for security"""
-    return hashlib.sha256(password.encode()).hexdigest()
+    return PASSWORD_CONTEXT.hash(password)
+
+
+def verify_password(password, password_hash):
+    return PASSWORD_CONTEXT.verify(password, password_hash)
 
 def get_user_by_phone(phone):
     """Get user from database by phone"""
@@ -1978,10 +2049,6 @@ def create_user(phone, name, role="farmer"):
     except Exception as e:
         logger.error(f"Error creating user: {e}")
         return None
-
-def generate_otp():
-    """Generate random 6-digit OTP"""
-    return ''.join([str(np.random.randint(0, 10)) for _ in range(6)])
 
 def get_farmer_dashboard(user_id):
     """Get farmer's dashboard data"""
@@ -2421,23 +2488,28 @@ def page_register():
                 if existing_user:
                     st.error(tr("phone_registered"))
                 else:
-                    # Generate and show OTP
-                    otp = generate_otp()
-                    st.session_state.otp_code = otp
+                    issue_server_side_otp(phone)
+                    st.session_state.otp_requested = True
+                    st.session_state.otp_verified_phone = None
                     st.session_state.phone_temp = phone
-                    st.success(tr("otp_sent_demo", otp=otp))
+                    st.success(tr("otp_sent_demo"))
                     st.info(tr("otp_demo_info"))
             else:
                 st.error(tr("valid_phone_error"))
         
         # Step 2: OTP Verification
-        if st.session_state.otp_code:
+        if st.session_state.otp_requested and st.session_state.phone_temp == phone:
             st.subheader(tr("step_2_verify"))
             otp_input = st.text_input(tr("enter_otp"), placeholder="123456")
             
-            if otp_input and otp_input == st.session_state.otp_code:
+            if otp_input and verify_server_side_otp(st.session_state.phone_temp, otp_input):
+                st.session_state.otp_verified_phone = st.session_state.phone_temp
+                st.session_state.otp_requested = False
                 st.success(tr("otp_verified"))
-                
+            elif otp_input:
+                st.error(tr("invalid_otp"))
+
+        if st.session_state.otp_verified_phone == st.session_state.phone_temp:
                 # Step 3: Farmer Details
                 st.subheader(tr("step_3_details"))
                 
@@ -2503,23 +2575,29 @@ def page_login():
             if phone and len(phone) == 10:
                 user = get_user_by_phone(phone)
                 if user:
-                    otp = generate_otp()
-                    st.session_state.otp_code = otp
+                    issue_server_side_otp(phone)
+                    st.session_state.otp_requested = True
+                    st.session_state.otp_verified_phone = None
                     st.session_state.phone_temp = phone
-                    st.success(tr("otp_sent_demo", otp=otp))
+                    st.success(tr("otp_sent_demo"))
+                    st.info(tr("otp_demo_info"))
                 else:
                     st.error(tr("user_not_found"))
         
-        if st.session_state.otp_code:
+        if st.session_state.otp_requested and st.session_state.phone_temp == phone:
             otp_input = st.text_input(tr("enter_otp"))
             
-            if otp_input and otp_input == st.session_state.otp_code:
+            if otp_input and verify_server_side_otp(st.session_state.phone_temp, otp_input):
                 user = get_user_by_phone(st.session_state.phone_temp)
                 st.session_state.user = user[0]
                 st.session_state.user_role = user[3]
+                st.session_state.otp_requested = False
+                st.session_state.otp_verified_phone = st.session_state.phone_temp
                 st.session_state.page = "dashboard"
                 st.success(tr("login_success"))
                 st.rerun()
+            elif otp_input:
+                st.error(tr("invalid_otp"))
         
         st.markdown('</div>', unsafe_allow_html=True)
         

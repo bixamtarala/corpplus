@@ -38,7 +38,7 @@ BACKEND_API_URL = os.getenv(
     "BACKEND_API_URL", 
     "https://web-production-7295a.up.railway.app"
 )
-API_KEY = os.getenv("API_KEY", "croppulse_admin_secret_key_12345")
+API_KEY = os.getenv("API_KEY")
 
 # Import eNAM API (optional fallback)
 try:
@@ -237,6 +237,8 @@ st.markdown("""
 def load_data_from_api():
     """Load commodity price data from CropPulse Backend API"""
     try:
+        if not API_KEY:
+            return None
         headers = {"X-API-Key": API_KEY}
         secure_url = BACKEND_API_URL.replace("http://", "https://", 1)
         

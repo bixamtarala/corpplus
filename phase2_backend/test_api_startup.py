@@ -3,6 +3,13 @@ Quick API startup and validation tests
 Tests that the FastAPI app initializes and routes are registered correctly
 """
 
+import os
+
+os.environ.setdefault("API_KEY_ADMIN", "test-admin-key")
+os.environ.setdefault("API_KEY_FARMER", "test-farmer-key")
+os.environ.setdefault("API_KEY_TRADER", "test-trader-key")
+os.environ.setdefault("JWT_SECRET", "test-jwt-secret-please-change")
+
 from fastapi.testclient import TestClient
 from phase2_backend.main import app
 import json
@@ -118,14 +125,16 @@ def test_commodity_validation():
     """Test commodity price endpoint validation"""
     # Invalid commodity
     response = client.get(
-        "/api/v1/prices/latest?commodity=invalid_commodity"
+        "/api/v1/prices/latest?commodity=invalid_commodity",
+        headers={"X-API-Key": os.environ["API_KEY_ADMIN"]}
     )
     assert response.status_code == 400
     print("✓ Commodity validation works (rejects invalid commodity)")
     
     # Valid commodity
     response = client.get(
-        "/api/v1/prices/latest?commodity=rice"
+        "/api/v1/prices/latest?commodity=rice",
+        headers={"X-API-Key": os.environ["API_KEY_ADMIN"]}
     )
     assert response.status_code == 200
     data = response.json()
