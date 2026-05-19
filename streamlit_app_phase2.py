@@ -298,22 +298,6 @@ st.markdown("""
         color: #556979;
     }
 
-    .schedule-demo-tab {
-        position: absolute;
-        right: -18px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: #6e9d2f;
-        color: white;
-        text-decoration: none;
-        font-weight: 700;
-        padding: 18px 14px;
-        border-radius: 10px 10px 0 0;
-        writing-mode: vertical-rl;
-        text-orientation: mixed;
-        box-shadow: 0 14px 26px rgba(110, 157, 47, 0.28);
-    }
-
     .hero-section {
         background: linear-gradient(180deg, #ffffff 0%, #f4fbff 100%);
         border: 1px solid #e1eef5;
@@ -831,10 +815,6 @@ st.markdown("""
             font-size: 12px;
         }
 
-        .schedule-demo-tab {
-            display: none;
-        }
-
         .floating-card,
         .floating-card.secondary {
             position: static;
@@ -1072,7 +1052,6 @@ def page_landing():
                 </div>
             </div>
         </div>
-        <a class="schedule-demo-tab" href="?action=register">Schedule a demo</a>
     </div>
     """, unsafe_allow_html=True)
 
