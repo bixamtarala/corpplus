@@ -1011,6 +1011,8 @@ TRANSLATIONS = {
         "governments_desc": "Traceable agricultural visibility for public-sector coordination and programs.",
         "food_processing": "Food Processing",
         "food_processing_desc": "Digitized farm operations and end-to-end processing traceability.",
+        "supply_chain": "Supply Chain",
+        "supply_chain_desc": "Live coordination for sourcing, storage, transport, and delivery across the agricultural network.",
         "agri_teams": "Agri Teams",
         "agri_teams_desc": "Shared workflow for sourcing, monitoring, and coordination teams.",
         "verified_network": "Verified Network",
@@ -1311,6 +1313,8 @@ TRANSLATIONS = {
         "governments_desc": "ప్రభుత్వ సమన్వయం కోసం ట్రేసబుల్ వ్యవసాయ విజిబిలిటీ.",
         "food_processing": "ఫుడ్ ప్రాసెసింగ్",
         "food_processing_desc": "డిజిటైజ్డ్ ఫార్మ్ ఆపరేషన్లు మరియు ఎండ్-టు-ఎండ్ ట్రేసబిలిటీ.",
+        "supply_chain": "సప్లై చైన్",
+        "supply_chain_desc": "సోర్సింగ్, నిల్వ, రవాణా, డెలివరీ కోసం వ్యవసాయ నెట్‌వర్క్ అంతటా ప్రత్యక్ష సమన్వయం.",
         "agri_teams": "వ్యవసాయ బృందాలు",
         "agri_teams_desc": "సోర్సింగ్, మానిటరింగ్, సమన్వయం కోసం పంచుకునే వర్క్‌ఫ్లో.",
         "verified_network": "ధృవీకరించిన నెట్‌వర్క్",
@@ -1863,6 +1867,7 @@ def page_landing():
                         <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#127793;</div><div><h4>{tr('seed_manufacturing')}</h4><p>{tr('seed_manufacturing_desc')}</p></div></a>
                         <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#127970;</div><div><h4>{tr('governments')}</h4><p>{tr('governments_desc')}</p></div></a>
                         <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#127981;</div><div><h4>{tr('food_processing')}</h4><p>{tr('food_processing_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#128667;</div><div><h4>{tr('supply_chain')}</h4><p>{tr('supply_chain_desc')}</p></div></a>
                         <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#129309;</div><div><h4>{tr('agri_teams')}</h4><p>{tr('agri_teams_desc')}</p></div></a>
                     </div>
                 </div>
