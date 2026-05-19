@@ -10,13 +10,9 @@ import logging
 from contextlib import contextmanager
 from datetime import datetime
 
-# Try to import psycopg2 for PostgreSQL (optional)
-try:
-    import psycopg2
-    from psycopg2.extras import RealDictCursor
-    HAS_PSYCOPG2 = True
-except ImportError:
-    HAS_PSYCOPG2 = False
+psycopg2 = None
+RealDictCursor = None
+HAS_PSYCOPG2 = False
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -25,9 +21,53 @@ logger = logging.getLogger(__name__)
 # ENVIRONMENT DETECTION
 # ============================================================================
 
-DATABASE_URL = os.getenv('DATABASE_URL')
-IS_PRODUCTION = DATABASE_URL is not None
-DB_TYPE = 'postgresql' if (DATABASE_URL and 'postgres' in DATABASE_URL) else 'sqlite'
+def _load_psycopg2():
+    """Import psycopg2 lazily so module import never fails on cloud startup."""
+    global psycopg2, RealDictCursor, HAS_PSYCOPG2
+
+    if HAS_PSYCOPG2:
+        return True
+
+    try:
+        import psycopg2 as psycopg2_module
+        from psycopg2.extras import RealDictCursor as real_dict_cursor
+
+        psycopg2 = psycopg2_module
+        RealDictCursor = real_dict_cursor
+        HAS_PSYCOPG2 = True
+        return True
+    except Exception as exc:
+        logger.warning(f"psycopg2 unavailable, falling back to SQLite: {exc}")
+        return False
+
+
+def _load_database_url():
+    """Resolve database URL from environment or Streamlit secrets when available."""
+    database_url = os.getenv('DATABASE_URL')
+    if database_url:
+        return database_url
+
+    try:
+        import streamlit as st
+
+        secrets = st.secrets
+        if 'DATABASE_URL' in secrets:
+            return secrets['DATABASE_URL']
+    except Exception:
+        pass
+
+    return None
+
+
+def _get_db_settings():
+    """Return runtime database settings without doing fragile work at import time."""
+    database_url = _load_database_url()
+    is_production = database_url is not None
+    db_type = 'postgresql' if (database_url and 'postgres' in database_url) else 'sqlite'
+    return database_url, is_production, db_type
+
+
+DATABASE_URL, IS_PRODUCTION, DB_TYPE = _get_db_settings()
 
 if IS_PRODUCTION:
     logger.info(f"🔵 Running in PRODUCTION mode with {DB_TYPE}")
@@ -44,7 +84,9 @@ def get_db_connection():
     Smart context manager that uses SQLite locally, PostgreSQL in production.
     Works seamlessly with both environments!
     """
-    if DB_TYPE == 'postgresql' and HAS_PSYCOPG2:
+    database_url, _, db_type = _get_db_settings()
+
+    if db_type == 'postgresql' and database_url and _load_psycopg2():
         yield from _get_postgres_connection()
     else:
         yield from _get_sqlite_connection()
@@ -73,12 +115,14 @@ def _get_sqlite_connection():
 
 def _get_postgres_connection():
     """PostgreSQL connection for production (Railway, Heroku, etc)."""
-    if not HAS_PSYCOPG2:
+    if not _load_psycopg2():
         raise ImportError("psycopg2 required for PostgreSQL. Install: pip install psycopg2-binary")
     
     conn = None
     try:
-        database_url = DATABASE_URL
+        database_url = _load_database_url()
+        if not database_url:
+            raise ValueError("DATABASE_URL is not configured for PostgreSQL mode")
         if database_url.startswith('postgres://'):
             database_url = database_url.replace('postgres://', 'postgresql://', 1)
         
@@ -98,16 +142,17 @@ def _get_postgres_connection():
 
 def test_connection():
     """Test database connection."""
+    _, _, db_type = _get_db_settings()
     try:
         with get_db_connection() as conn:
-            if DB_TYPE == 'sqlite':
+            if db_type == 'sqlite':
                 cursor = conn.cursor()
                 cursor.execute("SELECT 1")
             else:
                 cursor = conn.cursor()
                 cursor.execute("SELECT 1")
                 cursor.close()
-        logger.info(f"✅ {DB_TYPE.upper()} connection test successful")
+        logger.info(f"✅ {db_type.upper()} connection test successful")
         return True
     except Exception as e:
         logger.error(f"Connection test failed: {str(e)}")
@@ -120,7 +165,8 @@ def test_connection():
 
 def init_database():
     """Initialize database with proper schema for SQLite or PostgreSQL."""
-    if DB_TYPE == 'postgresql' and HAS_PSYCOPG2:
+    _, _, db_type = _get_db_settings()
+    if db_type == 'postgresql' and _load_psycopg2():
         _init_postgres_database()
     else:
         _init_sqlite_database()
@@ -298,13 +344,14 @@ def _init_postgres_database():
 
 def get_user_by_phone(phone):
     """Get user by phone number."""
+    _, _, db_type = _get_db_settings()
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM users WHERE phone = ?", (phone,))
             user = cursor.fetchone()
             cursor.close()
-            if DB_TYPE == 'sqlite':
+            if db_type == 'sqlite':
                 return dict(user) if user else None
             return user
     except Exception as e:
@@ -314,6 +361,7 @@ def get_user_by_phone(phone):
 
 def create_user(phone, name, role):
     """Create new user and return user ID."""
+    _, _, db_type = _get_db_settings()
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
@@ -322,7 +370,7 @@ def create_user(phone, name, role):
                 (phone, name, role)
             )
             
-            if DB_TYPE == 'sqlite':
+            if db_type == 'sqlite':
                 user_id = cursor.lastrowid
             else:
                 cursor.execute("SELECT id FROM users WHERE phone = ?", (phone,))
@@ -338,6 +386,7 @@ def create_user(phone, name, role):
 
 def create_farmer_profile(user_id, full_name, state, district, village, land_size_acres, soil_type):
     """Create farmer profile."""
+    _, _, db_type = _get_db_settings()
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
@@ -348,7 +397,7 @@ def create_farmer_profile(user_id, full_name, state, district, village, land_siz
                 (user_id, full_name, state, district, village, land_size_acres, soil_type)
             )
             
-            if DB_TYPE == 'sqlite':
+            if db_type == 'sqlite':
                 profile_id = cursor.lastrowid
             else:
                 cursor.execute("SELECT id FROM farmer_profiles WHERE user_id = ?", (user_id,))
@@ -364,6 +413,7 @@ def create_farmer_profile(user_id, full_name, state, district, village, land_siz
 
 def get_farmer_dashboard(user_id):
     """Get farmer dashboard data."""
+    _, _, db_type = _get_db_settings()
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
@@ -379,7 +429,7 @@ def get_farmer_dashboard(user_id):
                 return None
             
             # Convert to dict if SQLite
-            if DB_TYPE == 'sqlite':
+            if db_type == 'sqlite':
                 profile = dict(profile)
                 farmer_id = profile['id']
             else:
@@ -391,7 +441,7 @@ def get_farmer_dashboard(user_id):
                 (farmer_id,)
             )
             crops = cursor.fetchall()
-            if DB_TYPE == 'sqlite':
+            if db_type == 'sqlite':
                 crops = [dict(c) for c in crops]
             
             # Get farmer's listings
@@ -400,7 +450,7 @@ def get_farmer_dashboard(user_id):
                 (farmer_id,)
             )
             listings = cursor.fetchall()
-            if DB_TYPE == 'sqlite':
+            if db_type == 'sqlite':
                 listings = [dict(l) for l in listings]
             
             cursor.close()
