@@ -97,8 +97,8 @@ st.markdown("""
 
     .hero-grid {
         display: grid;
-        grid-template-columns: 1.5fr 1fr;
-        gap: 28px;
+        grid-template-columns: 1fr;
+        gap: 20px;
         align-items: center;
     }
 
@@ -131,25 +131,6 @@ st.markdown("""
         opacity: 0.95;
         margin-bottom: 24px;
         max-width: 760px;
-    }
-
-    .hero-panel {
-        background: rgba(255, 255, 255, 0.14);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        border-radius: 20px;
-        padding: 24px;
-        backdrop-filter: blur(8px);
-    }
-
-    .hero-panel h3 {
-        margin: 0 0 14px 0;
-        font-size: 20px;
-    }
-
-    .hero-panel ul {
-        margin: 0;
-        padding-left: 18px;
-        line-height: 1.8;
     }
 
     .cta-row {
@@ -448,15 +429,6 @@ def page_landing():
                     CropPulse helps farmers get market visibility, helps traders find supply faster, and gives agricultural teams
                     a single operating surface for crop intelligence, listings, and deal coordination.
                 </p>
-            </div>
-            <div class="hero-panel">
-                <h3>What you can do here</h3>
-                <ul>
-                    <li>Register farmers and traders from the same public app</li>
-                    <li>Use one-host Streamlit deployment for landing, auth, and dashboard</li>
-                    <li>Connect directly to SQLite locally or Railway PostgreSQL in production</li>
-                    <li>Run without the FastAPI service in the active user path</li>
-                </ul>
             </div>
         </div>
     </div>
