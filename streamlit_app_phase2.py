@@ -1686,44 +1686,6 @@ def translate_status_value(value):
     return tr(STATUS_KEYS.get(normalized, value))
 
 
-def render_language_switcher(widget_key, show_label=True):
-    current_lang = get_language()
-    widget_state_key = f"{widget_key}_language_choice"
-    if st.session_state.get(widget_state_key) != current_lang:
-        st.session_state[widget_state_key] = current_lang
-
-    if show_label:
-        label_col, select_col = st.columns([1.0, 1.7])
-        with label_col:
-            st.markdown(
-                "<div style='padding-top: 0.45rem; color: #6b7d90; font-size: 0.95rem; font-weight: 500;'>"
-                + tr("language_label")
-                + "</div>",
-                unsafe_allow_html=True,
-            )
-        with select_col:
-            selected_lang = st.selectbox(
-                tr("language_label"),
-                options=["en", "te"],
-                key=widget_state_key,
-                label_visibility="collapsed",
-                format_func=lambda code: tr("language_english") if code == "en" else tr("language_telugu"),
-            )
-    else:
-        selected_lang = st.selectbox(
-            tr("language_label"),
-            options=["en", "te"],
-            key=widget_state_key,
-            label_visibility="collapsed",
-            format_func=lambda code: tr("language_english") if code == "en" else tr("language_telugu"),
-        )
-
-    if selected_lang != current_lang:
-        set_language(selected_lang)
-        sync_language_query_param(selected_lang)
-        st.rerun()
-
-
 def go_to_page(page_name):
     """Centralized page switch helper."""
     sync_language_query_param()
@@ -2216,7 +2178,6 @@ def page_landing():
 def page_register():
     """Farmer Registration"""
     st.markdown(f"## {tr('register_title').replace('## ', '')}")
-    render_language_switcher("register", show_label=True)
     
     with st.container():
         st.markdown('<div class="auth-card">', unsafe_allow_html=True)
@@ -2340,26 +2301,7 @@ def page_login():
 
 def page_dashboard():
     """Main Dashboard for Farmers/Traders"""
-    # Top Navigation
-    header_col, lang_col = st.columns([5.2, 1.1])
-
-    with header_col:
-        st.markdown(tr("dashboard_title"))
-
-    with lang_col:
-        current_lang = get_language()
-        widget_state_key = "dashboard_language_choice"
-        selected_lang = st.selectbox(
-            tr("language_label"),
-            options=["en", "te"],
-            key=widget_state_key,
-            label_visibility="collapsed",
-            format_func=lambda code: tr("language_english") if code == "en" else tr("language_telugu"),
-        )
-        if selected_lang != current_lang:
-            set_language(selected_lang)
-            sync_language_query_param(selected_lang)
-            st.rerun()
+    st.markdown(tr("dashboard_title"))
     
     # Tabs
     tab1, tab2, tab3, tab4 = st.tabs([
