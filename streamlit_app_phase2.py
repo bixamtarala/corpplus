@@ -883,6 +883,12 @@ TRANSLATIONS = {
         "farmer_os_desc": "Crop tracking, harvest planning, and farmer workflows.",
         "marketplace": "Marketplace",
         "marketplace_desc": "Listings, offers, negotiations, and deal coordination.",
+        "crop_rice_desc": "Price signals, demand trends, and trading visibility for rice markets.",
+        "crop_wheat_desc": "Crop and market intelligence for wheat production and selling windows.",
+        "crop_corn_desc": "Planning and buyer visibility for corn supply and harvest movement.",
+        "crop_cotton_desc": "Field updates and market context for cotton growers and buyers.",
+        "crop_sugarcane_desc": "Operational and pricing support for sugarcane farmers and trade flows.",
+        "crop_soybean_desc": "Supply tracking and market awareness for soybean production and sales.",
         "food_retail": "Food Retail",
         "food_retail_desc": "Intelligent sourcing for a smarter, more sustainable food retail future.",
         "cpg_fmcg": "CPG/FMCG",
@@ -1177,6 +1183,12 @@ TRANSLATIONS = {
         "farmer_os_desc": "పంట ట్రాకింగ్, కోత ప్రణాళిక, రైతు వర్క్‌ఫ్లోలు.",
         "marketplace": "మార్కెట్‌ప్లేస్",
         "marketplace_desc": "లిస్టింగ్స్, ఆఫర్లు, చర్చలు, డీల్ సమన్వయం.",
+        "crop_rice_desc": "బియ్యం మార్కెట్లకు ధరల సంకేతాలు, డిమాండ్ ధోరణులు, ట్రేడింగ్ విజిబిలిటీ.",
+        "crop_wheat_desc": "గోధుమ ఉత్పత్తి మరియు అమ్మకాల సమయాల కోసం పంట మరియు మార్కెట్ ఇంటెలిజెన్స్.",
+        "crop_corn_desc": "మొక్కజొన్న సరఫరా మరియు కోత కదలికలకు ప్రణాళిక మరియు కొనుగోలుదారుల విజిబిలిటీ.",
+        "crop_cotton_desc": "పత్తి రైతులు మరియు కొనుగోలుదారుల కోసం ఫీల్డ్ అప్డేట్స్ మరియు మార్కెట్ సందర్భం.",
+        "crop_sugarcane_desc": "చెరకు రైతులు మరియు ట్రేడ్ ఫ్లోలకు ఆపరేషనల్ మరియు ధరల మద్దతు.",
+        "crop_soybean_desc": "సోయాబీన్ ఉత్పత్తి మరియు అమ్మకాల కోసం సరఫరా ట్రాకింగ్ మరియు మార్కెట్ అవగాహన.",
         "food_retail": "ఫుడ్ రిటైల్",
         "food_retail_desc": "తెలివైన సోర్సింగ్‌తో మరింత స్థిరమైన ఫుడ్ రిటైల్ భవిష్యత్తు.",
         "cpg_fmcg": "CPG/FMCG",
@@ -1758,20 +1770,14 @@ def page_landing():
         <div class="nav-menu">
             <div class="nav-item">
                 <div class="nav-link">{tr('nav_products')} <span class="nav-menu-caret">&#9662;</span></div>
-                <div class="nav-dropdown compact">
-                    <div class="dropdown-list">
-                        <a class="dropdown-item" href="#features">
-                            <div class="dropdown-icon">&#128200;</div>
-                            <div><h4>{tr('price_intelligence')}</h4><p>{tr('price_intelligence_desc')}</p></div>
-                        </a>
-                        <a class="dropdown-item" href="#features">
-                            <div class="dropdown-icon">&#127793;</div>
-                            <div><h4>{tr('farmer_os')}</h4><p>{tr('farmer_os_desc')}</p></div>
-                        </a>
-                        <a class="dropdown-item" href="#features">
-                            <div class="dropdown-icon">&#128722;</div>
-                            <div><h4>{tr('marketplace')}</h4><p>{tr('marketplace_desc')}</p></div>
-                        </a>
+                <div class="nav-dropdown mega">
+                    <div class="dropdown-grid">
+                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127806;</div><div><h4>{tr('crop_rice')}</h4><p>{tr('crop_rice_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_wheat')}</h4><p>{tr('crop_wheat_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_corn')}</h4><p>{tr('crop_corn_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127806;</div><div><h4>{tr('crop_cotton')}</h4><p>{tr('crop_cotton_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127795;</div><div><h4>{tr('crop_sugarcane')}</h4><p>{tr('crop_sugarcane_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127793;</div><div><h4>{tr('crop_soybean')}</h4><p>{tr('crop_soybean_desc')}</p></div></a>
                     </div>
                 </div>
             </div>
