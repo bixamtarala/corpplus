@@ -2329,7 +2329,7 @@ def page_login():
 def page_dashboard():
     """Main Dashboard for Farmers/Traders"""
     # Top Navigation
-    header_col, lang_col = st.columns([5.0, 1.0])
+    header_col, lang_col, toolbar_gap_col = st.columns([4.8, 1.15, 0.85])
 
     with header_col:
         st.markdown(tr("dashboard_title"))
@@ -2348,6 +2348,9 @@ def page_dashboard():
             set_language(selected_lang)
             sync_language_query_param(selected_lang)
             st.rerun()
+
+    with toolbar_gap_col:
+        st.empty()
     
     # Tabs
     tab1, tab2, tab3, tab4 = st.tabs([
@@ -2517,15 +2520,6 @@ def page_dashboard():
             st.metric(tr("pending_payment"), "₹45,000")
         with col3:
             st.metric(tr("completed_this_month"), 5)
-    
-    # Logout section at bottom
-    st.divider()
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col3:
-        if st.button(tr("logout"), key="dashboard_logout_btn", use_container_width=False):
-            st.session_state.user = None
-            st.session_state.page = "landing"
-            st.rerun()
 
 # ============================================================================
 # MAIN APP ROUTER
