@@ -1843,24 +1843,24 @@ def page_landing():
                     </div>
                 </div>
             </div>
-            <div class="nav-item">
-                <div class="nav-link">{tr('nav_language')} <span class="nav-menu-caret">&#9662;</span></div>
-                <div class="nav-dropdown compact">
-                    <div class="dropdown-list">
-                        <a class="dropdown-item" href="{build_query_href(lang='en')}"><div class="dropdown-icon">&#127468;&#127463;</div><div><h4>{tr('language_english')}</h4><p>{tr('language_english_desc')}</p></div></a>
-                        <a class="dropdown-item" href="{build_query_href(lang='te')}"><div class="dropdown-icon">&#127470;&#127475;</div><div><h4>{tr('language_telugu')}</h4><p>{tr('language_telugu_desc')}</p></div></a>
-                    </div>
-                </div>
-            </div>
         </div>
         <div class="nav-actions">
             <a class="nav-chip primary" href="#demo">&#8981;</a>
-            <a class="nav-chip secondary" href="{build_query_href(action='login', lang=current_lang)}#auth"><span>{tr('login')}</span></a>
         </div>
     </div>
     </div>
     <div class="landing-header-spacer"></div>
     """, unsafe_allow_html=True)
+
+    landing_controls_left, landing_controls_lang, landing_controls_login = st.columns([5.2, 2.0, 1.0])
+    with landing_controls_lang:
+        render_language_switcher("landing", show_label=True)
+    with landing_controls_login:
+        st.markdown("<div style='padding-top: 1.65rem;'></div>", unsafe_allow_html=True)
+        if st.button(tr("login"), key="landing_login_inline", use_container_width=True):
+            reset_auth_flow()
+            st.session_state.landing_panel = "login"
+            st.rerun()
 
     st.markdown(f"""
     <div class="hero-section">
