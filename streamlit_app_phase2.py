@@ -87,12 +87,18 @@ st.markdown("""
 
     /* Landing Page */
     .landing-header-shell {
-        position: sticky;
+        position: fixed;
         top: 0;
+        left: 0;
+        right: 0;
         z-index: 1000;
         background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(8px);
         box-shadow: 0 10px 22px rgba(31, 45, 61, 0.06);
+    }
+
+    .landing-header-spacer {
+        height: 118px;
     }
 
     .promo-bar {
@@ -1155,6 +1161,7 @@ def page_landing():
         </div>
     </div>
     </div>
+    <div class="landing-header-spacer"></div>
     """, unsafe_allow_html=True)
 
     st.markdown("""
