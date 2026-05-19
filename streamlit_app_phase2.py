@@ -2190,29 +2190,21 @@ def page_landing():
     </div>
     """, unsafe_allow_html=True)
 
-    demo_left, demo_center, demo_right = st.columns([1.2, 1.4, 1.2])
-    with demo_center:
-        st.markdown(f"### {tr('continue_demo')}")
-        st.caption(tr('continue_demo_desc'))
-        st.text_input(tr('work_email'), placeholder="your@email.com", key="landing_demo_email")
-        demo_action1, demo_action2 = st.columns(2)
-        with demo_action1:
-            if st.button(tr('continue_to_demo'), key="landing_demo_continue", use_container_width=True):
-                enter_demo_mode()
-        with demo_action2:
-            if st.button(tr('create_account'), key="landing_demo_register", use_container_width=True):
-                reset_auth_flow()
-                go_to_page("register")
+    st.markdown(f"### {tr('continue_demo')}")
+    st.caption(tr('continue_demo_desc'))
+    st.text_input(tr('work_email'), placeholder="your@email.com", key="landing_demo_email")
+    if st.button(tr('continue_to_demo'), key="landing_demo_continue", use_container_width=True):
+        enter_demo_mode()
+    if st.button(tr('create_account'), key="landing_demo_register", use_container_width=True):
+        reset_auth_flow()
+        go_to_page("register")
 
     st.markdown(f'<p class="landing-footer">{tr("landing_footer")}</p>', unsafe_allow_html=True)
 
 def page_register():
     """Farmer Registration"""
-    header_col, switcher_col = st.columns([4, 1.6])
-    with header_col:
-        st.markdown(f"## {tr('register_title').replace('## ', '')}")
-    with switcher_col:
-        render_language_switcher("register", show_label=True)
+    st.markdown(f"## {tr('register_title').replace('## ', '')}")
+    render_language_switcher("register", show_label=True)
     
     with st.container():
         st.markdown('<div class="auth-card">', unsafe_allow_html=True)
@@ -2248,23 +2240,14 @@ def page_register():
                 # Step 3: Farmer Details
                 st.subheader(tr("step_3_details"))
                 
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    name = st.text_input(tr("full_name"), placeholder=tr("placeholder_name"))
-                
-                with col_b:
-                    state = st.selectbox(
-                        tr("state"),
-                        STATE_OPTIONS,
-                        format_func=lambda value: translate_option(value, STATE_KEYS),
-                    )
-                
-                col_c, col_d = st.columns(2)
-                with col_c:
-                    district = st.text_input(tr("district"), placeholder=tr("placeholder_district"))
-                
-                with col_d:
-                    village = st.text_input(tr("village"), placeholder=tr("placeholder_village"))
+                name = st.text_input(tr("full_name"), placeholder=tr("placeholder_name"))
+                state = st.selectbox(
+                    tr("state"),
+                    STATE_OPTIONS,
+                    format_func=lambda value: translate_option(value, STATE_KEYS),
+                )
+                district = st.text_input(tr("district"), placeholder=tr("placeholder_district"))
+                village = st.text_input(tr("village"), placeholder=tr("placeholder_village"))
                 
                 land_size = st.number_input(tr("land_size"), min_value=0.5, value=1.0)
                 soil_type = st.selectbox(
