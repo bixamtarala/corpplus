@@ -56,7 +56,6 @@ st.markdown("""
 
     .top-strip {
         display: flex;
-        justify-content: space-between;
         align-items: center;
         gap: 16px;
         margin-bottom: 20px;
@@ -86,17 +85,6 @@ st.markdown("""
         margin: 2px 0 0 0;
     }
 
-    .top-badge {
-        display: inline-block;
-        padding: 8px 14px;
-        background: #eef8f1;
-        border: 1px solid #cfe8d7;
-        border-radius: 999px;
-        color: #1d6b3a;
-        font-size: 13px;
-        font-weight: 600;
-    }
-    
     /* Landing Page Hero */
     .hero-section {
         background: linear-gradient(135deg, #1f8f4d 0%, #2ecc71 100%);
@@ -446,7 +434,6 @@ def page_landing():
                 <p class="brand-subtitle">Agricultural Operating System</p>
             </div>
         </div>
-        <div class="top-badge">Streamlit-first public app</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -533,7 +520,7 @@ def page_landing():
         """, unsafe_allow_html=True)
 
     # Call to Action
-    c1, c2, c3 = st.columns([1.2, 1.2, 1])
+    c1, c2 = st.columns([1.2, 1.2])
     with c1:
         if st.button("👨‍🌾 Create farmer account", use_container_width=True):
             reset_auth_flow()
@@ -542,20 +529,17 @@ def page_landing():
         if st.button("🔐 Sign in to CropPulse", use_container_width=True):
             reset_auth_flow()
             go_to_page("login")
-    with c3:
-        st.caption("Deploy this file directly on Streamlit Cloud.")
 
-    # Phase Info
+    # Closing section
     st.markdown("""
-    ### Public deployment notes
+    ### Why teams use CropPulse
     
-    **This Streamlit app is the recommended public entrypoint:**
-    - Landing page, onboarding, and dashboard live in one app
-    - No FastAPI service is required in the active user journey
-    - Database auto-initializes on first run
-    - Ready for Streamlit Cloud with Railway PostgreSQL or local SQLite
+    CropPulse is built to reduce friction across the agriculture value chain.
+    It gives farmers better visibility, gives traders faster access to supply,
+    and gives agri teams a single place to coordinate decisions.
     
-    **Recommended deployment:** Streamlit Cloud for the app, PostgreSQL only for data.
+    Start with farmer onboarding, move into market discovery, and grow into a
+    full operating surface for intelligence, listings, and deal coordination.
     
     ---
     *©2026 CropPulse. Making agriculture smarter, fairer, and more profitable.*
