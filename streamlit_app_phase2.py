@@ -568,8 +568,7 @@ st.markdown("""
         gap: 14px;
     }
 
-    .visual-card,
-    .floating-card {
+    .visual-card {
         background: rgba(255, 255, 255, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 18px;
@@ -596,27 +595,6 @@ st.markdown("""
         font-size: 12px;
         color: #b8cae2;
         margin: 0;
-    }
-
-    .floating-card {
-        position: absolute;
-        right: -12px;
-        top: 148px;
-        width: 172px;
-        background: linear-gradient(180deg, #2fa84a 0%, #2c9c46 100%);
-        box-shadow: 0 16px 30px rgba(25, 64, 25, 0.25);
-    }
-
-    .floating-card.secondary {
-        top: 244px;
-        right: -4px;
-        background: white;
-        color: #1f2d3d;
-    }
-
-    .floating-card.secondary .visual-label,
-    .floating-card.secondary .visual-note {
-        color: #5f7286;
     }
 
     .action-bar {
@@ -2014,16 +1992,6 @@ def page_landing():
                         <p class="visual-value">{tr('high')}</p>
                         <p class="visual-note">{tr('buyer_activity_desc')}</p>
                     </div>
-                </div>
-                <div class="floating-card">
-                    <div class="visual-label">{tr('signal_confidence')}</div>
-                    <p class="visual-value">{tr('active')}</p>
-                    <p class="visual-note">{tr('signal_confidence_desc')}</p>
-                </div>
-                <div class="floating-card secondary">
-                    <div class="visual-label">{tr('watchlist_priority')}</div>
-                    <p class="visual-value" style="font-size: 20px; color: #17324d;">{tr('rice_buyers')}</p>
-                    <p class="visual-note">{tr('watchlist_priority_desc')}</p>
                 </div>
             </div>
         </div>
