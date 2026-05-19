@@ -114,13 +114,13 @@ st.markdown("""
 
     .landing-nav {
         display: grid;
-        grid-template-columns: auto 1fr auto;
+        grid-template-columns: auto minmax(0, 1fr) auto;
         align-items: center;
-        gap: 28px;
+        gap: 20px;
         background: #ffffff;
         border: 1px solid #edf3f7;
         border-radius: 0;
-        padding: 20px 34px;
+        padding: 18px 24px;
         margin: 0 0 10px 0;
         box-shadow: 0 8px 20px rgba(31, 45, 61, 0.04);
     }
@@ -129,6 +129,7 @@ st.markdown("""
         display: flex;
         align-items: center;
         gap: 12px;
+        min-width: max-content;
     }
 
     .nav-mark {
@@ -148,7 +149,7 @@ st.markdown("""
         display: inline-flex;
         align-items: baseline;
         gap: 2px;
-        font-size: 24px;
+        font-size: 22px;
         font-weight: 800;
         line-height: 1;
         margin: 0;
@@ -163,8 +164,8 @@ st.markdown("""
     }
 
     .nav-subtitle {
-        font-size: 10px;
-        letter-spacing: 0.12em;
+        font-size: 9px;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
         color: #6f8498;
         margin: 3px 0 0 0;
@@ -173,18 +174,19 @@ st.markdown("""
     .nav-menu {
         display: flex;
         justify-content: center;
-        gap: 38px;
-        flex-wrap: wrap;
+        gap: 26px;
+        flex-wrap: nowrap;
+        min-width: 0;
     }
 
     .nav-menu a {
         color: #182635;
         text-decoration: none;
-        font-size: 15px;
+        font-size: 13px;
         font-weight: 500;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         white-space: nowrap;
     }
 
@@ -204,10 +206,11 @@ st.markdown("""
 
     .nav-actions {
         display: flex;
-        gap: 12px;
+        gap: 10px;
         justify-content: flex-end;
         flex-wrap: nowrap;
         align-items: center;
+        min-width: max-content;
     }
 
     .nav-chip {
@@ -230,21 +233,21 @@ st.markdown("""
         background: #7acb57;
         border-color: #7acb57;
         color: white;
-        min-width: 64px;
-        width: 64px;
-        height: 64px;
+        min-width: 56px;
+        width: 56px;
+        height: 56px;
         padding: 0;
-        font-size: 24px;
+        font-size: 20px;
         box-shadow: 0 10px 24px rgba(122, 203, 87, 0.26);
     }
 
     .nav-chip.secondary {
-        min-width: 116px;
-        height: 64px;
-        padding: 0 18px;
-        font-size: 16px;
+        min-width: 108px;
+        height: 56px;
+        padding: 0 16px;
+        font-size: 14px;
         font-weight: 800;
-        gap: 10px;
+        gap: 8px;
         border-color: #edf1f5;
         box-shadow: 0 10px 24px rgba(31, 45, 61, 0.06);
     }
