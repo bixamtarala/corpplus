@@ -86,6 +86,15 @@ st.markdown("""
     }
 
     /* Landing Page */
+    .landing-header-shell {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(8px);
+        box-shadow: 0 10px 22px rgba(31, 45, 61, 0.06);
+    }
+
     .promo-bar {
         background: linear-gradient(90deg, #0a2f1f 0%, #0f3c29 100%);
         color: rgba(255, 255, 255, 0.92);
@@ -998,6 +1007,7 @@ def page_landing():
         enter_demo_mode()
 
     st.markdown("""
+    <div class="landing-header-shell">
     <div class="promo-bar">
         Turn farm data into ROI. <a href="?action=demo">Invite CropPulse</a> to your AI and digital transformation workflow.
     </div>
@@ -1022,6 +1032,7 @@ def page_landing():
             <a class="nav-chip primary" href="?action=demo">&#8981;</a>
             <a class="nav-chip secondary" href="?action=login">&#127760; <span>Login</span> <span class="nav-menu-caret">&#9662;</span></a>
         </div>
+    </div>
     </div>
 
     <div class="industry-panel-wrap" id="industry-panel">
