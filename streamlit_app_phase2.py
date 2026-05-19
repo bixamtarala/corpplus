@@ -423,11 +423,11 @@ def page_landing():
         <div class="hero-grid">
             <div>
                 <div class="section-kicker">Agricultural intelligence and market coordination</div>
-                <div class="hero-title">One public entry point for farmers, traders, and agri teams.</div>
-                <div class="hero-subtitle">Landing page, onboarding, and working dashboards in a single Streamlit app.</div>
+                <div class="hero-title">Sell smarter, source faster, and coordinate every farm decision in one place.</div>
+                <div class="hero-subtitle">CropPulse helps farmers, traders, and agricultural teams act on prices, crops, and opportunities with confidence.</div>
                 <p class="hero-copy">
-                    CropPulse helps farmers get market visibility, helps traders find supply faster, and gives agricultural teams
-                    a single operating surface for crop intelligence, listings, and deal coordination.
+                    Follow market prices, manage crops, discover buyers, publish listings, and keep deals moving without jumping
+                    between disconnected tools or phone calls.
                 </p>
             </div>
         </div>
@@ -438,19 +438,19 @@ def page_landing():
     <div class="metric-strip">
         <div class="hero-stat">
             <p class="hero-stat-value">500+</p>
-            <p class="hero-stat-label">Traders validated in Phase 1</p>
+            <p class="hero-stat-label">Traders already validated in the network</p>
         </div>
         <div class="hero-stat">
-            <p class="hero-stat-value">1 app</p>
-            <p class="hero-stat-label">Landing, auth, and dashboard together</p>
+            <p class="hero-stat-value">Live</p>
+            <p class="hero-stat-label">Market prices, crop tracking, and buyer discovery</p>
         </div>
         <div class="hero-stat">
-            <p class="hero-stat-value">2 DB modes</p>
-            <p class="hero-stat-label">SQLite local, PostgreSQL in production</p>
+            <p class="hero-stat-value">Faster</p>
+            <p class="hero-stat-label">Farmer onboarding and listing management</p>
         </div>
         <div class="hero-stat">
-            <p class="hero-stat-value">0 API</p>
-            <p class="hero-stat-label">Required in the active Streamlit path</p>
+            <p class="hero-stat-value">Better</p>
+            <p class="hero-stat-label">Visibility for decisions, negotiations, and deals</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -463,8 +463,8 @@ def page_landing():
         <div class="feature-card">
             <h3>📍 Farmer Dashboard</h3>
             <p>
-            Manage crops, track prices, find the best time to sell, and connect directly
-            with buyers using one public app.
+            Manage crops, track prices, choose the best time to sell, and connect directly
+            with buyers from a single workspace.
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -475,7 +475,7 @@ def page_landing():
             <h3>🛒 Smart Marketplace</h3>
             <p>
             Create listings, receive offers, negotiate prices, and coordinate deals
-            without leaving the Streamlit flow.
+            in one simple marketplace flow.
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -506,12 +506,12 @@ def page_landing():
     st.markdown("""
     ### Why teams use CropPulse
     
-    CropPulse is built to reduce friction across the agriculture value chain.
-    It gives farmers better visibility, gives traders faster access to supply,
-    and gives agri teams a single place to coordinate decisions.
+    CropPulse reduces friction across the agriculture value chain.
+    Farmers get clearer selling signals, traders get faster access to supply,
+    and agricultural teams get one place to coordinate action.
     
-    Start with farmer onboarding, move into market discovery, and grow into a
-    full operating surface for intelligence, listings, and deal coordination.
+    Start with onboarding, move into market discovery, and keep daily work moving
+    through pricing intelligence, listings, and deal coordination.
     
     ---
     *©2026 CropPulse. Making agriculture smarter, fairer, and more profitable.*
