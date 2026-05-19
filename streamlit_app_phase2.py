@@ -1155,7 +1155,7 @@ def page_landing():
         </div>
         <div class="nav-actions">
             <a class="nav-chip primary" href="?action=demo">&#8981;</a>
-            <a class="nav-chip secondary" href="?action=login">&#127760; <span>Login</span> <span class="nav-menu-caret">&#9662;</span></a>
+            <a class="nav-chip secondary" href="?action=login"><span>Login</span> <span class="nav-menu-caret">&#9662;</span></a>
         </div>
     </div>
     </div>
