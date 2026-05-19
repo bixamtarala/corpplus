@@ -67,12 +67,13 @@ def _get_db_settings():
     return database_url, is_production, db_type
 
 
-DATABASE_URL, IS_PRODUCTION, DB_TYPE = _get_db_settings()
-
-if IS_PRODUCTION:
-    logger.info(f"🔵 Running in PRODUCTION mode with {DB_TYPE}")
-else:
-    logger.info("🟢 Running in LOCAL mode with SQLite")
+def log_db_mode():
+    """Log the active database mode after the app has finished importing."""
+    _, is_production, db_type = _get_db_settings()
+    if is_production:
+        logger.info(f"🔵 Running in PRODUCTION mode with {db_type}")
+    else:
+        logger.info("🟢 Running in LOCAL mode with SQLite")
 
 # ============================================================================
 # DATABASE CONNECTION - SMART SELECTION
@@ -466,9 +467,10 @@ def get_farmer_dashboard(user_id):
 
 # Initialize on module load
 if __name__ == "__main__":
-    logger.info(f"Testing {DB_TYPE.upper()} connection...")
+    _, _, db_type = _get_db_settings()
+    logger.info(f"Testing {db_type.upper()} connection...")
     if test_connection():
-        logger.info(f"✅ {DB_TYPE.upper()} connection successful!")
+        logger.info(f"✅ {db_type.upper()} connection successful!")
         init_database()
     else:
-        logger.error(f"❌ Failed to connect to {DB_TYPE.upper()}")
+        logger.error(f"❌ Failed to connect to {db_type.upper()}")
