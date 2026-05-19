@@ -81,9 +81,14 @@ st.markdown("""
     
     /* Main Container */
     .main {
-        padding-top: 1rem;
+        padding-top: 0;
         max-width: 1600px;
         margin: 0 auto;
+    }
+
+    .block-container {
+        padding-top: 0.75rem;
+        padding-bottom: 1rem;
     }
     
     /* Top Navigation Bar */
@@ -448,34 +453,16 @@ def generate_intelligence_feed():
 # ============================================================================
 
 # Logo & User Info (Compact Top)
-col1, col2, col3 = st.columns([1, 3, 1])
-
-with col1:
-    st.markdown("<h1 style='color: #2ecc71; margin: 0;'>🌾</h1>", unsafe_allow_html=True)
-
-with col2:
-    st.markdown("""
+# Logo & Product Name (Top Left)
+st.markdown("""
+<div style='display: flex; align-items: center; gap: 14px; margin: 0 0 8px 0;'>
+    <div style='font-size: 38px; line-height: 1; color: #2ecc71;'>🌾</div>
     <div>
         <h2 style='color: #2c3e50; margin: 0 0 4px 0; font-size: 28px;'>CropPulse</h2>
         <p style='color: #7f8c8d; margin: 0; font-size: 13px;'>Agricultural Operating System</p>
     </div>
-    """, unsafe_allow_html=True)
-
-with col3:
-    user_role = get_user_role()
-    
-    # Role selector
-    new_role = st.selectbox(
-        "Role",
-        ["Farmer", "Trader", "Exporter"],
-        index=0 if user_role == "Farmer" else 1 if user_role == "Trader" else 2,
-        label_visibility="collapsed",
-        key="role_selector"
-    )
-    
-    if new_role != user_role:
-        st.session_state.user_role = new_role
-        st.rerun()
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("---")
 
