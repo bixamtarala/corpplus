@@ -863,6 +863,8 @@ TRANSLATIONS = {
         "lang_en": "EN",
         "lang_te": "తెలుగు",
         "language_label": "Language",
+        "language_english": "English",
+        "language_telugu": "Telugu",
         "promo_bar": "Turn farm data into ROI.",
         "invite_link": "Invite CropPulse",
         "promo_suffix": "to your AI and digital transformation workflow.",
@@ -1152,6 +1154,8 @@ TRANSLATIONS = {
         "lang_en": "EN",
         "lang_te": "తెలుగు",
         "language_label": "భాష",
+        "language_english": "ఇంగ్లీష్",
+        "language_telugu": "తెలుగు",
         "promo_bar": "వ్యవసాయ డేటాను ROIగా మార్చండి.",
         "invite_link": "CropPulse ను ఆహ్వానించండి",
         "promo_suffix": "మీ AI మరియు డిజిటల్ ట్రాన్స్‌ఫార్మేషన్ వర్క్‌ఫ్లోకు.",
@@ -1554,8 +1558,12 @@ def translate_status_value(value):
 
 def render_language_switcher(widget_key, show_label=True):
     current_lang = get_language()
+    widget_state_key = f"{widget_key}_language_choice"
+    if st.session_state.get(widget_state_key) != current_lang:
+        st.session_state[widget_state_key] = current_lang
+
     if show_label:
-        label_col, col_en, col_te = st.columns([1.15, 0.95, 1.2])
+        label_col, radio_col = st.columns([1.1, 2.2])
         with label_col:
             st.markdown(
                 "<div style='padding-top: 0.45rem; color: #6b7d90; font-size: 0.95rem; font-weight: 500;'>"
@@ -1563,32 +1571,29 @@ def render_language_switcher(widget_key, show_label=True):
                 + "</div>",
                 unsafe_allow_html=True,
             )
+        with radio_col:
+            selected_lang = st.radio(
+                tr("language_label"),
+                options=["en", "te"],
+                key=widget_state_key,
+                horizontal=True,
+                label_visibility="collapsed",
+                format_func=lambda code: tr("language_english") if code == "en" else tr("language_telugu"),
+            )
     else:
-        col_en, col_te = st.columns([1, 1.2])
+        selected_lang = st.radio(
+            tr("language_label"),
+            options=["en", "te"],
+            key=widget_state_key,
+            horizontal=True,
+            label_visibility="collapsed",
+            format_func=lambda code: tr("language_english") if code == "en" else tr("language_telugu"),
+        )
 
-    with col_en:
-        if st.button(
-            tr("lang_en"),
-            key=f"{widget_key}_lang_en",
-            use_container_width=True,
-            type="primary" if current_lang == "en" else "secondary",
-        ):
-            if current_lang != "en":
-                set_language("en")
-                sync_language_query_param("en")
-                st.rerun()
-
-    with col_te:
-        if st.button(
-            tr("lang_te"),
-            key=f"{widget_key}_lang_te",
-            use_container_width=True,
-            type="primary" if current_lang == "te" else "secondary",
-        ):
-            if current_lang != "te":
-                set_language("te")
-                sync_language_query_param("te")
-                st.rerun()
+    if selected_lang != current_lang:
+        set_language(selected_lang)
+        sync_language_query_param(selected_lang)
+        st.rerun()
 
 
 def go_to_page(page_name):
