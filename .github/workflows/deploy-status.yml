@@ -20,7 +20,7 @@ jobs:
           echo "📱 Application URL: https://corpplus.streamlit.app"
           echo ""
           echo "🔍 Check deployment status at:"
-          echo "   https://share.streamlit.io/bixamtarala/corpplus/main/croppulse/croppulse_app.py"
+          echo "   https://share.streamlit.io/bixamtarala/corpplus/main/streamlit_app_phase2.py"
         else
           echo "✗ CI/CD Pipeline failed"
           echo "❌ Deployment cancelled"

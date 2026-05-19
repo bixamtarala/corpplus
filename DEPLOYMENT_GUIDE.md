@@ -218,7 +218,7 @@ This guide covers multiple options to deploy your CropPulse landing page to the 
 
 ## 📲 Link Landing Page to Streamlit App
 
-### In Streamlit App (`croppulse_app.py`):
+### In Streamlit App (`streamlit_app_phase2.py`):
 ```python
 st.markdown("""
     <div style="text-align: center; padding: 1rem; background: #f0f0f0; border-radius: 8px;">

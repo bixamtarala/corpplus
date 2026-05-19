@@ -202,7 +202,7 @@ Overall Readiness:   ██████████ 99% ✅
 **Test Results:** See `SAAS_TEST_REPORT.md`  
 **Test Script:** Run `python test_saas.py` to re-run tests  
 **Configuration:** Check `.streamlit/config.toml`  
-**Entry Points:** `streamlit_app_phase2.py` (cloud), `croppulse/croppulse_app.py` (legacy app)  
+**Entry Point:** `streamlit_app_phase2.py`  
 **Data:** `croppulse/data/commodity_prices.csv`  
 
 ---

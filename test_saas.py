@@ -108,20 +108,20 @@ def test_5_entry_points():
     """Test 5: Verify Streamlit entry points exist"""
     print('\n🧪 TEST 5: Verify Deployment Entry Points')
     try:
-        streamlit_app = Path(__file__).parent / 'streamlit_app.py'
-        croppulse_app = Path(__file__).parent / 'croppulse' / 'croppulse_app.py'
+        streamlit_app = Path(__file__).parent / 'streamlit_app_phase2.py'
+        db_config = Path(__file__).parent / 'db_config.py'
         
         if not streamlit_app.exists():
-            print(f'❌ Missing root streamlit_app.py')
+            print(f'❌ Missing streamlit_app_phase2.py')
             return False
         
-        if not croppulse_app.exists():
-            print(f'❌ Missing croppulse/croppulse_app.py')
+        if not db_config.exists():
+            print(f'❌ Missing db_config.py')
             return False
         
-        print('✅ All deployment entry points exist')
-        print(f'   ✓ streamlit_app.py (root)')
-        print(f'   ✓ croppulse/croppulse_app.py')
+        print('✅ Active deployment entry points exist')
+        print(f'   ✓ streamlit_app_phase2.py')
+        print(f'   ✓ db_config.py')
         return True
     except Exception as e:
         print(f'❌ Entry point check error: {e}')

@@ -34,18 +34,17 @@ Before pushing, test locally:
 
 ```bash
 # Install dependencies
-pip install -r croppulse/requirements.txt
+pip install -r requirements.txt
 pip install pylint
 
 # Check syntax
-python -m py_compile croppulse/croppulse_app.py
+python -m py_compile streamlit_app_phase2.py
 
 # Test imports
-cd croppulse
-python -c "import streamlit; import pandas; import plotly; print('✓ All imports successful')"
+python -c "import streamlit; import pandas; import plotly; import db_config; print('✓ All imports successful')"
 
 # Run the app locally
-streamlit run croppulse_app.py
+streamlit run streamlit_app_phase2.py
 ```
 
 ## File Structure

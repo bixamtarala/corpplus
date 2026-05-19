@@ -2,7 +2,7 @@
 
 ## Overview
 
-Deploy the CropPulse Streamlit frontend to Streamlit Cloud while keeping the FastAPI backend on Railway.
+Deploy the CropPulse Streamlit-only public app to Streamlit Cloud with optional PostgreSQL via `DATABASE_URL`.
 
 ---
 
@@ -50,8 +50,8 @@ Deploy the CropPulse Streamlit frontend to Streamlit Cloud while keeping the Fas
 
 1. Go to https://share.streamlit.io
 2. Click "Create App"
-3. Select repository: `bixamtarala/croppulse`
-4. Main file path: `croppulse/croppulse_app.py`
+3. Select repository: `bixamtarala/corpplus`
+4. Main file path: `streamlit_app_phase2.py`
 5. Click "Deploy"
 
 **Streamlit automatically detects:**
@@ -67,7 +67,7 @@ Deploy the CropPulse Streamlit frontend to Streamlit Cloud while keeping the Fas
 3. Add these secrets:
 
 ```toml
-BACKEND_API_URL = "https://web-production-7295a.up.railway.app"
+DATABASE_URL = "postgresql://username:password@host:5432/database"
 API_KEY = "croppulse_admin_secret_key_12345"
 ENVIRONMENT = "production"
 ```
@@ -121,14 +121,13 @@ data = response.json()
 Before deploying to Streamlit Cloud, test locally:
 
 ```bash
-cd croppulse
-streamlit run croppulse_app.py
+streamlit run streamlit_app_phase2.py
 ```
 
 The app will:
-1. Try to connect to Railway backend
-2. Show "✅ Live data from CropPulse Backend API!"
-3. Display real data from your API
+1. Initialize the local database schema automatically
+2. Load the public landing page
+3. Support registration, login, and demo/dashboard flows
 
 ---
 

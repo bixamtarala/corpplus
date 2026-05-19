@@ -72,7 +72,7 @@ And uncomment the Google Analytics script tag.
 
 ## 🔗 Link Streamlit App (10 min)
 
-### In Your Streamlit App (`croppulse_app.py`):
+### In Your Streamlit App (`streamlit_app_phase2.py`):
 
 Add this to your sidebar:
 ```python

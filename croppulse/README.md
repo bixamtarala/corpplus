@@ -1,4 +1,6 @@
-# CropPulse: AI Agricultural Market Intelligence Infrastructure
+# CropPulse Legacy Module: AI Agricultural Market Intelligence Infrastructure
+
+This subfolder app is legacy. The current public Streamlit deployment entrypoint is `../streamlit_app_phase2.py`.
 
 **Helps rice traders see supply shortages, demand patterns, and price movements 7-30 days ahead.**
 **Pilot results: 15-25% margin improvement documented**
@@ -13,7 +15,8 @@ pip install -r requirements.txt
 
 ### 2. Run the App
 ```bash
-streamlit run croppulse_app.py
+cd ..
+streamlit run streamlit_app_phase2.py
 ```
 
 Opens at: `http://localhost:8501`
@@ -121,7 +124,7 @@ Opens at: `http://localhost:8501`
 
 ```
 croppulse/
-├─ croppulse_app.py              # Main Streamlit app (Phase 2: enhanced)
+├─ croppulse_app.py              # Legacy Streamlit app kept for reference
 ├─ requirements.txt              # Python dependencies
 ├─ data/
 │  └─ commodity_prices.csv       # 30-day sample data (3 commodities)
@@ -173,7 +176,8 @@ git push origin main
 
 2. Go to https://streamlit.io/cloud
 3. Click "New app" and select your repo
-4. App deploys automatically ✅
+4. Set the main file path to `streamlit_app_phase2.py`
+5. App deploys automatically ✅
 
 ---
 
@@ -196,7 +200,8 @@ git push origin main
 ### App won't start
 ```bash
 rm -rf .streamlit/cache
-streamlit run croppulse_app.py
+cd ..
+streamlit run streamlit_app_phase2.py
 ```
 
 ### Missing dependencies
@@ -211,7 +216,8 @@ pip install --upgrade -r requirements.txt
 
 ### Port 8501 in use
 ```bash
-streamlit run croppulse_app.py --server.port 8502
+cd ..
+streamlit run streamlit_app_phase2.py --server.port 8502
 ```
 
 ---

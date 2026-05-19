@@ -2,7 +2,7 @@
 
 ## 🔗 Linking Streamlit App to Landing Page
 
-### In Your Streamlit App (`croppulse_app.py`):
+### In Your Streamlit App (`streamlit_app_phase2.py`):
 
 Add this at the top of your app (after imports):
 
