@@ -342,20 +342,6 @@ st.markdown("""
         min-width: max-content;
     }
 
-    .landing-language-anchor + div[data-testid="stHorizontalBlock"] {
-        position: fixed;
-        top: 18px;
-        right: 500px;
-        width: 165px;
-        z-index: 1002;
-        margin: 0;
-        align-items: center;
-    }
-
-    .landing-language-anchor + div[data-testid="stHorizontalBlock"] > div {
-        margin-top: 0;
-    }
-
     .landing-login-anchor + div[data-testid="stHorizontalBlock"] {
         position: fixed;
         top: 18px;
@@ -807,7 +793,6 @@ st.markdown("""
             justify-content: flex-start;
         }
 
-        .landing-language-anchor + div[data-testid="stHorizontalBlock"],
         .landing-login-anchor + div[data-testid="stHorizontalBlock"] {
             position: static;
             width: 100%;
@@ -1887,6 +1872,15 @@ def page_landing():
                     </div>
                 </div>
             </div>
+            <div class="nav-item">
+                <div class="nav-link">{tr('nav_language')} <span class="nav-menu-caret">&#9662;</span></div>
+                <div class="nav-dropdown compact">
+                    <div class="dropdown-list">
+                        <a class="dropdown-item" href="{build_query_href(lang='en')}"><div class="dropdown-icon">&#127760;</div><div><h4>{tr('language_english')}</h4><p>{tr('language_english_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang='te')}"><div class="dropdown-icon">&#127760;</div><div><h4>{tr('language_telugu')}</h4><p>{tr('language_telugu_desc')}</p></div></a>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="nav-actions">
             <a class="nav-chip primary" href="#demo">&#8981;</a>
@@ -1895,10 +1889,6 @@ def page_landing():
     </div>
     <div class="landing-header-spacer"></div>
     """, unsafe_allow_html=True)
-
-    st.markdown('<div class="landing-language-anchor"></div>', unsafe_allow_html=True)
-    with st.columns([1])[0]:
-        render_language_switcher("landing", show_label=False)
 
     st.markdown('<div class="landing-login-anchor"></div>', unsafe_allow_html=True)
     with st.columns([1])[0]:
