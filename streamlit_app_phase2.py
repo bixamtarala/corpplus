@@ -1745,11 +1745,11 @@ def page_landing():
     if landing_action == "login":
         clear_action_query_param()
         reset_auth_flow()
-        st.session_state.landing_panel = "login"
+        go_to_page("login")
     if landing_action == "register":
         clear_action_query_param()
         reset_auth_flow()
-        st.session_state.landing_panel = "register"
+        go_to_page("register")
     if landing_action == "demo":
         clear_action_query_param()
         enter_demo_mode()
@@ -1881,13 +1881,6 @@ def page_landing():
         </div>
     </div>
     """, unsafe_allow_html=True)
-
-    if st.session_state.landing_panel:
-        st.markdown('<div id="auth"></div>', unsafe_allow_html=True)
-        if st.session_state.landing_panel == "login":
-            page_login()
-        elif st.session_state.landing_panel == "register":
-            page_register()
 
     st.markdown(f"""
     <div id="features" class="section-shell">
