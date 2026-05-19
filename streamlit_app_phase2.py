@@ -425,9 +425,9 @@ st.markdown("""
 
     .hero-grid {
         display: grid;
-        grid-template-columns: 1.05fr 1fr;
-        gap: 34px;
-        align-items: center;
+        grid-template-columns: 1fr;
+        gap: 18px;
+        align-items: flex-start;
     }
 
     .section-kicker {
@@ -479,122 +479,6 @@ st.markdown("""
         padding: 8px 14px;
         font-size: 12px;
         font-weight: 700;
-    }
-
-    .hero-visual {
-        position: relative;
-        background: linear-gradient(180deg, #16233a 0%, #1d2d49 100%);
-        border-radius: 24px;
-        padding: 16px;
-        min-height: 330px;
-        box-shadow: 0 20px 50px rgba(10, 18, 34, 0.22);
-        overflow: hidden;
-    }
-
-    .hero-visual::after {
-        content: "";
-        position: absolute;
-        inset: auto -80px -120px auto;
-        width: 220px;
-        height: 220px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(46,204,113,0.45) 0%, rgba(46,204,113,0) 70%);
-    }
-
-    .visual-top {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #8fa1bb;
-        font-size: 12px;
-        font-weight: 700;
-        margin-bottom: 12px;
-    }
-
-    .visual-dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        display: inline-block;
-    }
-
-    .dot-red { background: #ff5f57; }
-    .dot-yellow { background: #febc2e; }
-    .dot-green { background: #28c840; }
-
-    .visual-chart {
-        background: linear-gradient(180deg, #284a79 0%, #233d63 100%);
-        border: 1px solid rgba(140, 182, 235, 0.18);
-        border-radius: 20px;
-        padding: 18px;
-        height: 128px;
-        position: relative;
-        overflow: hidden;
-        margin-bottom: 14px;
-    }
-
-    .visual-chart::before {
-        content: "";
-        position: absolute;
-        inset: 20px 18px 18px 18px;
-        border-radius: 14px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
-    }
-
-    .chart-line {
-        position: absolute;
-        left: 16px;
-        right: 16px;
-        top: 24px;
-        height: 4px;
-        border-radius: 999px;
-        background: linear-gradient(90deg, #7aa3d5 0%, #2ed0a1 45%, #8bb8f5 100%);
-    }
-
-    .chart-area {
-        position: absolute;
-        left: 18px;
-        right: 18px;
-        bottom: 18px;
-        height: 68px;
-        background: linear-gradient(180deg, rgba(46, 204, 113, 0.15), rgba(46, 204, 113, 0.04));
-        clip-path: polygon(0% 85%, 14% 83%, 28% 80%, 42% 88%, 58% 60%, 74% 70%, 88% 38%, 100% 24%, 100% 100%, 0% 100%);
-        border-radius: 12px;
-    }
-
-    .visual-grid {
-        display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
-        gap: 14px;
-    }
-
-    .visual-card {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 18px;
-        padding: 14px;
-        color: white;
-        position: relative;
-        z-index: 1;
-    }
-
-    .visual-label {
-        font-size: 12px;
-        color: #9db2ce;
-        margin-bottom: 6px;
-    }
-
-    .visual-value {
-        font-size: 28px;
-        font-weight: 800;
-        line-height: 1.1;
-        margin: 0 0 4px 0;
-    }
-
-    .visual-note {
-        font-size: 12px;
-        color: #b8cae2;
-        margin: 0;
     }
 
     .action-bar {
@@ -1968,30 +1852,6 @@ def page_landing():
                     <span class="hero-tag">{tr('tag_sell')}</span>
                     <span class="hero-tag">{tr('tag_trader')}</span>
                     <span class="hero-tag">{tr('tag_listing')}</span>
-                </div>
-            </div>
-            <div class="hero-visual">
-                <div class="visual-top">
-                    <span class="visual-dot dot-red"></span>
-                    <span class="visual-dot dot-yellow"></span>
-                    <span class="visual-dot dot-green"></span>
-                    <span>{tr('live_market_workspace')}</span>
-                </div>
-                <div class="visual-chart">
-                    <div class="chart-line"></div>
-                    <div class="chart-area"></div>
-                </div>
-                <div class="visual-grid">
-                    <div class="visual-card">
-                        <div class="visual-label">{tr('best_selling_window')}</div>
-                        <p class="visual-value">48 hrs</p>
-                        <p class="visual-note">{tr('demand_desc')}</p>
-                    </div>
-                    <div class="visual-card">
-                        <div class="visual-label">{tr('buyer_activity')}</div>
-                        <p class="visual-value">{tr('high')}</p>
-                        <p class="visual-note">{tr('buyer_activity_desc')}</p>
-                    </div>
                 </div>
             </div>
         </div>
