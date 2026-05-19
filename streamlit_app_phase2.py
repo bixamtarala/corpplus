@@ -90,39 +90,39 @@ st.markdown("""
         display: grid;
         grid-template-columns: auto 1fr auto;
         align-items: center;
-        gap: 34px;
+        gap: 28px;
         background: #ffffff;
-        border: 1px solid #dfeaf3;
-        border-radius: 24px;
-        padding: 18px 28px;
-        margin: 8px 0 18px 0;
-        box-shadow: 0 14px 34px rgba(31, 45, 61, 0.06);
+        border: 1px solid #edf3f7;
+        border-radius: 0;
+        padding: 20px 34px;
+        margin: 0 0 10px 0;
+        box-shadow: 0 8px 20px rgba(31, 45, 61, 0.04);
     }
 
     .nav-brand {
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 12px;
     }
 
     .nav-mark {
-        width: 56px;
-        height: 56px;
-        border-radius: 18px;
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 26px;
+        font-size: 20px;
         color: white;
-        background: linear-gradient(135deg, #1570b8 0%, #2ecc71 100%);
+        background: linear-gradient(135deg, #1b98d2 0%, #67c658 100%);
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.28);
     }
 
     .nav-wordmark {
-        display: flex;
+        display: inline-flex;
         align-items: baseline;
         gap: 2px;
-        font-size: 28px;
+        font-size: 24px;
         font-weight: 800;
         line-height: 1;
         margin: 0;
@@ -137,32 +137,42 @@ st.markdown("""
     }
 
     .nav-subtitle {
-        font-size: 11px;
-        letter-spacing: 0.08em;
+        font-size: 10px;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
         color: #6f8498;
-        margin: 4px 0 0 0;
+        margin: 3px 0 0 0;
     }
 
     .nav-menu {
         display: flex;
         justify-content: center;
-        gap: 34px;
+        gap: 38px;
         flex-wrap: wrap;
     }
 
     .nav-menu a {
-        color: #243a57;
+        color: #182635;
         text-decoration: none;
         font-size: 15px;
         font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+    .nav-menu-caret {
+        font-size: 11px;
+        color: #182635;
     }
 
     .nav-actions {
         display: flex;
         gap: 12px;
         justify-content: flex-end;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        align-items: center;
     }
 
     .nav-chip {
@@ -189,13 +199,19 @@ st.markdown("""
         width: 64px;
         height: 64px;
         padding: 0;
-        font-size: 28px;
+        font-size: 24px;
         box-shadow: 0 10px 24px rgba(122, 203, 87, 0.26);
     }
 
     .nav-chip.secondary {
-        min-width: 148px;
-        font-size: 15px;
+        min-width: 116px;
+        height: 64px;
+        padding: 0 18px;
+        font-size: 16px;
+        font-weight: 800;
+        gap: 10px;
+        border-color: #edf1f5;
+        box-shadow: 0 10px 24px rgba(31, 45, 61, 0.06);
     }
 
     .hero-section {
@@ -701,6 +717,11 @@ st.markdown("""
             font-size: 14px;
         }
 
+        .nav-chip.secondary {
+            height: auto;
+            padding: 11px 20px;
+        }
+
         .floating-card,
         .floating-card.secondary {
             position: static;
@@ -878,18 +899,20 @@ def page_landing():
             <div class="nav-mark">🌾</div>
             <div>
                 <p class="nav-wordmark"><span class="nav-wordmark-primary">Crop</span><span class="nav-wordmark-secondary">Pulse</span></p>
-                <p class="nav-subtitle">Agricultural operating system</p>
+                <p class="nav-subtitle">Agricultural intelligence</p>
             </div>
         </div>
         <div class="nav-menu">
-            <a href="#features">Features</a>
-            <a href="#workflows">Workflows</a>
-            <a href="#trust">Trust</a>
-            <a href="#demo">Demo</a>
+            <a href="#features">Products <span class="nav-menu-caret">&#9662;</span></a>
+            <a href="#workflows">Industry <span class="nav-menu-caret">&#9662;</span></a>
+            <a href="#trust">Solutions <span class="nav-menu-caret">&#9662;</span></a>
+            <a href="#demo">Crop Knowledge Grid</a>
+            <a href="#demo">Resources <span class="nav-menu-caret">&#9662;</span></a>
+            <a href="#demo">Company <span class="nav-menu-caret">&#9662;</span></a>
         </div>
         <div class="nav-actions">
-            <a class="nav-chip primary" href="?action=login">&#9711;</a>
-            <a class="nav-chip secondary" href="?action=register">Create Account</a>
+            <a class="nav-chip primary" href="?action=demo">&#8981;</a>
+            <a class="nav-chip secondary" href="?action=login">&#127760; <span>Login</span> <span class="nav-menu-caret">&#9662;</span></a>
         </div>
     </div>
     """, unsafe_allow_html=True)
