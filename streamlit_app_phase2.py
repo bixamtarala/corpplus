@@ -755,18 +755,34 @@ st.markdown("""
             grid-template-columns: 1fr;
         }
 
-        .landing-nav,
+        .landing-nav {
+            grid-template-columns: 1fr;
+            gap: 14px;
+            padding: 16px 18px;
+        }
+
         .top-strip {
             flex-direction: column;
             align-items: flex-start;
         }
 
+        .landing-header-spacer {
+            height: 116px;
+        }
+
+        .nav-brand,
+        .nav-menu,
+        .nav-actions {
+            width: 100%;
+        }
+
         .hero-title {
-            font-size: 38px;
+            font-size: 34px;
+            line-height: 1.14;
         }
 
         .hero-section {
-            padding: 32px 24px;
+            padding: 24px 18px;
         }
 
         .nav-menu,
@@ -776,6 +792,7 @@ st.markdown("""
 
         .nav-menu {
             flex-wrap: wrap;
+            gap: 14px;
         }
 
         .nav-dropdown,
@@ -829,7 +846,87 @@ st.markdown("""
         .section-shell,
         .feedback-card,
         .demo-shell {
-            padding: 24px;
+            padding: 20px 16px;
+            border-radius: 24px;
+        }
+
+        .section-title {
+            font-size: 24px;
+        }
+
+        .section-description,
+        .hero-subtitle {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .hero-copy {
+            font-size: 14px;
+        }
+
+        .auth-card {
+            max-width: none;
+            margin: 20px 0;
+            padding: 22px 18px;
+        }
+
+        .stButton > button,
+        .stSelectbox,
+        .stTextInput,
+        .stNumberInput {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .block-container {
+            padding-top: 0.75rem;
+            padding-bottom: 1.5rem;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        .landing-header-spacer {
+            height: 124px;
+        }
+
+        .promo-bar {
+            margin-left: -0.75rem;
+            margin-right: -0.75rem;
+            padding: 9px 0.9rem;
+        }
+
+        .nav-mark {
+            width: 44px;
+            height: 44px;
+            font-size: 20px;
+        }
+
+        .nav-wordmark {
+            font-size: 20px;
+        }
+
+        .nav-chip.secondary,
+        .nav-chip.primary {
+            min-width: 96px;
+            height: 44px;
+            padding: 0 14px;
+            font-size: 13px;
+        }
+
+        .nav-chip.primary {
+            width: 44px;
+            min-width: 44px;
+            padding: 0;
+            font-size: 16px;
+        }
+
+        .hero-title {
+            font-size: 28px;
+        }
+
+        .section-title {
+            font-size: 22px;
         }
     }
 </style>
@@ -2117,9 +2214,7 @@ def page_register():
     with switcher_col:
         render_language_switcher("register", show_label=True)
     
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
-    with col2:
+    with st.container():
         st.markdown('<div class="auth-card">', unsafe_allow_html=True)
         
         # Step 1: Phone Registration
@@ -2214,10 +2309,8 @@ def page_register():
 def page_login():
     """Login Page"""
     st.markdown(tr("sign_in"))
-    
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
-    with col2:
+
+    with st.container():
         st.markdown('<div class="auth-card">', unsafe_allow_html=True)
         
         phone = st.text_input(tr("phone_number"), placeholder="9876543210")
