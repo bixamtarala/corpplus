@@ -875,6 +875,7 @@ TRANSLATIONS = {
         "nav_resources": "Resources",
         "nav_company": "Company",
         "nav_user": "User",
+        "nav_language": "Language",
         "login": "Login",
         "price_intelligence": "Price Intelligence",
         "price_intelligence_desc": "Daily market signals, price visibility, and selling windows.",
@@ -918,6 +919,8 @@ TRANSLATIONS = {
         "user_traders_desc": "Supply discovery, buyer visibility, and faster deal coordination for traders.",
         "user_fpo": "FPO",
         "user_fpo_desc": "Aggregation, coordination, and member support tools for farmer producer organizations.",
+        "language_english_desc": "Switch the landing page and app into English.",
+        "language_telugu_desc": "Switch the landing page and app into Telugu.",
         "section_kicker": "Agricultural intelligence and market coordination",
         "hero_title": "Know when to sell. Find supply faster. Coordinate every farm move.",
         "hero_subtitle": "CropPulse brings price visibility, crop planning, marketplace activity, and deal coordination into one clean operating surface.",
@@ -1166,6 +1169,7 @@ TRANSLATIONS = {
         "nav_resources": "వనరులు",
         "nav_company": "సంస్థ",
         "nav_user": "వినియోగదారులు",
+        "nav_language": "భాష",
         "login": "లాగిన్",
         "price_intelligence": "ధరల ఇంటెలిజెన్స్",
         "price_intelligence_desc": "రోజువారీ మార్కెట్ సంకేతాలు, ధరల విజిబిలిటీ, అమ్మకానికి సరైన సమయ సూచనలు.",
@@ -1209,6 +1213,8 @@ TRANSLATIONS = {
         "user_traders_desc": "వ్యాపారుల కోసం సరఫరా గుర్తింపు, కొనుగోలుదారు విజిబిలిటీ, వేగవంతమైన డీల్ సమన్వయం.",
         "user_fpo": "FPO",
         "user_fpo_desc": "రైతు ఉత్పత్తిదారుల సంస్థల కోసం ఏకీకరణ, సమన్వయం, సభ్యుల మద్దతు సాధనాలు.",
+        "language_english_desc": "ల్యాండింగ్ పేజీ మరియు యాప్‌ను ఇంగ్లీష్‌లో చూపించండి.",
+        "language_telugu_desc": "ల్యాండింగ్ పేజీ మరియు యాప్‌ను తెలుగులో చూపించండి.",
         "section_kicker": "వ్యవసాయ ఇంటెలిజెన్స్ మరియు మార్కెట్ సమన్వయం",
         "hero_title": "ఎప్పుడు అమ్మాలో తెలుసుకోండి. సరఫరాను వేగంగా కనుగొనండి. ప్రతి వ్యవసాయ నిర్ణయాన్ని సమన్వయం చేయండి.",
         "hero_subtitle": "CropPulse ధరల విజిబిలిటీ, పంట ప్రణాళిక, మార్కెట్‌ప్లేస్ కార్యకలాపాలు, డీల్ సమన్వయాన్ని ఒకే ప్లాట్‌ఫార్మ్‌లో అందిస్తుంది.",
@@ -1829,6 +1835,15 @@ def page_landing():
                     </div>
                 </div>
             </div>
+            <div class="nav-item">
+                <div class="nav-link">{tr('nav_language')} <span class="nav-menu-caret">&#9662;</span></div>
+                <div class="nav-dropdown compact">
+                    <div class="dropdown-list">
+                        <a class="dropdown-item" href="{build_query_href(lang='en')}"><div class="dropdown-icon">&#127468;&#127463;</div><div><h4>{tr('language_english')}</h4><p>{tr('language_english_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang='te')}"><div class="dropdown-icon">&#127470;&#127475;</div><div><h4>{tr('language_telugu')}</h4><p>{tr('language_telugu_desc')}</p></div></a>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="nav-actions">
             <a class="nav-chip primary" href="{build_query_href(action='demo', lang=current_lang)}">&#8981;</a>
@@ -1838,10 +1853,6 @@ def page_landing():
     </div>
     <div class="landing-header-spacer"></div>
     """, unsafe_allow_html=True)
-
-    landing_switcher_left, landing_switcher_right = st.columns([5.2, 1.8])
-    with landing_switcher_right:
-        render_language_switcher("landing", show_label=False)
 
     st.markdown(f"""
     <div class="hero-section">
