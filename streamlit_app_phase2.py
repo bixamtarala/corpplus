@@ -174,20 +174,28 @@ st.markdown("""
         gap: 26px;
         flex-wrap: nowrap;
         min-width: 0;
+        position: relative;
+        overflow: visible;
     }
 
-    .nav-menu a {
+    .nav-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .nav-link {
         color: #182635;
-        text-decoration: none;
         font-size: 13px;
         font-weight: 500;
         display: inline-flex;
         align-items: center;
         gap: 6px;
         white-space: nowrap;
+        cursor: default;
     }
 
-    .nav-menu a.active {
+    .nav-item.active .nav-link {
         color: #1f8f4d;
         font-weight: 700;
     }
@@ -197,8 +205,95 @@ st.markdown("""
         color: #182635;
     }
 
-    .nav-menu a.active .nav-menu-caret {
+    .nav-item.active .nav-menu-caret {
         color: #1f8f4d;
+    }
+
+    .nav-dropdown {
+        position: absolute;
+        top: calc(100% + 20px);
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        min-width: 300px;
+        background: #ffffff;
+        border: 1px solid #e8eff4;
+        box-shadow: 0 18px 36px rgba(31, 45, 61, 0.1);
+        border-radius: 20px;
+        padding: 22px;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+        z-index: 1005;
+    }
+
+    .nav-dropdown.mega {
+        width: 760px;
+        max-width: min(760px, 78vw);
+    }
+
+    .nav-dropdown.compact {
+        width: 360px;
+        max-width: min(360px, 78vw);
+    }
+
+    .nav-item:hover .nav-dropdown,
+    .nav-item:focus-within .nav-dropdown {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px 20px;
+    }
+
+    .dropdown-list {
+        display: grid;
+        gap: 14px;
+    }
+
+    .dropdown-item {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        text-decoration: none;
+        padding: 8px;
+        border-radius: 14px;
+    }
+
+    .dropdown-item:hover {
+        background: #f6fbf8;
+    }
+
+    .dropdown-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #edf8f1;
+        color: #1f8f4d;
+        font-size: 22px;
+        flex: 0 0 auto;
+    }
+
+    .dropdown-item h4 {
+        font-size: 16px;
+        color: #1b2c3a;
+        margin: 0 0 5px 0;
+        font-weight: 700;
+    }
+
+    .dropdown-item p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.45;
+        color: #556979;
     }
 
     .nav-actions {
@@ -247,55 +342,6 @@ st.markdown("""
         gap: 8px;
         border-color: #edf1f5;
         box-shadow: 0 10px 24px rgba(31, 45, 61, 0.06);
-    }
-
-    .industry-panel-wrap {
-        position: relative;
-        margin-bottom: 18px;
-    }
-
-    .industry-panel {
-        background: #ffffff;
-        border: 1px solid #e8eff4;
-        border-top: none;
-        box-shadow: 0 16px 34px rgba(31, 45, 61, 0.08);
-        padding: 36px 40px 28px 40px;
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 28px 38px;
-    }
-
-    .industry-card {
-        display: flex;
-        gap: 16px;
-        align-items: flex-start;
-    }
-
-    .industry-icon {
-        width: 54px;
-        height: 54px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #edf8f1;
-        color: #1f8f4d;
-        font-size: 28px;
-        flex: 0 0 auto;
-    }
-
-    .industry-card h4 {
-        font-size: 18px;
-        color: #1b2c3a;
-        margin: 0 0 8px 0;
-        font-weight: 700;
-    }
-
-    .industry-card p {
-        margin: 0;
-        font-size: 15px;
-        line-height: 1.5;
-        color: #556979;
     }
 
     .hero-section {
@@ -764,14 +810,14 @@ st.markdown("""
     }
 
     @media (max-width: 900px) {
-        .industry-panel,
         .landing-nav,
         .hero-grid,
         .card-grid,
         .mini-grid,
         .workflow-grid,
         .feedback-row,
-        .visual-grid {
+        .visual-grid,
+        .dropdown-grid {
             grid-template-columns: 1fr;
         }
 
@@ -792,6 +838,30 @@ st.markdown("""
         .nav-menu,
         .nav-actions {
             justify-content: flex-start;
+        }
+
+        .nav-menu {
+            flex-wrap: wrap;
+        }
+
+        .nav-dropdown,
+        .nav-dropdown.mega,
+        .nav-dropdown.compact {
+            position: static;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            margin-top: 12px;
+            transform: none;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            display: none;
+        }
+
+        .nav-item:hover .nav-dropdown,
+        .nav-item:focus-within .nav-dropdown {
+            display: block;
         }
 
         .nav-chip.primary {
@@ -1000,58 +1070,81 @@ def page_landing():
             </div>
         </div>
         <div class="nav-menu">
-            <a href="#features">Products <span class="nav-menu-caret">&#9662;</span></a>
-            <a class="active" href="#industry-panel">Industry <span class="nav-menu-caret">&#9662;</span></a>
-            <a href="#trust">Solutions <span class="nav-menu-caret">&#9662;</span></a>
-            <a href="#demo">Crop Knowledge Grid</a>
-            <a href="#demo">Resources <span class="nav-menu-caret">&#9662;</span></a>
-            <a href="#demo">Company <span class="nav-menu-caret">&#9662;</span></a>
+            <div class="nav-item">
+                <div class="nav-link">Products <span class="nav-menu-caret">&#9662;</span></div>
+                <div class="nav-dropdown compact">
+                    <div class="dropdown-list">
+                        <a class="dropdown-item" href="#features">
+                            <div class="dropdown-icon">&#128200;</div>
+                            <div><h4>Price Intelligence</h4><p>Daily market signals, price visibility, and selling windows.</p></div>
+                        </a>
+                        <a class="dropdown-item" href="#features">
+                            <div class="dropdown-icon">&#127793;</div>
+                            <div><h4>Farmer OS</h4><p>Crop tracking, harvest planning, and farmer workflows.</p></div>
+                        </a>
+                        <a class="dropdown-item" href="#features">
+                            <div class="dropdown-icon">&#128722;</div>
+                            <div><h4>Marketplace</h4><p>Listings, offers, negotiations, and deal coordination.</p></div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-item active">
+                <div class="nav-link">Industry <span class="nav-menu-caret">&#9662;</span></div>
+                <div class="nav-dropdown mega">
+                    <div class="dropdown-grid">
+                        <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#127806;</div><div><h4>Food Retail</h4><p>Intelligent sourcing for a smarter, more sustainable food retail future.</p></div></a>
+                        <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#128230;</div><div><h4>CPG/FMCG</h4><p>AI support for supply leaders managing food production and procurement.</p></div></a>
+                        <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#127793;</div><div><h4>Seed Manufacturing</h4><p>Field intelligence, forecasting, and scale-ready seed operations.</p></div></a>
+                        <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#127970;</div><div><h4>Governments</h4><p>Traceable agricultural visibility for public-sector coordination and programs.</p></div></a>
+                        <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#127981;</div><div><h4>Food Processing</h4><p>Digitized farm operations and end-to-end processing traceability.</p></div></a>
+                        <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#129309;</div><div><h4>Agri Teams</h4><p>Shared workflow for sourcing, monitoring, and coordination teams.</p></div></a>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-link">Solutions <span class="nav-menu-caret">&#9662;</span></div>
+                <div class="nav-dropdown compact">
+                    <div class="dropdown-list">
+                        <a class="dropdown-item" href="#trust"><div class="dropdown-icon">&#9989;</div><div><h4>Verified Network</h4><p>Profiles and participant trust for cleaner buyer-seller interactions.</p></div></a>
+                        <a class="dropdown-item" href="#trust"><div class="dropdown-icon">&#128274;</div><div><h4>Protected Access</h4><p>Reliable access, account flows, and future-ready authentication.</p></div></a>
+                        <a class="dropdown-item" href="#trust"><div class="dropdown-icon">&#9881;</div><div><h4>Operational Focus</h4><p>Built for monitoring, listing, negotiating, and deciding faster.</p></div></a>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-link">Crop Knowledge Grid</div>
+                <div class="nav-dropdown compact">
+                    <div class="dropdown-list">
+                        <a class="dropdown-item" href="#demo"><div class="dropdown-icon">&#127793;</div><div><h4>Crop Signals</h4><p>Weather, readiness, and market context across crop cycles.</p></div></a>
+                        <a class="dropdown-item" href="#demo"><div class="dropdown-icon">&#128161;</div><div><h4>Decision Guidance</h4><p>Use intelligence layers to improve timing and action quality.</p></div></a>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-link">Resources <span class="nav-menu-caret">&#9662;</span></div>
+                <div class="nav-dropdown compact">
+                    <div class="dropdown-list">
+                        <a class="dropdown-item" href="#demo"><div class="dropdown-icon">&#128218;</div><div><h4>Guides</h4><p>Product walkthroughs and onboarding help for new users.</p></div></a>
+                        <a class="dropdown-item" href="#demo"><div class="dropdown-icon">&#128202;</div><div><h4>Case Examples</h4><p>See how teams use pricing, crop, and marketplace workflows.</p></div></a>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-link">Company <span class="nav-menu-caret">&#9662;</span></div>
+                <div class="nav-dropdown compact">
+                    <div class="dropdown-list">
+                        <a class="dropdown-item" href="#demo"><div class="dropdown-icon">&#127759;</div><div><h4>About CropPulse</h4><p>Why we are building agricultural intelligence and coordination tools.</p></div></a>
+                        <a class="dropdown-item" href="#demo"><div class="dropdown-icon">&#128233;</div><div><h4>Contact</h4><p>Reach the team for product access, demos, and partnerships.</p></div></a>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="nav-actions">
             <a class="nav-chip primary" href="?action=demo">&#8981;</a>
             <a class="nav-chip secondary" href="?action=login">&#127760; <span>Login</span> <span class="nav-menu-caret">&#9662;</span></a>
         </div>
     </div>
-    </div>
-
-    <div class="industry-panel-wrap" id="industry-panel">
-        <div class="industry-panel">
-            <div class="industry-card">
-                <div class="industry-icon">&#127806;</div>
-                <div>
-                    <h4>Food Retail</h4>
-                    <p>Intelligent sourcing for a smarter, more sustainable food retail future.</p>
-                </div>
-            </div>
-            <div class="industry-card">
-                <div class="industry-icon">&#128230;</div>
-                <div>
-                    <h4>CPG/FMCG</h4>
-                    <p>Powering the future of food with AI for CPG and FMCG supply leaders.</p>
-                </div>
-            </div>
-            <div class="industry-card">
-                <div class="industry-icon">&#127793;</div>
-                <div>
-                    <h4>Seed Manufacturing</h4>
-                    <p>Smarter seed production with field intelligence, forecasting, and scale-ready operations.</p>
-                </div>
-            </div>
-            <div class="industry-card">
-                <div class="industry-icon">&#127970;</div>
-                <div>
-                    <h4>Development Agencies &amp; Governments</h4>
-                    <p>Programs for governments and institutions that need traceable agricultural visibility at scale.</p>
-                </div>
-            </div>
-            <div class="industry-card">
-                <div class="industry-icon">&#127981;</div>
-                <div>
-                    <h4>Other Industries</h4>
-                    <p>Digitize farm operations and create end-to-end food processing traceability across regions.</p>
-                </div>
-            </div>
-        </div>
     </div>
     """, unsafe_allow_html=True)
 
