@@ -1730,8 +1730,6 @@ def page_landing():
         enter_demo_mode()
 
     current_lang = get_language()
-    lang_en_class = "language-pill active" if current_lang == "en" else "language-pill"
-    lang_te_class = "language-pill active" if current_lang == "te" else "language-pill"
 
     st.markdown(f"""
     <div class="landing-header-shell">
@@ -1828,10 +1826,6 @@ def page_landing():
             </div>
         </div>
         <div class="nav-actions">
-            <div class="language-toggle">
-                <a class="{lang_en_class}" href="{build_query_href(lang='en')}">{tr('lang_en')}</a>
-                <a class="{lang_te_class}" href="{build_query_href(lang='te')}">{tr('lang_te')}</a>
-            </div>
             <a class="nav-chip primary" href="{build_query_href(action='demo', lang=current_lang)}">&#8981;</a>
             <a class="nav-chip secondary" href="{build_query_href(action='login', lang=current_lang)}"><span>{tr('login')}</span></a>
         </div>
@@ -1839,6 +1833,10 @@ def page_landing():
     </div>
     <div class="landing-header-spacer"></div>
     """, unsafe_allow_html=True)
+
+    landing_switcher_left, landing_switcher_right = st.columns([5.2, 1.8])
+    with landing_switcher_right:
+        render_language_switcher("landing", show_label=False)
 
     st.markdown(f"""
     <div class="hero-section">
