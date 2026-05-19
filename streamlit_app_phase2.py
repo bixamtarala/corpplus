@@ -985,6 +985,7 @@ TRANSLATIONS = {
         "nav_crop_knowledge": "Crop Knowledge Grid",
         "nav_resources": "Resources",
         "nav_company": "Company",
+        "nav_user": "User",
         "login": "Login",
         "price_intelligence": "Price Intelligence",
         "price_intelligence_desc": "Daily market signals, price visibility, and selling windows.",
@@ -1022,6 +1023,12 @@ TRANSLATIONS = {
         "about_croppulse_desc": "Why we are building agricultural intelligence and coordination tools.",
         "contact": "Contact",
         "contact_desc": "Reach the team for product access, demos, and partnerships.",
+        "user_farmer": "Farmer",
+        "user_farmer_desc": "Crop planning, selling guidance, and farm workflow tools for producers.",
+        "user_traders": "Traders",
+        "user_traders_desc": "Supply discovery, buyer visibility, and faster deal coordination for traders.",
+        "user_fpo": "FPO",
+        "user_fpo_desc": "Aggregation, coordination, and member support tools for farmer producer organizations.",
         "section_kicker": "Agricultural intelligence and market coordination",
         "hero_title": "Know when to sell. Find supply faster. Coordinate every farm move.",
         "hero_subtitle": "CropPulse brings price visibility, crop planning, marketplace activity, and deal coordination into one clean operating surface.",
@@ -1267,6 +1274,7 @@ TRANSLATIONS = {
         "nav_crop_knowledge": "పంట జ్ఞాన గ్రిడ్",
         "nav_resources": "వనరులు",
         "nav_company": "సంస్థ",
+        "nav_user": "వినియోగదారులు",
         "login": "లాగిన్",
         "price_intelligence": "ధరల ఇంటెలిజెన్స్",
         "price_intelligence_desc": "రోజువారీ మార్కెట్ సంకేతాలు, ధరల విజిబిలిటీ, అమ్మకానికి సరైన సమయ సూచనలు.",
@@ -1304,6 +1312,12 @@ TRANSLATIONS = {
         "about_croppulse_desc": "వ్యవసాయ ఇంటెలిజెన్స్ మరియు సమన్వయ సాధనాలను ఎందుకు నిర్మిస్తున్నామో.",
         "contact": "సంప్రదించండి",
         "contact_desc": "ఉత్పత్తి ప్రాప్తి, డెమోలు, భాగస్వామ్యాల కోసం బృందాన్ని సంప్రదించండి.",
+        "user_farmer": "రైతులు",
+        "user_farmer_desc": "రైతుల కోసం పంట ప్రణాళిక, అమ్మకాల మార్గదర్శకం, ఫార్మ్ వర్క్‌ఫ్లో సాధనాలు.",
+        "user_traders": "వ్యాపారులు",
+        "user_traders_desc": "వ్యాపారుల కోసం సరఫరా గుర్తింపు, కొనుగోలుదారు విజిబిలిటీ, వేగవంతమైన డీల్ సమన్వయం.",
+        "user_fpo": "FPO",
+        "user_fpo_desc": "రైతు ఉత్పత్తిదారుల సంస్థల కోసం ఏకీకరణ, సమన్వయం, సభ్యుల మద్దతు సాధనాలు.",
         "section_kicker": "వ్యవసాయ ఇంటెలిజెన్స్ మరియు మార్కెట్ సమన్వయం",
         "hero_title": "ఎప్పుడు అమ్మాలో తెలుసుకోండి. సరఫరాను వేగంగా కనుగొనండి. ప్రతి వ్యవసాయ నిర్ణయాన్ని సమన్వయం చేయండి.",
         "hero_subtitle": "CropPulse ధరల విజిబిలిటీ, పంట ప్రణాళిక, మార్కెట్‌ప్లేస్ కార్యకలాపాలు, డీల్ సమన్వయాన్ని ఒకే ప్లాట్‌ఫార్మ్‌లో అందిస్తుంది.",
@@ -1912,6 +1926,16 @@ def page_landing():
                     <div class="dropdown-list">
                         <a class="dropdown-item" href="#demo"><div class="dropdown-icon">&#127759;</div><div><h4>{tr('about_croppulse')}</h4><p>{tr('about_croppulse_desc')}</p></div></a>
                         <a class="dropdown-item" href="#demo"><div class="dropdown-icon">&#128233;</div><div><h4>{tr('contact')}</h4><p>{tr('contact_desc')}</p></div></a>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-link">{tr('nav_user')} <span class="nav-menu-caret">&#9662;</span></div>
+                <div class="nav-dropdown compact">
+                    <div class="dropdown-list">
+                        <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#128104;&#8205;&#127806;</div><div><h4>{tr('user_farmer')}</h4><p>{tr('user_farmer_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#129489;&#8205;&#128188;</div><div><h4>{tr('user_traders')}</h4><p>{tr('user_traders_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#127970;</div><div><h4>{tr('user_fpo')}</h4><p>{tr('user_fpo_desc')}</p></div></a>
                     </div>
                 </div>
             </div>
