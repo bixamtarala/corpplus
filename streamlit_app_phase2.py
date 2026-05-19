@@ -89,9 +89,9 @@ st.markdown("""
     .hero-section {
         background: linear-gradient(135deg, #1f8f4d 0%, #2ecc71 100%);
         color: white;
-        padding: 56px 44px;
-        border-radius: 24px;
-        margin: 24px 0 28px 0;
+        padding: 34px 32px;
+        border-radius: 20px;
+        margin: 16px 0 22px 0;
         box-shadow: 0 10px 40px rgba(46, 204, 113, 0.2);
     }
 
@@ -105,32 +105,32 @@ st.markdown("""
     .section-kicker {
         text-transform: uppercase;
         letter-spacing: 0.12em;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 700;
         opacity: 0.85;
-        margin-bottom: 14px;
+        margin-bottom: 10px;
     }
     
     .hero-title {
-        font-size: 52px;
+        font-size: 36px;
         font-weight: 800;
-        line-height: 1.05;
-        margin: 0 0 18px 0;
+        line-height: 1.12;
+        margin: 0 0 12px 0;
     }
     
     .hero-subtitle {
-        font-size: 21px;
+        font-size: 18px;
         font-weight: 400;
-        margin: 0 0 18px 0;
+        margin: 0 0 12px 0;
         opacity: 0.94;
     }
 
     .hero-copy {
-        font-size: 16px;
-        line-height: 1.7;
+        font-size: 15px;
+        line-height: 1.55;
         opacity: 0.95;
-        margin-bottom: 24px;
-        max-width: 760px;
+        margin-bottom: 10px;
+        max-width: 680px;
     }
 
     .cta-row {
@@ -423,11 +423,10 @@ def page_landing():
         <div class="hero-grid">
             <div>
                 <div class="section-kicker">Agricultural intelligence and market coordination</div>
-                <div class="hero-title">Sell smarter, source faster, and coordinate every farm decision in one place.</div>
-                <div class="hero-subtitle">CropPulse helps farmers, traders, and agricultural teams act on prices, crops, and opportunities with confidence.</div>
+                <div class="hero-title">Smarter farming and trading, in one place.</div>
+                <div class="hero-subtitle">Track prices, manage crops, and connect with buyers faster.</div>
                 <p class="hero-copy">
-                    Follow market prices, manage crops, discover buyers, publish listings, and keep deals moving without jumping
-                    between disconnected tools or phone calls.
+                    CropPulse gives farmers, traders, and agri teams a simpler way to monitor markets and move deals forward.
                 </p>
             </div>
         </div>
