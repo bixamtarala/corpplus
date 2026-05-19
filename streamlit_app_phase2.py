@@ -1858,7 +1858,7 @@ def page_landing():
                     </div>
                 </div>
             </div>
-            <div class="nav-item active">
+            <div class="nav-item">
                 <div class="nav-link">{tr('nav_industry')} <span class="nav-menu-caret">&#9662;</span></div>
                 <div class="nav-dropdown mega">
                     <div class="dropdown-grid">
