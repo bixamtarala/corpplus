@@ -88,62 +88,74 @@ st.markdown("""
     /* Landing Page */
     .landing-nav {
         display: grid;
-        grid-template-columns: 1.2fr 1fr auto;
+        grid-template-columns: auto 1fr auto;
         align-items: center;
-        gap: 24px;
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid #d9e7ef;
-        border-radius: 28px;
-        padding: 18px 24px;
-        margin: 8px 0 22px 0;
-        box-shadow: 0 16px 40px rgba(31, 45, 61, 0.08);
-        backdrop-filter: blur(10px);
+        gap: 34px;
+        background: #ffffff;
+        border: 1px solid #dfeaf3;
+        border-radius: 24px;
+        padding: 18px 28px;
+        margin: 8px 0 18px 0;
+        box-shadow: 0 14px 34px rgba(31, 45, 61, 0.06);
     }
 
     .nav-brand {
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 14px;
     }
 
     .nav-mark {
-        width: 68px;
-        height: 68px;
-        border-radius: 22px;
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 32px;
+        font-size: 26px;
         color: white;
-        background: linear-gradient(135deg, #123a68 0%, #2ecc71 100%);
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+        background: linear-gradient(135deg, #1570b8 0%, #2ecc71 100%);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.28);
     }
 
-    .nav-title {
-        font-size: 18px;
+    .nav-wordmark {
+        display: flex;
+        align-items: baseline;
+        gap: 2px;
+        font-size: 28px;
         font-weight: 800;
-        color: #17324d;
+        line-height: 1;
         margin: 0;
     }
 
+    .nav-wordmark-primary {
+        color: #1490d2;
+    }
+
+    .nav-wordmark-secondary {
+        color: #1f3151;
+    }
+
     .nav-subtitle {
-        font-size: 13px;
-        color: #6c8196;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #6f8498;
         margin: 4px 0 0 0;
     }
 
     .nav-menu {
         display: flex;
         justify-content: center;
-        gap: 28px;
+        gap: 34px;
         flex-wrap: wrap;
     }
 
     .nav-menu a {
-        color: #50657c;
+        color: #243a57;
         text-decoration: none;
-        font-size: 14px;
-        font-weight: 700;
+        font-size: 15px;
+        font-weight: 500;
     }
 
     .nav-actions {
@@ -154,18 +166,36 @@ st.markdown("""
     }
 
     .nav-chip {
-        background: linear-gradient(135deg, #17b57d 0%, #0f9e6b 100%);
-        color: white;
+        color: #17324d;
         border-radius: 999px;
-        padding: 12px 20px;
+        padding: 11px 20px;
         font-size: 14px;
-        font-weight: 800;
+        font-weight: 700;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-width: 120px;
-        box-shadow: 0 10px 24px rgba(23, 181, 125, 0.2);
+        min-width: 122px;
+        border: 1px solid #d6e4ee;
+        background: #ffffff;
+        box-shadow: 0 8px 20px rgba(31, 45, 61, 0.05);
+    }
+
+    .nav-chip.primary {
+        background: #7acb57;
+        border-color: #7acb57;
+        color: white;
+        min-width: 64px;
+        width: 64px;
+        height: 64px;
+        padding: 0;
+        font-size: 28px;
+        box-shadow: 0 10px 24px rgba(122, 203, 87, 0.26);
+    }
+
+    .nav-chip.secondary {
+        min-width: 148px;
+        font-size: 15px;
     }
 
     .hero-section {
@@ -663,6 +693,14 @@ st.markdown("""
             justify-content: flex-start;
         }
 
+        .nav-chip.primary {
+            width: auto;
+            min-width: 122px;
+            height: auto;
+            padding: 11px 20px;
+            font-size: 14px;
+        }
+
         .floating-card,
         .floating-card.secondary {
             position: static;
@@ -839,8 +877,8 @@ def page_landing():
         <div class="nav-brand">
             <div class="nav-mark">🌾</div>
             <div>
-                <p class="nav-title">CropPulse</p>
-                <p class="nav-subtitle">Know when to sell and who to reach next.</p>
+                <p class="nav-wordmark"><span class="nav-wordmark-primary">Crop</span><span class="nav-wordmark-secondary">Pulse</span></p>
+                <p class="nav-subtitle">Agricultural operating system</p>
             </div>
         </div>
         <div class="nav-menu">
@@ -850,8 +888,8 @@ def page_landing():
             <a href="#demo">Demo</a>
         </div>
         <div class="nav-actions">
-            <a class="nav-chip" href="?action=login">Login</a>
-            <a class="nav-chip" href="?action=register">Create Account</a>
+            <a class="nav-chip primary" href="?action=login">&#9711;</a>
+            <a class="nav-chip secondary" href="?action=register">Create Account</a>
         </div>
     </div>
     """, unsafe_allow_html=True)
