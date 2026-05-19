@@ -2268,8 +2268,8 @@ def page_dashboard():
             st.rerun()
     
     # Tabs
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        tr("tab_dashboard"), tr("tab_crops"), tr("tab_marketplace"), tr("tab_intelligence"), tr("tab_deals")
+    tab1, tab2, tab3, tab4 = st.tabs([
+        tr("tab_dashboard"), tr("tab_marketplace"), tr("tab_intelligence"), tr("tab_deals")
     ])
     
     with tab1:
@@ -2376,26 +2376,6 @@ def page_dashboard():
             st.info(tr("trader_dashboard_info"))
     
     with tab2:
-        st.subheader(tr("manage_crops"))
-        
-        with st.form("crop_form"):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                crop_name = st.selectbox(tr("crop"), CROP_OPTIONS, format_func=lambda value: translate_option(value, CROP_KEYS))
-                variety = st.text_input(tr("variety"), placeholder=tr("placeholder_variety"))
-            
-            with col2:
-                area = st.number_input(tr("area"), min_value=0.1, value=1.0)
-                soil_type = st.selectbox(tr("soil_type"), SOIL_OPTIONS[:-1], format_func=lambda value: translate_option(value, SOIL_KEYS))
-            
-            sowing_date = st.date_input(tr("sowing_date"))
-            harvest_date = st.date_input(tr("expected_harvest"))
-            
-            if st.form_submit_button(tr("add_crop")):
-                st.success(tr("crop_added"))
-    
-    with tab3:
         st.subheader(tr("marketplace_title"))
         st.info(tr("marketplace_info"))
         
@@ -2416,7 +2396,7 @@ def page_dashboard():
             if st.form_submit_button(tr("create_listing")):
                 st.success(tr("listing_created"))
     
-    with tab4:
+    with tab3:
         st.subheader(tr("intelligence_feed"))
         
         # Weather Alert
@@ -2444,7 +2424,7 @@ def page_dashboard():
         with col2:
             st.markdown(f"{tr('scheme_alert_title')}\n\n{tr('scheme_alert_body')}")
     
-    with tab5:
+    with tab4:
         st.subheader(tr("active_deals_title"))
         st.info(tr("active_deals_info"))
         
