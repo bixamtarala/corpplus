@@ -1654,9 +1654,17 @@ def translate_status_value(value):
 def render_language_switcher(widget_key, show_label=True):
     current_lang = get_language()
     if show_label:
-        st.caption(tr("language_label"))
+        label_col, col_en, col_te = st.columns([1.15, 0.95, 1.2])
+        with label_col:
+            st.markdown(
+                "<div style='padding-top: 0.45rem; color: #6b7d90; font-size: 0.95rem; font-weight: 500;'>"
+                + tr("language_label")
+                + "</div>",
+                unsafe_allow_html=True,
+            )
+    else:
+        col_en, col_te = st.columns([1, 1.2])
 
-    col_en, col_te = st.columns(2)
     with col_en:
         if st.button(
             tr("lang_en"),
@@ -2350,15 +2358,15 @@ def page_login():
 def page_dashboard():
     """Main Dashboard for Farmers/Traders"""
     # Top Navigation
-    col1, col2, col3, col4, col5 = st.columns([2.4, 1.6, 1.6, 1.4, 1.8])
+    col1, col2, col3 = st.columns([4.4, 2.5, 1.4])
     
     with col1:
         st.markdown(tr("dashboard_title"))
 
-    with col4:
+    with col2:
         render_language_switcher("dashboard", show_label=True)
     
-    with col5:
+    with col3:
         if st.button(tr("logout")):
             st.session_state.user = None
             st.session_state.page = "landing"
