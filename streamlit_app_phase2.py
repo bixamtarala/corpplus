@@ -342,21 +342,35 @@ st.markdown("""
         min-width: max-content;
     }
 
-    .landing-inline-controls-anchor + div[data-testid="stHorizontalBlock"] {
+    .landing-language-anchor + div[data-testid="stHorizontalBlock"] {
         position: fixed;
         top: 18px;
-        right: 92px;
-        width: 320px;
+        right: 500px;
+        width: 165px;
         z-index: 1002;
         margin: 0;
         align-items: center;
     }
 
-    .landing-inline-controls-anchor + div[data-testid="stHorizontalBlock"] > div {
+    .landing-language-anchor + div[data-testid="stHorizontalBlock"] > div {
         margin-top: 0;
     }
 
-    .landing-inline-controls-anchor + div[data-testid="stHorizontalBlock"] button {
+    .landing-login-anchor + div[data-testid="stHorizontalBlock"] {
+        position: fixed;
+        top: 18px;
+        right: 92px;
+        width: 112px;
+        z-index: 1002;
+        margin: 0;
+        align-items: center;
+    }
+
+    .landing-login-anchor + div[data-testid="stHorizontalBlock"] > div {
+        margin-top: 0;
+    }
+
+    .landing-login-anchor + div[data-testid="stHorizontalBlock"] button {
         min-height: 42px;
         margin-top: 0.15rem;
     }
@@ -793,13 +807,14 @@ st.markdown("""
             justify-content: flex-start;
         }
 
-        .landing-inline-controls-anchor + div[data-testid="stHorizontalBlock"] {
+        .landing-language-anchor + div[data-testid="stHorizontalBlock"],
+        .landing-login-anchor + div[data-testid="stHorizontalBlock"] {
             position: static;
             width: 100%;
             margin: 0 0 1rem 0;
         }
 
-        .landing-inline-controls-anchor + div[data-testid="stHorizontalBlock"] button {
+        .landing-login-anchor + div[data-testid="stHorizontalBlock"] button {
             margin-top: 0;
         }
 
@@ -1881,11 +1896,12 @@ def page_landing():
     <div class="landing-header-spacer"></div>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="landing-inline-controls-anchor"></div>', unsafe_allow_html=True)
-    landing_controls_lang, landing_controls_login = st.columns([1.45, 0.75])
-    with landing_controls_lang:
+    st.markdown('<div class="landing-language-anchor"></div>', unsafe_allow_html=True)
+    with st.columns([1])[0]:
         render_language_switcher("landing", show_label=False)
-    with landing_controls_login:
+
+    st.markdown('<div class="landing-login-anchor"></div>', unsafe_allow_html=True)
+    with st.columns([1])[0]:
         st.markdown("<div style='padding-top: 0.15rem;'></div>", unsafe_allow_html=True)
         if st.button(tr("login"), key="landing_login_inline", use_container_width=True):
             reset_auth_flow()
