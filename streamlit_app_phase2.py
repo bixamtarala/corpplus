@@ -98,7 +98,7 @@ st.markdown("""
     }
 
     .landing-header-spacer {
-        height: 118px;
+        height: 132px;
     }
 
     .promo-bar {
@@ -107,10 +107,8 @@ st.markdown("""
         text-align: center;
         font-size: 14px;
         font-weight: 600;
-        padding: 9px 20px;
-        margin: -1.25rem -999px 0 -999px;
-        padding-left: 999px;
-        padding-right: 999px;
+        padding: 10px 24px;
+        margin: 0;
     }
 
     .promo-bar a {
@@ -126,7 +124,7 @@ st.markdown("""
         background: #ffffff;
         border: 1px solid #edf3f7;
         border-radius: 0;
-        padding: 18px 24px;
+        padding: 20px 28px;
         margin: 0 0 10px 0;
         box-shadow: 0 8px 20px rgba(31, 45, 61, 0.04);
     }
@@ -144,13 +142,13 @@ st.markdown("""
     }
 
     .nav-mark {
-        width: 44px;
-        height: 44px;
+        width: 50px;
+        height: 50px;
         border-radius: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
+        font-size: 22px;
         color: white;
         background: linear-gradient(135deg, #1b98d2 0%, #67c658 100%);
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.28);
@@ -160,7 +158,7 @@ st.markdown("""
         display: inline-flex;
         align-items: baseline;
         gap: 2px;
-        font-size: 22px;
+        font-size: 24px;
         font-weight: 800;
         line-height: 1;
         margin: 0;
