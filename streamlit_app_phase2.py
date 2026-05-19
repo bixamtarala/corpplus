@@ -55,6 +55,18 @@ st.markdown("""
         padding-bottom: 2rem;
     }
 
+    header[data-testid="stHeader"] {
+        height: 0;
+        background: transparent;
+    }
+
+    [data-testid="stToolbar"],
+    [data-testid="stDecoration"],
+    [data-testid="stStatusWidget"],
+    #MainMenu {
+        display: none;
+    }
+
     .top-strip {
         display: flex;
         align-items: center;
@@ -2329,7 +2341,7 @@ def page_login():
 def page_dashboard():
     """Main Dashboard for Farmers/Traders"""
     # Top Navigation
-    header_col, lang_col, toolbar_gap_col = st.columns([4.8, 1.15, 0.85])
+    header_col, lang_col = st.columns([5.2, 1.1])
 
     with header_col:
         st.markdown(tr("dashboard_title"))
@@ -2348,9 +2360,6 @@ def page_dashboard():
             set_language(selected_lang)
             sync_language_query_param(selected_lang)
             st.rerun()
-
-    with toolbar_gap_col:
-        st.empty()
     
     # Tabs
     tab1, tab2, tab3, tab4 = st.tabs([
