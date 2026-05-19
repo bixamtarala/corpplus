@@ -132,6 +132,11 @@ st.markdown("""
         min-width: max-content;
     }
 
+    .nav-brand-copy {
+        display: flex;
+        align-items: center;
+    }
+
     .nav-mark {
         width: 44px;
         height: 44px;
@@ -161,14 +166,6 @@ st.markdown("""
 
     .nav-wordmark-secondary {
         color: #1f3151;
-    }
-
-    .nav-subtitle {
-        font-size: 9px;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        color: #6f8498;
-        margin: 3px 0 0 0;
     }
 
     .nav-menu {
@@ -1018,9 +1015,8 @@ def page_landing():
     <div class="landing-nav">
         <div class="nav-brand">
             <div class="nav-mark">🌾</div>
-            <div>
+            <div class="nav-brand-copy">
                 <p class="nav-wordmark"><span class="nav-wordmark-primary">Crop</span><span class="nav-wordmark-secondary">Pulse</span></p>
-                <p class="nav-subtitle">Agricultural intelligence</p>
             </div>
         </div>
         <div class="nav-menu">
