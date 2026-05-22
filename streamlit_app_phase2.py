@@ -1,6 +1,7 @@
 """CropPulse Phase 2 - Streamlit-first public app."""
 
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta, date
@@ -24,10 +25,35 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 st.set_page_config(
-    page_title="CropPulse - Agricultural OS",
+        page_title="corppluse",
     page_icon="🌾",
     layout="wide",
     initial_sidebar_state="collapsed"
+)
+
+components.html(
+        """
+        <script>
+        const appName = "corppluse";
+        document.title = appName;
+
+        const ensureMeta = (name, content) => {
+            let tag = document.head.querySelector(`meta[name="${name}"]`);
+            if (!tag) {
+                tag = document.createElement("meta");
+                tag.setAttribute("name", name);
+                document.head.appendChild(tag);
+            }
+            tag.setAttribute("content", content);
+        };
+
+        ensureMeta("application-name", appName);
+        ensureMeta("apple-mobile-web-app-title", appName);
+        ensureMeta("apple-mobile-web-app-capable", "yes");
+        ensureMeta("theme-color", "#1f8f4d");
+        </script>
+        """,
+        height=0,
 )
 
 # ============================================================================
@@ -36,6 +62,10 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+    html, body, [data-testid="stAppViewContainer"], .stApp {
+        overflow-x: hidden;
+    }
+
     :root {
         --primary: #2ecc71;
         --secondary: #3498db;
@@ -836,6 +866,10 @@ st.markdown("""
     }
 
     @media (max-width: 900px) {
+        .landing-header-shell {
+            position: sticky;
+        }
+
         .landing-nav,
         .hero-grid,
         .card-grid,
@@ -859,7 +893,7 @@ st.markdown("""
         }
 
         .landing-header-spacer {
-            height: 108px;
+            display: none;
         }
 
         .nav-brand {
@@ -964,7 +998,38 @@ st.markdown("""
         }
 
         .landing-header-spacer {
-            height: 124px;
+            display: none;
+        }
+
+        .landing-nav {
+            padding: 14px;
+        }
+
+        .mobile-landing-shortcuts,
+        .mobile-dashboard-actions {
+            grid-template-columns: 1fr;
+        }
+
+        .mobile-shortcut {
+            min-height: 50px;
+            font-size: 14px;
+        }
+
+        .mobile-dashboard-action {
+            min-height: auto;
+            padding: 14px;
+        }
+
+        .mobile-bottom-nav {
+            gap: 8px;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .mobile-bottom-link {
+            min-height: 50px;
+            font-size: 11px;
+            padding: 4px;
         }
 
         .nav-mark {
@@ -979,6 +1044,11 @@ st.markdown("""
 
         .hero-title {
             font-size: 28px;
+        }
+
+        .hero-section {
+            padding: 20px 14px;
+            border-radius: 24px;
         }
 
         .section-title {
