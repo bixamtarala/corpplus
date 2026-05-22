@@ -1159,6 +1159,10 @@ TRANSLATIONS = {
         "marketplace": "Marketplace",
         "marketplace_desc": "Listings, offers, negotiations, and deal coordination.",
         "crop_rice_desc": "Price signals, demand trends, and trading visibility for rice markets.",
+        "crop_paddy_desc": "Harvest readiness, mandi pricing, and buyer visibility for paddy growers and mill-linked trade.",
+        "crop_pulses_desc": "Demand tracking and selling support for pulse crops across seasonal and regional markets.",
+        "crop_oilseeds_desc": "Price intelligence and market coordination for oilseed production, sourcing, and sales.",
+        "crop_kharif_desc": "Planning support for other Kharif crops with seasonal signals, crop movement, and buyer context.",
         "crop_wheat_desc": "Crop and market intelligence for wheat production and selling windows.",
         "crop_corn_desc": "Planning and buyer visibility for corn supply and harvest movement.",
         "crop_cotton_desc": "Field updates and market context for cotton growers and buyers.",
@@ -1431,6 +1435,10 @@ TRANSLATIONS = {
         "soil_laterite": "Laterite",
         "soil_clay": "Clay",
         "crop_rice": "Rice",
+        "crop_paddy": "Paddy",
+        "crop_pulses": "Pulses",
+        "crop_oilseeds": "Oilseeds",
+        "crop_kharif": "Other Kharif Crops",
         "crop_wheat": "Wheat",
         "crop_corn": "Corn",
         "crop_cotton": "Cotton",
@@ -1462,6 +1470,10 @@ TRANSLATIONS = {
         "marketplace": "మార్కెట్‌ప్లేస్",
         "marketplace_desc": "లిస్టింగ్స్, ఆఫర్లు, చర్చలు, డీల్ సమన్వయం.",
         "crop_rice_desc": "బియ్యం మార్కెట్లకు ధరల సంకేతాలు, డిమాండ్ ధోరణులు, ట్రేడింగ్ విజిబిలిటీ.",
+        "crop_paddy_desc": "వరి రైతులు మరియు మిల్లర్-లింక్డ్ ట్రేడ్ కోసం కోత సిద్ధత, మండీ ధరలు, కొనుగోలుదారుల విజిబిలిటీ.",
+        "crop_pulses_desc": "వివిధ సీజనల్ మరియు ప్రాంతీయ మార్కెట్లలో పప్పుధాన్యాల డిమాండ్ ట్రాకింగ్ మరియు అమ్మకాల మద్దతు.",
+        "crop_oilseeds_desc": "నూనెగింజల ఉత్పత్తి, సోర్సింగ్, అమ్మకాల కోసం ధరల ఇంటెలిజెన్స్ మరియు మార్కెట్ సమన్వయం.",
+        "crop_kharif_desc": "ఇతర ఖరీఫ్ పంటల కోసం సీజనల్ సంకేతాలు, పంట కదలికలు, కొనుగోలుదారుల సందర్భంతో ప్రణాళిక మద్దతు.",
         "crop_wheat_desc": "గోధుమ ఉత్పత్తి మరియు అమ్మకాల సమయాల కోసం పంట మరియు మార్కెట్ ఇంటెలిజెన్స్.",
         "crop_corn_desc": "మొక్కజొన్న సరఫరా మరియు కోత కదలికలకు ప్రణాళిక మరియు కొనుగోలుదారుల విజిబిలిటీ.",
         "crop_cotton_desc": "పత్తి రైతులు మరియు కొనుగోలుదారుల కోసం ఫీల్డ్ అప్డేట్స్ మరియు మార్కెట్ సందర్భం.",
@@ -1734,6 +1746,10 @@ TRANSLATIONS = {
         "soil_laterite": "లేటరైట్",
         "soil_clay": "చిక్కటి మట్టి",
         "crop_rice": "బియ్యం",
+        "crop_paddy": "వరి",
+        "crop_pulses": "పప్పుధాన్యాలు",
+        "crop_oilseeds": "నూనెగింజలు",
+        "crop_kharif": "ఇతర ఖరీఫ్ పంటలు",
         "crop_wheat": "గోధుమ",
         "crop_corn": "మొక్కజొన్న",
         "crop_cotton": "పత్తి",
@@ -1880,10 +1896,14 @@ SOIL_KEYS = {
     "Clay": "soil_clay",
 }
 
-CROP_OPTIONS = ["Rice", "Wheat", "Corn", "Cotton", "Sugarcane", "Soybean"]
+CROP_OPTIONS = ["Rice", "Paddy", "Pulses", "Oilseeds", "Other Kharif Crops", "Wheat", "Corn", "Cotton", "Sugarcane", "Soybean"]
 
 CROP_KEYS = {
     "Rice": "crop_rice",
+    "Paddy": "crop_paddy",
+    "Pulses": "crop_pulses",
+    "Oilseeds": "crop_oilseeds",
+    "Other Kharif Crops": "crop_kharif",
     "Wheat": "crop_wheat",
     "Corn": "crop_corn",
     "Cotton": "crop_cotton",
@@ -2132,6 +2152,10 @@ def page_landing():
                 <div class="nav-dropdown mega">
                     <div class="dropdown-grid">
                         <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127806;</div><div><h4>{tr('crop_rice')}</h4><p>{tr('crop_rice_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127807;</div><div><h4>{tr('crop_paddy')}</h4><p>{tr('crop_paddy_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#129372;</div><div><h4>{tr('crop_pulses')}</h4><p>{tr('crop_pulses_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_oilseeds')}</h4><p>{tr('crop_oilseeds_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127793;</div><div><h4>{tr('crop_kharif')}</h4><p>{tr('crop_kharif_desc')}</p></div></a>
                         <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_wheat')}</h4><p>{tr('crop_wheat_desc')}</p></div></a>
                         <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_corn')}</h4><p>{tr('crop_corn_desc')}</p></div></a>
                         <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127806;</div><div><h4>{tr('crop_cotton')}</h4><p>{tr('crop_cotton_desc')}</p></div></a>
@@ -2726,7 +2750,7 @@ def page_dashboard():
             col1, col2 = st.columns(2)
             
             with col1:
-                crop = st.selectbox(tr("select_crop"), ["Rice", "Wheat", "Corn"], format_func=lambda value: translate_option(value, CROP_KEYS))
+                crop = st.selectbox(tr("select_crop"), CROP_OPTIONS, format_func=lambda value: translate_option(value, CROP_KEYS))
                 quantity = st.number_input(tr("quantity"), min_value=100.0, value=1000.0)
             
             with col2:
