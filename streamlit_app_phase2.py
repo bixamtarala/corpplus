@@ -1132,6 +1132,9 @@ if "language" not in st.session_state:
 if "landing_panel" not in st.session_state:
     st.session_state.landing_panel = None
 
+if "selected_area" not in st.session_state:
+    st.session_state.selected_area = None
+
 
 TRANSLATIONS = {
     "en": {
@@ -1802,11 +1805,20 @@ def sync_language_query_param(lang_code=None):
         st.query_params["lang"] = active_lang
 
 
+def sync_area_query_param(area_name=None):
+    active_area = area_name or st.session_state.get("selected_area")
+    if active_area in STATE_OPTIONS:
+        st.query_params["area"] = active_area
+
+
 def clear_action_query_param():
     current_lang = st.query_params.get("lang", get_language())
+    current_area = st.query_params.get("area") or st.session_state.get("selected_area")
     st.query_params.clear()
     if current_lang in TRANSLATIONS:
         st.query_params["lang"] = current_lang
+    if current_area in STATE_OPTIONS:
+        st.query_params["area"] = current_area
 
 
 def initialize_language_from_query():
@@ -1815,6 +1827,12 @@ def initialize_language_from_query():
         set_language(query_lang)
     else:
         sync_language_query_param(get_language())
+
+    query_area = st.query_params.get("area")
+    if query_area in STATE_OPTIONS:
+        st.session_state.selected_area = query_area
+    elif st.session_state.get("selected_area") in STATE_OPTIONS:
+        sync_area_query_param(st.session_state.selected_area)
 
 
 def get_language():
@@ -2094,7 +2112,10 @@ def get_selected_crop():
 
 def get_selected_area():
     area_name = st.query_params.get("area")
-    return area_name if area_name in STATE_OPTIONS else None
+    if area_name in STATE_OPTIONS:
+        return area_name
+    session_area = st.session_state.get("selected_area")
+    return session_area if session_area in STATE_OPTIONS else None
 
 
 def render_crop_guide_section(selected_crop, selected_area):
@@ -2295,6 +2316,24 @@ def get_user_by_phone(phone):
             return result
     except Exception as e:
         logger.error(f"Error fetching user: {e}")
+        return None
+
+
+def get_farmer_area_by_user_id(user_id):
+    """Get saved farmer area/state for the logged-in user."""
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT state FROM farmer_profiles WHERE user_id = ?",
+                (user_id,)
+            )
+            result = cursor.fetchone()
+            if result:
+                return result[0]
+            return None
+    except Exception as e:
+        logger.error(f"Error fetching farmer area: {e}")
         return None
 
 def create_user(phone, name, role="farmer"):
@@ -2545,6 +2584,7 @@ def page_landing():
 
     chosen_area = chosen_area_option if chosen_area_option in STATE_OPTIONS else None
     if chosen_area != selected_area:
+        st.session_state.selected_area = chosen_area
         st.query_params["lang"] = current_lang
         if chosen_area:
             st.query_params["area"] = chosen_area
@@ -2857,6 +2897,8 @@ def page_register():
                             except Exception as e:
                                 logger.error(f"Error updating profile: {e}")
                             
+                            st.session_state.selected_area = state
+                            sync_area_query_param(state)
                             st.session_state.user = user_id
                             st.session_state.user_role = "farmer"
                             st.session_state.page = "dashboard"
@@ -2900,6 +2942,10 @@ def page_login():
                 user = get_user_by_phone(st.session_state.phone_temp)
                 st.session_state.user = user[0]
                 st.session_state.user_role = user[3]
+                farmer_area = get_farmer_area_by_user_id(user[0])
+                st.session_state.selected_area = farmer_area if farmer_area in STATE_OPTIONS else st.session_state.get("selected_area")
+                if st.session_state.selected_area in STATE_OPTIONS:
+                    sync_area_query_param(st.session_state.selected_area)
                 st.session_state.otp_requested = False
                 st.session_state.otp_verified_phone = st.session_state.phone_temp
                 st.session_state.page = "dashboard"
