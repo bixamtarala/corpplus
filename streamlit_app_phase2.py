@@ -1129,8 +1129,6 @@ TRANSLATIONS = {
         "promo_suffix": "to your AI and digital transformation workflow.",
         "nav_products": "Products",
         "nav_industry": "Industry",
-        "nav_solutions": "Solutions",
-        "nav_resources": "Resources",
         "nav_company": "Company",
         "nav_user": "User",
         "nav_language": "Language",
@@ -1455,8 +1453,6 @@ TRANSLATIONS = {
         "promo_suffix": "మీ AI మరియు డిజిటల్ ట్రాన్స్‌ఫార్మేషన్ వర్క్‌ఫ్లోకు.",
         "nav_products": "ఉత్పత్తులు",
         "nav_industry": "పరిశ్రమ",
-        "nav_solutions": "పరిష్కారాలు",
-        "nav_resources": "వనరులు",
         "nav_company": "సంస్థ",
         "nav_user": "వినియోగదారులు",
         "nav_language": "భాష",
@@ -2436,25 +2432,6 @@ def page_landing():
                 </div>
             </div>
             <div class="nav-item">
-                <div class="nav-link">{tr('nav_solutions')} <span class="nav-menu-caret">&#9662;</span></div>
-                <div class="nav-dropdown compact">
-                    <div class="dropdown-list">
-                        <a class="dropdown-item" href="#trust"><div class="dropdown-icon">&#9989;</div><div><h4>{tr('verified_network')}</h4><p>{tr('verified_network_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#trust"><div class="dropdown-icon">&#128274;</div><div><h4>{tr('protected_access')}</h4><p>{tr('protected_access_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#trust"><div class="dropdown-icon">&#9881;</div><div><h4>{tr('operational_focus')}</h4><p>{tr('operational_focus_desc')}</p></div></a>
-                    </div>
-                </div>
-            </div>
-            <div class="nav-item">
-                <div class="nav-link">{tr('nav_resources')} <span class="nav-menu-caret">&#9662;</span></div>
-                <div class="nav-dropdown compact">
-                    <div class="dropdown-list">
-                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#128218;</div><div><h4>{tr('guides')}</h4><p>{tr('guides_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#128202;</div><div><h4>{tr('case_examples')}</h4><p>{tr('case_examples_desc')}</p></div></a>
-                    </div>
-                </div>
-            </div>
-            <div class="nav-item">
                 <div class="nav-link">{tr('nav_company')} <span class="nav-menu-caret">&#9662;</span></div>
                 <div class="nav-dropdown compact">
                     <div class="dropdown-list">
@@ -2486,7 +2463,6 @@ def page_landing():
         <div class="mobile-landing-shortcuts">
             <a class="mobile-shortcut" href="#features">{tr('nav_products')}</a>
             <a class="mobile-shortcut" href="#workflows">{tr('nav_industry')}</a>
-            <a class="mobile-shortcut" href="#trust">{tr('nav_solutions')}</a>
             <a class="mobile-shortcut" href="{build_query_href(lang='en')}">{tr('language_english')}</a>
             <a class="mobile-shortcut" href="{build_query_href(lang='te')}">{tr('language_telugu')}</a>
         </div>
