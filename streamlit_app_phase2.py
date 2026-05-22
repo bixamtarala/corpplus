@@ -2414,10 +2414,6 @@ def page_landing():
     initialize_language_from_query()
 
     landing_action = st.query_params.get("action")
-    if landing_action == "login":
-        clear_action_query_param()
-        reset_auth_flow()
-        go_to_page("login")
     if landing_action == "register":
         clear_action_query_param()
         reset_auth_flow()
@@ -2537,7 +2533,6 @@ def page_landing():
             <a class="mobile-shortcut" href="{build_query_href(lang='te')}">{tr('language_telugu')}</a>
         </div>
         <div class="nav-actions">
-            <a class="nav-chip secondary" href="{build_query_href(lang=current_lang, action='login')}">{tr('login')}</a>
             <a class="nav-chip primary" href="#demo">&#8981;</a>
         </div>
     </div>
@@ -3154,8 +3149,6 @@ def main():
         page_landing()
     elif st.session_state.page == "register":
         page_register()
-    elif st.session_state.page == "login":
-        page_login()
     elif st.session_state.page == "dashboard" and st.session_state.user:
         page_dashboard()
     else:
