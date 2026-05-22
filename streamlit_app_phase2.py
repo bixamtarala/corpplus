@@ -349,15 +349,6 @@ st.markdown("""
         color: #556979;
     }
 
-    .nav-actions {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
-        flex-wrap: nowrap;
-        align-items: center;
-        min-width: max-content;
-    }
-
     .language-toggle {
         display: inline-flex;
         align-items: center;
@@ -381,53 +372,6 @@ st.markdown("""
     .language-pill.active {
         background: #1f8f4d;
         color: white;
-    }
-
-    .nav-chip {
-        color: #17324d;
-        border-radius: 999px;
-        padding: 11px 20px;
-        font-size: 14px;
-        font-weight: 700;
-        text-decoration: none !important;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 122px;
-        border: 1px solid #d6e4ee;
-        background: #ffffff;
-        box-shadow: 0 8px 20px rgba(31, 45, 61, 0.05);
-    }
-
-    .nav-chip:hover,
-    .nav-chip:focus,
-    .nav-chip:active,
-    .nav-chip:visited,
-    .nav-chip span {
-        text-decoration: none !important;
-    }
-
-    .nav-chip.primary {
-        background: #7acb57;
-        border-color: #7acb57;
-        color: white;
-        min-width: 56px;
-        width: 56px;
-        height: 56px;
-        padding: 0;
-        font-size: 20px;
-        box-shadow: 0 10px 24px rgba(122, 203, 87, 0.26);
-    }
-
-    .nav-chip.secondary {
-        min-width: 108px;
-        height: 56px;
-        padding: 0 16px;
-        font-size: 14px;
-        font-weight: 800;
-        gap: 8px;
-        border-color: #edf1f5;
-        box-shadow: 0 10px 24px rgba(31, 45, 61, 0.06);
     }
 
     .mobile-landing-shortcuts,
@@ -918,8 +862,7 @@ st.markdown("""
             height: 108px;
         }
 
-        .nav-brand,
-        .nav-actions {
+        .nav-brand {
             width: 100%;
         }
 
@@ -940,10 +883,6 @@ st.markdown("""
             padding: 24px 18px;
         }
 
-        .nav-actions {
-            justify-content: flex-start;
-        }
-
         .nav-dropdown,
         .nav-dropdown.mega,
         .nav-dropdown.compact {
@@ -962,19 +901,6 @@ st.markdown("""
         .nav-item:hover .nav-dropdown,
         .nav-item:focus-within .nav-dropdown {
             display: block;
-        }
-
-        .nav-chip.primary {
-            width: auto;
-            min-width: 122px;
-            height: auto;
-            padding: 11px 20px;
-            font-size: 14px;
-        }
-
-        .nav-chip.secondary {
-            height: auto;
-            padding: 11px 20px;
         }
 
         .floating-card,
@@ -1049,21 +975,6 @@ st.markdown("""
 
         .nav-wordmark {
             font-size: 20px;
-        }
-
-        .nav-chip.secondary,
-        .nav-chip.primary {
-            min-width: 96px;
-            height: 44px;
-            padding: 0 14px;
-            font-size: 13px;
-        }
-
-        .nav-chip.primary {
-            width: 44px;
-            min-width: 44px;
-            padding: 0;
-            font-size: 16px;
         }
 
         .hero-title {
@@ -2520,9 +2431,6 @@ def page_landing():
             <a class="mobile-shortcut" href="#features">{tr('nav_crop_knowledge')}</a>
             <a class="mobile-shortcut" href="{build_query_href(lang='en')}">{tr('language_english')}</a>
             <a class="mobile-shortcut" href="{build_query_href(lang='te')}">{tr('language_telugu')}</a>
-        </div>
-        <div class="nav-actions">
-            <a class="nav-chip primary" href="#features">&#8981;</a>
         </div>
     </div>
     </div>
