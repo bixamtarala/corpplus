@@ -27,6 +27,10 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# Keep Flutter mobile source tracked
+!mobile_app_flutter/lib/
+!mobile_app_flutter/lib/**
+
 # PyInstaller
 *.manifest
 *.spec
