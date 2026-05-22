@@ -1113,6 +1113,9 @@ if "language" not in st.session_state:
 if "landing_panel" not in st.session_state:
     st.session_state.landing_panel = None
 
+if "auth_view" not in st.session_state:
+    st.session_state.auth_view = "login"
+
 if "selected_area" not in st.session_state:
     st.session_state.selected_area = None
 
@@ -1345,6 +1348,14 @@ TRANSLATIONS = {
         "registration_success": "✅ Registration successful!",
         "fill_all_fields": "❌ Please fill all fields",
         "back_to_landing": "← Back to Landing",
+        "auth_center_title": "Access your account",
+        "auth_center_desc": "Keep sign in, create account, and account recovery in one place.",
+        "auth_option_label": "Choose auth option",
+        "auth_option_signin": "Sign in",
+        "auth_option_create": "Create account",
+        "auth_option_reset": "Reset password",
+        "reset_password_desc": "This build uses OTP access. Verify your phone to recover access and continue into your account.",
+        "access_restored": "✅ Access restored!",
         "sign_in": "## 🔐 Sign In",
         "phone_number": "📱 Phone Number",
         "user_not_found": "❌ User not found. Please register first.",
@@ -1669,6 +1680,14 @@ TRANSLATIONS = {
         "registration_success": "✅ నమోదు విజయవంతం!",
         "fill_all_fields": "❌ అన్ని ఫీల్డ్‌లు నింపండి",
         "back_to_landing": "← హోమ్‌కు తిరిగి",
+        "auth_center_title": "మీ ఖాతాను యాక్సెస్ చేయండి",
+        "auth_center_desc": "సైన్ ఇన్, ఖాతా సృష్టి, ఖాతా రికవరీ అన్నింటినీ ఒకే చోట ఉంచండి.",
+        "auth_option_label": "ఆథ్ ఎంపికను ఎంచుకోండి",
+        "auth_option_signin": "సైన్ ఇన్",
+        "auth_option_create": "ఖాతా సృష్టించండి",
+        "auth_option_reset": "పాస్‌వర్డ్ రీసెట్",
+        "reset_password_desc": "ఈ బిల్డ్ OTP ఆధారిత యాక్సెస్ ఉపయోగిస్తుంది. మీ ఫోన్‌ను ధృవీకరించి మీ ఖాతాలోకి తిరిగి ప్రవేశించండి.",
+        "access_restored": "✅ యాక్సెస్ పునరుద్ధరించబడింది!",
         "sign_in": "## 🔐 సైన్ ఇన్",
         "phone_number": "📱 ఫోన్ నంబర్",
         "user_not_found": "❌ వినియోగదారు కనబడలేదు. ముందుగా నమోదు చేయండి.",
@@ -2208,6 +2227,11 @@ def reset_auth_flow():
     st.session_state.landing_panel = None
 
 
+def set_auth_view(view_name):
+    if view_name in {"login", "create", "reset"}:
+        st.session_state.auth_view = view_name
+
+
 def _hash_otp(otp):
     return hashlib.sha256(otp.encode("utf-8")).hexdigest()
 
@@ -2381,10 +2405,16 @@ def page_landing():
     initialize_language_from_query()
 
     landing_action = st.query_params.get("action")
+    if landing_action == "login":
+        clear_action_query_param()
+        reset_auth_flow()
+        set_auth_view("login")
+        go_to_page("login")
     if landing_action == "register":
         clear_action_query_param()
         reset_auth_flow()
-        go_to_page("register")
+        set_auth_view("create")
+        go_to_page("login")
 
     current_lang = get_language()
     selected_crop = get_selected_crop()
@@ -2459,10 +2489,14 @@ def page_landing():
                     </div>
                 </div>
             </div>
+            <div class="nav-item">
+                <a class="nav-link" href="{build_query_href(lang=current_lang, area=selected_area, action='login')}">{tr('login')}</a>
+            </div>
         </div>
         <div class="mobile-landing-shortcuts">
             <a class="mobile-shortcut" href="#features">{tr('nav_products')}</a>
             <a class="mobile-shortcut" href="#workflows">{tr('nav_industry')}</a>
+            <a class="mobile-shortcut" href="{build_query_href(lang=current_lang, area=selected_area, action='login')}">{tr('login')}</a>
             <a class="mobile-shortcut" href="{build_query_href(lang='en')}">{tr('language_english')}</a>
             <a class="mobile-shortcut" href="{build_query_href(lang='te')}">{tr('language_telugu')}</a>
         </div>
@@ -2724,148 +2758,178 @@ def page_landing():
     st.markdown('<div id="help"></div>', unsafe_allow_html=True)
     if st.button(tr('create_account'), key="landing_demo_register", use_container_width=True):
         reset_auth_flow()
-        go_to_page("register")
+        set_auth_view("create")
+        go_to_page("login")
 
     st.markdown(f'<p class="landing-footer">{tr("landing_footer")}</p>', unsafe_allow_html=True)
 
-def page_register():
-    """Farmer Registration"""
-    st.markdown(f"## {tr('register_title').replace('## ', '')}")
-    
-    with st.container():
-        st.markdown('<div class="auth-card">', unsafe_allow_html=True)
-        
-        # Step 1: Phone Registration
-        st.subheader(tr("step_1_phone"))
-        phone = st.text_input(tr("phone_number_10"), placeholder="9876543210")
-        
-        if st.button(tr("send_otp"), use_container_width=True):
-            if phone and len(phone) == 10 and phone.isdigit():
-                # Check if user exists
-                existing_user = get_user_by_phone(phone)
-                if existing_user:
-                    st.error(tr("phone_registered"))
-                else:
-                    issue_server_side_otp(phone)
-                    st.session_state.otp_requested = True
-                    st.session_state.otp_verified_phone = None
-                    st.session_state.phone_temp = phone
-                    st.success(tr("otp_sent_demo"))
-                    st.info(tr("otp_demo_info"))
-            else:
-                st.error(tr("valid_phone_error"))
-        
-        # Step 2: OTP Verification
-        if st.session_state.otp_requested and st.session_state.phone_temp == phone:
-            st.subheader(tr("step_2_verify"))
-            otp_input = st.text_input(tr("enter_otp"), placeholder="123456")
-            
-            if otp_input and verify_server_side_otp(st.session_state.phone_temp, otp_input):
-                st.session_state.otp_verified_phone = st.session_state.phone_temp
-                st.session_state.otp_requested = False
-                st.success(tr("otp_verified"))
-            elif otp_input:
-                st.error(tr("invalid_otp"))
+def render_create_account_flow():
+    st.subheader(tr("step_1_phone"))
+    phone = st.text_input(tr("phone_number_10"), placeholder="9876543210", key="auth_create_phone")
 
-        if st.session_state.otp_verified_phone == st.session_state.phone_temp:
-                # Step 3: Farmer Details
-                st.subheader(tr("step_3_details"))
-                
-                name = st.text_input(tr("full_name"), placeholder=tr("placeholder_name"))
-                state = st.selectbox(
-                    tr("state"),
-                    STATE_OPTIONS,
-                    format_func=lambda value: translate_option(value, STATE_KEYS),
-                )
-                district = st.text_input(tr("district"), placeholder=tr("placeholder_district"))
-                village = st.text_input(tr("village"), placeholder=tr("placeholder_village"))
-                
-                land_size = st.number_input(tr("land_size"), min_value=0.5, value=1.0)
-                soil_type = st.selectbox(
-                    tr("soil_type"),
-                    SOIL_OPTIONS,
-                    format_func=lambda value: translate_option(value, SOIL_KEYS),
-                )
-                
-                if st.button(tr("register_now"), use_container_width=True):
-                    if name and district and village:
-                        user_id = create_user(st.session_state.phone_temp, name, "farmer")
-                        if user_id:
-                            # Update farmer profile
-                            try:
-                                with get_db_connection() as conn:
-                                    cursor = conn.cursor()
-                                    cursor.execute(
-                                        """UPDATE farmer_profiles 
-                                           SET state = ?, district = ?, village = ?, 
-                                               land_size_acres = ?, soil_type = ? 
-                                           WHERE user_id = ?""",
-                                        (state, district, village, land_size, soil_type, user_id)
-                                    )
-                                    conn.commit()
-                            except Exception as e:
-                                logger.error(f"Error updating profile: {e}")
-                            
-                            st.session_state.selected_area = state
-                            sync_area_query_param(state)
-                            st.session_state.user = user_id
-                            st.session_state.user_role = "farmer"
-                            st.session_state.page = "dashboard"
-                            st.success(tr("registration_success"))
-                            st.rerun()
-                    else:
-                        st.error(tr("fill_all_fields"))
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        if st.button(tr("back_to_landing")):
-            reset_auth_flow()
-            go_to_page("landing")
+    if st.button(tr("send_otp"), key="auth_create_send_otp", use_container_width=True):
+        if phone and len(phone) == 10 and phone.isdigit():
+            existing_user = get_user_by_phone(phone)
+            if existing_user:
+                st.error(tr("phone_registered"))
+            else:
+                issue_server_side_otp(phone)
+                st.session_state.otp_requested = True
+                st.session_state.otp_verified_phone = None
+                st.session_state.phone_temp = phone
+                st.success(tr("otp_sent_demo"))
+                st.info(tr("otp_demo_info"))
+        else:
+            st.error(tr("valid_phone_error"))
+
+    if st.session_state.otp_requested and st.session_state.phone_temp == phone:
+        st.subheader(tr("step_2_verify"))
+        otp_input = st.text_input(tr("enter_otp"), placeholder="123456", key="auth_create_otp")
+
+        if otp_input and verify_server_side_otp(st.session_state.phone_temp, otp_input):
+            st.session_state.otp_verified_phone = st.session_state.phone_temp
+            st.session_state.otp_requested = False
+            st.success(tr("otp_verified"))
+        elif otp_input:
+            st.error(tr("invalid_otp"))
+
+    if st.session_state.otp_verified_phone == st.session_state.phone_temp:
+        st.subheader(tr("step_3_details"))
+
+        name = st.text_input(tr("full_name"), placeholder=tr("placeholder_name"), key="auth_create_name")
+        state = st.selectbox(
+            tr("state"),
+            STATE_OPTIONS,
+            key="auth_create_state",
+            format_func=lambda value: translate_option(value, STATE_KEYS),
+        )
+        district = st.text_input(tr("district"), placeholder=tr("placeholder_district"), key="auth_create_district")
+        village = st.text_input(tr("village"), placeholder=tr("placeholder_village"), key="auth_create_village")
+        land_size = st.number_input(tr("land_size"), min_value=0.5, value=1.0, key="auth_create_land_size")
+        soil_type = st.selectbox(
+            tr("soil_type"),
+            SOIL_OPTIONS,
+            key="auth_create_soil",
+            format_func=lambda value: translate_option(value, SOIL_KEYS),
+        )
+
+        if st.button(tr("register_now"), key="auth_create_register", use_container_width=True):
+            if name and district and village:
+                user_id = create_user(st.session_state.phone_temp, name, "farmer")
+                if user_id:
+                    try:
+                        with get_db_connection() as conn:
+                            cursor = conn.cursor()
+                            cursor.execute(
+                                """UPDATE farmer_profiles 
+                                   SET state = ?, district = ?, village = ?, 
+                                       land_size_acres = ?, soil_type = ? 
+                                   WHERE user_id = ?""",
+                                (state, district, village, land_size, soil_type, user_id)
+                            )
+                            conn.commit()
+                    except Exception as e:
+                        logger.error(f"Error updating profile: {e}")
+
+                    st.session_state.selected_area = state
+                    sync_area_query_param(state)
+                    st.session_state.user = user_id
+                    st.session_state.user_role = "farmer"
+                    st.session_state.page = "dashboard"
+                    st.success(tr("registration_success"))
+                    st.rerun()
+            else:
+                st.error(tr("fill_all_fields"))
+
+
+def render_phone_otp_access_flow(reset_mode=False):
+    phone = st.text_input(tr("phone_number"), placeholder="9876543210", key=f"auth_phone_{'reset' if reset_mode else 'login'}")
+
+    if reset_mode:
+        st.caption(tr("reset_password_desc"))
+
+    if st.button(tr("send_otp"), key=f"auth_send_otp_{'reset' if reset_mode else 'login'}", use_container_width=True):
+        if phone and len(phone) == 10 and phone.isdigit():
+            user = get_user_by_phone(phone)
+            if user:
+                issue_server_side_otp(phone)
+                st.session_state.otp_requested = True
+                st.session_state.otp_verified_phone = None
+                st.session_state.phone_temp = phone
+                st.success(tr("otp_sent_demo"))
+                st.info(tr("otp_demo_info"))
+            else:
+                st.error(tr("user_not_found"))
+        else:
+            st.error(tr("valid_phone_error"))
+
+    if st.session_state.otp_requested and st.session_state.phone_temp == phone:
+        otp_input = st.text_input(tr("enter_otp"), key=f"auth_otp_{'reset' if reset_mode else 'login'}")
+
+        if otp_input and verify_server_side_otp(st.session_state.phone_temp, otp_input):
+            user = get_user_by_phone(st.session_state.phone_temp)
+            st.session_state.user = user[0]
+            st.session_state.user_role = user[3]
+            farmer_area = get_farmer_area_by_user_id(user[0])
+            st.session_state.selected_area = farmer_area if farmer_area in STATE_OPTIONS else st.session_state.get("selected_area")
+            if st.session_state.selected_area in STATE_OPTIONS:
+                sync_area_query_param(st.session_state.selected_area)
+            st.session_state.otp_requested = False
+            st.session_state.otp_verified_phone = st.session_state.phone_temp
+            st.session_state.page = "dashboard"
+            st.success(tr("access_restored") if reset_mode else tr("login_success"))
+            st.rerun()
+        elif otp_input:
+            st.error(tr("invalid_otp"))
+
+
+def page_register():
+    """Registration entry routes into the unified auth page."""
+    set_auth_view("create")
+    page_login()
 
 def page_login():
-    """Login Page"""
-    st.markdown(tr("sign_in"))
+    """Unified authentication page."""
+    st.markdown(f"## {tr('auth_center_title')}")
+    st.caption(tr("auth_center_desc"))
 
     with st.container():
         st.markdown('<div class="auth-card">', unsafe_allow_html=True)
-        
-        phone = st.text_input(tr("phone_number"), placeholder="9876543210")
-        
-        if st.button(tr("send_otp"), use_container_width=True):
-            if phone and len(phone) == 10:
-                user = get_user_by_phone(phone)
-                if user:
-                    issue_server_side_otp(phone)
-                    st.session_state.otp_requested = True
-                    st.session_state.otp_verified_phone = None
-                    st.session_state.phone_temp = phone
-                    st.success(tr("otp_sent_demo"))
-                    st.info(tr("otp_demo_info"))
-                else:
-                    st.error(tr("user_not_found"))
-        
-        if st.session_state.otp_requested and st.session_state.phone_temp == phone:
-            otp_input = st.text_input(tr("enter_otp"))
-            
-            if otp_input and verify_server_side_otp(st.session_state.phone_temp, otp_input):
-                user = get_user_by_phone(st.session_state.phone_temp)
-                st.session_state.user = user[0]
-                st.session_state.user_role = user[3]
-                farmer_area = get_farmer_area_by_user_id(user[0])
-                st.session_state.selected_area = farmer_area if farmer_area in STATE_OPTIONS else st.session_state.get("selected_area")
-                if st.session_state.selected_area in STATE_OPTIONS:
-                    sync_area_query_param(st.session_state.selected_area)
-                st.session_state.otp_requested = False
-                st.session_state.otp_verified_phone = st.session_state.phone_temp
-                st.session_state.page = "dashboard"
-                st.success(tr("login_success"))
-                st.rerun()
-            elif otp_input:
-                st.error(tr("invalid_otp"))
+
+        auth_options = {
+            "login": tr("auth_option_signin"),
+            "create": tr("auth_option_create"),
+            "reset": tr("auth_option_reset"),
+        }
+        current_view = st.session_state.get("auth_view", "login")
+        selected_view = st.radio(
+            tr("auth_option_label"),
+            list(auth_options.keys()),
+            index=list(auth_options.keys()).index(current_view if current_view in auth_options else "login"),
+            key="auth_center_selector",
+            horizontal=True,
+            format_func=lambda value: auth_options[value],
+        )
+
+        if selected_view != current_view:
+            reset_auth_flow()
+            set_auth_view(selected_view)
+        else:
+            set_auth_view(selected_view)
+
+        if selected_view == "create":
+            st.markdown(f"### {tr('create_account')}")
+            render_create_account_flow()
+        elif selected_view == "reset":
+            st.markdown(f"### {tr('auth_option_reset')}")
+            render_phone_otp_access_flow(reset_mode=True)
+        else:
+            st.markdown(tr("sign_in"))
+            render_phone_otp_access_flow(reset_mode=False)
         
         st.markdown('</div>', unsafe_allow_html=True)
         
-        if st.button(tr("back_to_landing")):
+        if st.button(tr("back_to_landing"), key="auth_back_to_landing"):
             reset_auth_flow()
             go_to_page("landing")
 
@@ -3022,6 +3086,8 @@ def main():
     # Route to appropriate page
     if st.session_state.page == "landing":
         page_landing()
+    elif st.session_state.page == "login":
+        page_login()
     elif st.session_state.page == "register":
         page_register()
     elif st.session_state.page == "dashboard" and st.session_state.user:
