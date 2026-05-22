@@ -1316,6 +1316,16 @@ TRANSLATIONS = {
         "demo_p1": "No signup required for demo",
         "demo_p2": "Fast dashboard access",
         "demo_p3": "Built for farmers and traders",
+        "crop_guide_title": "Crop guide",
+        "crop_guide_desc": "See season timing, seed guidance, fertilizer planning, water needs, and field requirements for the selected crop.",
+        "guide_best_season": "Best season",
+        "guide_start_window": "Start window",
+        "guide_duration": "Crop duration",
+        "guide_seed_details": "Seed details",
+        "guide_fertilizer": "Fertilizer plan",
+        "guide_water": "Water and irrigation",
+        "guide_field_needs": "Field requirements",
+        "guide_key_actions": "Key actions",
         "continue_demo": "Continue into the live demo",
         "continue_demo_desc": "Add your email if you want it carried into future follow-up, or continue directly to explore the product workflow.",
         "work_email": "Work email",
@@ -1627,6 +1637,16 @@ TRANSLATIONS = {
         "demo_p1": "డెమో కోసం సైన్‌అప్ అవసరం లేదు",
         "demo_p2": "త్వరిత డ్యాష్‌బోర్డ్ ప్రాప్తి",
         "demo_p3": "రైతులు మరియు వ్యాపారుల కోసం నిర్మితమైనది",
+        "crop_guide_title": "పంట మార్గదర్శిని",
+        "crop_guide_desc": "ఎంచుకున్న పంటకు సీజన్ సమయం, విత్తన మార్గదర్శకం, ఎరువుల ప్రణాళిక, నీటి అవసరాలు, మరియు ఫీల్డ్ అవసరాలను చూడండి.",
+        "guide_best_season": "ఉత్తమ సీజన్",
+        "guide_start_window": "ప్రారంభ సమయం",
+        "guide_duration": "పంట వ్యవధి",
+        "guide_seed_details": "విత్తన వివరాలు",
+        "guide_fertilizer": "ఎరువుల ప్రణాళిక",
+        "guide_water": "నీరు మరియు నీటిపారుదల",
+        "guide_field_needs": "ఫీల్డ్ అవసరాలు",
+        "guide_key_actions": "ప్రధాన చర్యలు",
         "continue_demo": "ప్రత్యక్ష డెమోలో కొనసాగండి",
         "continue_demo_desc": "మీ ఇమెయిల్‌ను జోడించండి లేదా నేరుగా ఉత్పత్తి వర్క్‌ఫ్లోను అన్వేషించండి.",
         "work_email": "పని ఇమెయిల్",
@@ -1911,6 +1931,215 @@ CROP_KEYS = {
     "Soybean": "crop_soybean",
 }
 
+CROP_GUIDES = {
+    "Rice": {
+        "season": "Kharif in most regions, with Rabi and summer cycles where irrigation is available.",
+        "start_window": "Start nursery in June-July for Kharif or October-November for irrigated Rabi cycles.",
+        "duration": "110-150 days depending on the variety.",
+        "seed_details": "Use certified seed with strong germination and choose a variety based on duration, grain quality, and local mandi demand.",
+        "fertilizer": "Apply organic manure before planting and use split nitrogen doses with phosphorus and potash guided by soil test.",
+        "water": "Needs reliable water during transplanting, tillering, flowering, and grain formation stages.",
+        "field_needs": "Level field, nursery planning, weed control, drainage for heavy rain, and close pest monitoring.",
+        "key_actions": [
+            "Choose a variety that matches crop duration and buyer preference.",
+            "Prepare nursery and transplant schedule before the season opens.",
+            "Use split fertilizer applications instead of one heavy dose.",
+        ],
+    },
+    "Paddy": {
+        "season": "Mainly Kharif, with extended cycles in irrigated belts.",
+        "start_window": "Raise nursery 20-30 days before transplanting, usually June-July in monsoon regions.",
+        "duration": "120-150 days for common paddy varieties.",
+        "seed_details": "Select certified paddy seed suited to rainfall pattern, pest pressure, and the grain type preferred by mills and traders.",
+        "fertilizer": "Use FYM or compost first, then apply nitrogen in splits with phosphorus, potash, and zinc where deficient.",
+        "water": "Maintain shallow standing water after transplanting and avoid moisture stress during tillering and panicle initiation.",
+        "field_needs": "Puddled field or well-prepared bed, bund strengthening, nursery care, transplant spacing, and weed management.",
+        "key_actions": [
+            "Match seed choice to Kharif rainfall and local buyer demand.",
+            "Plan nursery, transplant date, and fertilizer schedule together.",
+            "Keep both irrigation and drainage readiness in place.",
+        ],
+    },
+    "Pulses": {
+        "season": "Kharif, Rabi, or summer depending on whether you grow tur, urad, moong, or gram.",
+        "start_window": "Sow with first effective rains for Kharif or on conserved moisture in Rabi conditions.",
+        "duration": "65-180 days depending on the pulse crop and variety.",
+        "seed_details": "Use crop-specific certified seed and seed treatment with Rhizobium or recommended bio-inputs for better establishment.",
+        "fertilizer": "Pulses need less nitrogen than cereals; focus on phosphorus, sulfur, organic matter, and micronutrients.",
+        "water": "Low to moderate water need; protect flowering stage and avoid waterlogging.",
+        "field_needs": "Well-drained field, timely sowing, seed treatment, early weed control, and pod-stage pest watch.",
+        "key_actions": [
+            "Choose the pulse crop based on season length and local demand.",
+            "Treat seed before sowing for stronger nodulation and growth.",
+            "Avoid excess nitrogen because it weakens pulse performance.",
+        ],
+    },
+    "Oilseeds": {
+        "season": "Kharif or Rabi depending on crop type such as groundnut, sesame, sunflower, or mustard.",
+        "start_window": "Sow at the beginning of the target season when the field has clean seedbed and adequate moisture.",
+        "duration": "80-140 days for most oilseed crops.",
+        "seed_details": "Use certified seed chosen for oil content, disease resistance, maturity duration, and local buyer demand.",
+        "fertilizer": "Balanced NPK with sulfur is important; gypsum, boron, or zinc may be needed depending on soil and crop.",
+        "water": "Moderate water need with strong sensitivity at flowering and pod or seed development stages.",
+        "field_needs": "Good drainage, weed-free start, pest control, and timely harvest to protect quality and oil recovery.",
+        "key_actions": [
+            "Pick the oilseed crop that fits your rainfall and market channel.",
+            "Check sulfur and micronutrient needs early in the season.",
+            "Protect flowering and seed formation from moisture stress.",
+        ],
+    },
+    "Other Kharif Crops": {
+        "season": "Monsoon-driven Kharif cycle from June to October.",
+        "start_window": "Start sowing once rains are stable and the field holds enough moisture for establishment.",
+        "duration": "Usually 70-160 days depending on crop selection.",
+        "seed_details": "Choose seed based on rainfall zone, crop duration, soil type, and procurement demand in your area.",
+        "fertilizer": "Use soil-test-led fertilization rather than a single common schedule across all Kharif crops.",
+        "water": "Mostly rainfed; moisture conservation and drainage are both important during monsoon variability.",
+        "field_needs": "Land preparation before rain, weed control, pest readiness, and harvest planning tied to local weather.",
+        "key_actions": [
+            "Select crops that fit your rainfall pattern and soil profile.",
+            "Do not use one seed or fertilizer plan across all Kharif crops.",
+            "Prepare for both heavy rain drainage and dry-spell backup.",
+        ],
+    },
+    "Wheat": {
+        "season": "Mainly Rabi.",
+        "start_window": "Sow from late October to December depending on local temperature and irrigation access.",
+        "duration": "110-145 days.",
+        "seed_details": "Use heat-tolerant or high-yield certified seed based on whether sowing is timely or delayed.",
+        "fertilizer": "Balanced NPK with split nitrogen; use sulfur and zinc where soil tests show deficiency.",
+        "water": "Critical irrigation points are crown root initiation, tillering, flowering, and grain filling.",
+        "field_needs": "Fine seedbed, line sowing, weed management, and rust monitoring in vulnerable belts.",
+        "key_actions": [
+            "Avoid delayed sowing beyond the optimum regional window.",
+            "Protect the first irrigation timing carefully.",
+            "Choose seed based on heat and disease risk.",
+        ],
+    },
+    "Corn": {
+        "season": "Kharif, Rabi, and spring in suitable irrigated belts.",
+        "start_window": "Sow at monsoon onset for Kharif or within cooler irrigated dry-season windows.",
+        "duration": "90-120 days.",
+        "seed_details": "Use hybrid seed matched to grain, feed, fodder, or green cob market objectives.",
+        "fertilizer": "Corn has high nitrogen demand and also needs balanced phosphorus, potash, and zinc where deficient.",
+        "water": "Tasseling, silking, and grain fill are the most critical stages for moisture.",
+        "field_needs": "Good spacing, drainage, stem borer watch, and timely harvest based on end use.",
+        "key_actions": [
+            "Pick hybrid seed based on end market and season length.",
+            "Prioritize water at tasseling and silking stages.",
+            "Maintain disciplined spacing and nutrient timing.",
+        ],
+    },
+    "Cotton": {
+        "season": "Primarily Kharif.",
+        "start_window": "Sow with the onset of monsoon when soil temperature and moisture are stable.",
+        "duration": "150-180 days or longer depending on variety.",
+        "seed_details": "Use approved region-suitable seed with strong germination and pest tolerance where available.",
+        "fertilizer": "Apply balanced NPK with attention to potassium and secondary nutrients; avoid excess nitrogen late in the crop.",
+        "water": "Moderate water need but highly sensitive to both drought stress and waterlogging.",
+        "field_needs": "Deep prepared soil, weed management, boll-stage protection, and close pink bollworm monitoring.",
+        "key_actions": [
+            "Select seed based on pest pressure and climate.",
+            "Do not overuse nitrogen after vegetative growth.",
+            "Monitor sucking pests and bollworm from early stage onward.",
+        ],
+    },
+    "Sugarcane": {
+        "season": "Spring or autumn planting depending on region.",
+        "start_window": "Plant in February-March or September-October where local cane systems support it.",
+        "duration": "10-16 months depending on crop cycle.",
+        "seed_details": "Use healthy disease-free seed cane or setts with strong bud viability from a clean source.",
+        "fertilizer": "High nutrient-demand crop needing organic manure, nitrogen, phosphorus, potash, and micronutrient correction where required.",
+        "water": "Requires regular irrigation, especially during germination, tillering, and grand growth stage.",
+        "field_needs": "Wide spacing, earthing up, ratoon planning, trash management, and pest and disease watch.",
+        "key_actions": [
+            "Use clean seed cane and plan the full long-duration crop cycle.",
+            "Schedule irrigation and earthing up early.",
+            "Align harvest timing with mill or buyer movement.",
+        ],
+    },
+    "Soybean": {
+        "season": "Primarily Kharif.",
+        "start_window": "Sow with the first effective monsoon rains, usually in June-July.",
+        "duration": "85-110 days.",
+        "seed_details": "Select certified seed with suitable maturity duration and use recommended inoculants where needed.",
+        "fertilizer": "Moderate fertilizer need with strong importance of phosphorus, sulfur, and micronutrients in deficient soils.",
+        "water": "Mostly rainfed; flowering and pod formation stages should not face prolonged stress.",
+        "field_needs": "Well-drained soil, seed treatment, early weed control, and disease monitoring in humid spells.",
+        "key_actions": [
+            "Choose maturity duration based on local rainfall length.",
+            "Prevent waterlogging during heavy rain periods.",
+            "Keep the early weed-free period clean for stable yield.",
+        ],
+    },
+}
+
+
+def get_selected_crop():
+    crop_name = st.query_params.get("crop")
+    return crop_name if crop_name in CROP_OPTIONS else None
+
+
+def render_crop_guide_section(selected_crop):
+    crop_guide = CROP_GUIDES.get(selected_crop)
+    if not crop_guide:
+        return
+
+    crop_label = translate_crop_value(selected_crop)
+    action_items = "".join(f"<li>{item}</li>" for item in crop_guide["key_actions"])
+
+    st.markdown(f"""
+    <div class="section-shell">
+        <div class="section-header">
+            <p class="section-title">{crop_label} {tr('crop_guide_title')}</p>
+            <p class="section-description">{tr('crop_guide_desc')}</p>
+        </div>
+        <div class="mini-grid">
+            <div class="mini-card">
+                <h3>{tr('guide_best_season')}</h3>
+                <p>{crop_guide['season']}</p>
+            </div>
+            <div class="mini-card">
+                <h3>{tr('guide_start_window')}</h3>
+                <p>{crop_guide['start_window']}</p>
+            </div>
+            <div class="mini-card">
+                <h3>{tr('guide_duration')}</h3>
+                <p>{crop_guide['duration']}</p>
+            </div>
+        </div>
+        <div class="card-grid">
+            <div class="detail-card">
+                <div class="pill">{crop_label}</div>
+                <h3>{tr('guide_seed_details')}</h3>
+                <p>{crop_guide['seed_details']}</p>
+            </div>
+            <div class="detail-card">
+                <div class="pill">{crop_label}</div>
+                <h3>{tr('guide_fertilizer')}</h3>
+                <p>{crop_guide['fertilizer']}</p>
+            </div>
+            <div class="detail-card">
+                <div class="pill">{crop_label}</div>
+                <h3>{tr('guide_water')}</h3>
+                <p>{crop_guide['water']}</p>
+            </div>
+        </div>
+        <div class="workflow-grid">
+            <div class="workflow-card">
+                <div class="pill">{crop_label}</div>
+                <h3>{tr('guide_field_needs')}</h3>
+                <p>{crop_guide['field_needs']}</p>
+            </div>
+            <div class="workflow-card alt">
+                <div class="pill">{crop_label}</div>
+                <h3>{tr('guide_key_actions')}</h3>
+                <ul>{action_items}</ul>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
 
 def translate_option(value, mapping):
     return tr(mapping.get(value, value))
@@ -2136,6 +2365,7 @@ def page_landing():
         enter_demo_mode()
 
     current_lang = get_language()
+    selected_crop = get_selected_crop()
 
     st.markdown(f"""
     <div class="landing-header-shell">
@@ -2151,16 +2381,16 @@ def page_landing():
                 <div class="nav-link">{tr('nav_products')} <span class="nav-menu-caret">&#9662;</span></div>
                 <div class="nav-dropdown mega">
                     <div class="dropdown-grid">
-                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127806;</div><div><h4>{tr('crop_rice')}</h4><p>{tr('crop_rice_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127807;</div><div><h4>{tr('crop_paddy')}</h4><p>{tr('crop_paddy_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#129372;</div><div><h4>{tr('crop_pulses')}</h4><p>{tr('crop_pulses_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_oilseeds')}</h4><p>{tr('crop_oilseeds_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127793;</div><div><h4>{tr('crop_kharif')}</h4><p>{tr('crop_kharif_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_wheat')}</h4><p>{tr('crop_wheat_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_corn')}</h4><p>{tr('crop_corn_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127806;</div><div><h4>{tr('crop_cotton')}</h4><p>{tr('crop_cotton_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127795;</div><div><h4>{tr('crop_sugarcane')}</h4><p>{tr('crop_sugarcane_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127793;</div><div><h4>{tr('crop_soybean')}</h4><p>{tr('crop_soybean_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Rice')}"><div class="dropdown-icon">&#127806;</div><div><h4>{tr('crop_rice')}</h4><p>{tr('crop_rice_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Paddy')}"><div class="dropdown-icon">&#127807;</div><div><h4>{tr('crop_paddy')}</h4><p>{tr('crop_paddy_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Pulses')}"><div class="dropdown-icon">&#129372;</div><div><h4>{tr('crop_pulses')}</h4><p>{tr('crop_pulses_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Oilseeds')}"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_oilseeds')}</h4><p>{tr('crop_oilseeds_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Other Kharif Crops')}"><div class="dropdown-icon">&#127793;</div><div><h4>{tr('crop_kharif')}</h4><p>{tr('crop_kharif_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Wheat')}"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_wheat')}</h4><p>{tr('crop_wheat_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Corn')}"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_corn')}</h4><p>{tr('crop_corn_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Cotton')}"><div class="dropdown-icon">&#127806;</div><div><h4>{tr('crop_cotton')}</h4><p>{tr('crop_cotton_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Sugarcane')}"><div class="dropdown-icon">&#127795;</div><div><h4>{tr('crop_sugarcane')}</h4><p>{tr('crop_sugarcane_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Soybean')}"><div class="dropdown-icon">&#127793;</div><div><h4>{tr('crop_soybean')}</h4><p>{tr('crop_soybean_desc')}</p></div></a>
                     </div>
                 </div>
             </div>
@@ -2271,6 +2501,9 @@ def page_landing():
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+    if selected_crop:
+        render_crop_guide_section(selected_crop)
 
     st.markdown(f"""
     <div id="features" class="section-shell">
