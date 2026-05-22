@@ -2454,7 +2454,7 @@ def page_landing():
                 <div class="nav-link">{tr('nav_user')} <span class="nav-menu-caret">&#9662;</span></div>
                 <div class="nav-dropdown compact">
                     <div class="dropdown-list">
-                        <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#128104;&#8205;&#127806;</div><div><h4>{tr('user_farmer')}</h4><p>{tr('user_farmer_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#farmer-tools"><div class="dropdown-icon">&#128104;&#8205;&#127806;</div><div><h4>{tr('user_farmer')}</h4><p>{tr('user_farmer_desc')}</p></div></a>
                         <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#129489;&#8205;&#128188;</div><div><h4>{tr('user_traders')}</h4><p>{tr('user_traders_desc')}</p></div></a>
                         <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#127970;</div><div><h4>{tr('user_fpo')}</h4><p>{tr('user_fpo_desc')}</p></div></a>
                     </div>
@@ -2504,6 +2504,8 @@ def page_landing():
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+    st.markdown('<div id="farmer-tools"></div>', unsafe_allow_html=True)
 
     area_choices = [tr("area_selector_placeholder"), *STATE_OPTIONS]
     current_area_option = selected_area if selected_area else tr("area_selector_placeholder")
