@@ -1316,6 +1316,12 @@ TRANSLATIONS = {
         "demo_p1": "No signup required for demo",
         "demo_p2": "Fast dashboard access",
         "demo_p3": "Built for farmers and traders",
+        "area_selector_title": "Select your area first",
+        "area_selector_desc": "Choose your area once, then open any crop to view direct guidance for that crop.",
+        "area_selector_label": "Area",
+        "area_selector_placeholder": "Choose your area",
+        "crop_area_notice": "Showing {crop} guidance for {area}.",
+        "crop_area_required": "Select your area first to view crop guidance.",
         "crop_guide_title": "Crop guide",
         "crop_guide_desc": "See season timing, seed guidance, fertilizer planning, water needs, and field requirements for the selected crop.",
         "guide_best_season": "Best season",
@@ -1637,6 +1643,12 @@ TRANSLATIONS = {
         "demo_p1": "డెమో కోసం సైన్‌అప్ అవసరం లేదు",
         "demo_p2": "త్వరిత డ్యాష్‌బోర్డ్ ప్రాప్తి",
         "demo_p3": "రైతులు మరియు వ్యాపారుల కోసం నిర్మితమైనది",
+        "area_selector_title": "ముందుగా మీ ప్రాంతాన్ని ఎంచుకోండి",
+        "area_selector_desc": "ఒకసారి మీ ప్రాంతాన్ని ఎంచుకున్న తర్వాత, ఏ పంటనైనా తెరిచి ఆ పంటకు నేరుగా మార్గదర్శకాన్ని చూడండి.",
+        "area_selector_label": "ప్రాంతం",
+        "area_selector_placeholder": "మీ ప్రాంతాన్ని ఎంచుకోండి",
+        "crop_area_notice": "{area} కోసం {crop} మార్గదర్శకం చూపబడుతోంది.",
+        "crop_area_required": "పంట మార్గదర్శకాన్ని చూడడానికి ముందుగా మీ ప్రాంతాన్ని ఎంచుకోండి.",
         "crop_guide_title": "పంట మార్గదర్శిని",
         "crop_guide_desc": "ఎంచుకున్న పంటకు సీజన్ సమయం, విత్తన మార్గదర్శకం, ఎరువుల ప్రణాళిక, నీటి అవసరాలు, మరియు ఫీల్డ్ అవసరాలను చూడండి.",
         "guide_best_season": "ఉత్తమ సీజన్",
@@ -2080,12 +2092,22 @@ def get_selected_crop():
     return crop_name if crop_name in CROP_OPTIONS else None
 
 
-def render_crop_guide_section(selected_crop):
+def get_selected_area():
+    area_name = st.query_params.get("area")
+    return area_name if area_name in STATE_OPTIONS else None
+
+
+def render_crop_guide_section(selected_crop, selected_area):
+    if not selected_area:
+        st.info(tr("crop_area_required"))
+        return
+
     crop_guide = CROP_GUIDES.get(selected_crop)
     if not crop_guide:
         return
 
     crop_label = translate_crop_value(selected_crop)
+    area_label = translate_state_value(selected_area)
     action_items = "".join(f"<li>{item}</li>" for item in crop_guide["key_actions"])
 
     st.markdown(f"""
@@ -2093,6 +2115,7 @@ def render_crop_guide_section(selected_crop):
         <div class="section-header">
             <p class="section-title">{crop_label} {tr('crop_guide_title')}</p>
             <p class="section-description">{tr('crop_guide_desc')}</p>
+            <p class="section-description">{tr('crop_area_notice', crop=crop_label, area=area_label)}</p>
         </div>
         <div class="mini-grid">
             <div class="mini-card">
@@ -2366,6 +2389,7 @@ def page_landing():
 
     current_lang = get_language()
     selected_crop = get_selected_crop()
+    selected_area = get_selected_area()
 
     st.markdown(f"""
     <div class="landing-header-shell">
@@ -2381,16 +2405,16 @@ def page_landing():
                 <div class="nav-link">{tr('nav_products')} <span class="nav-menu-caret">&#9662;</span></div>
                 <div class="nav-dropdown mega">
                     <div class="dropdown-grid">
-                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Rice')}"><div class="dropdown-icon">&#127806;</div><div><h4>{tr('crop_rice')}</h4><p>{tr('crop_rice_desc')}</p></div></a>
-                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Paddy')}"><div class="dropdown-icon">&#127807;</div><div><h4>{tr('crop_paddy')}</h4><p>{tr('crop_paddy_desc')}</p></div></a>
-                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Pulses')}"><div class="dropdown-icon">&#129372;</div><div><h4>{tr('crop_pulses')}</h4><p>{tr('crop_pulses_desc')}</p></div></a>
-                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Oilseeds')}"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_oilseeds')}</h4><p>{tr('crop_oilseeds_desc')}</p></div></a>
-                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Other Kharif Crops')}"><div class="dropdown-icon">&#127793;</div><div><h4>{tr('crop_kharif')}</h4><p>{tr('crop_kharif_desc')}</p></div></a>
-                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Wheat')}"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_wheat')}</h4><p>{tr('crop_wheat_desc')}</p></div></a>
-                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Corn')}"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_corn')}</h4><p>{tr('crop_corn_desc')}</p></div></a>
-                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Cotton')}"><div class="dropdown-icon">&#127806;</div><div><h4>{tr('crop_cotton')}</h4><p>{tr('crop_cotton_desc')}</p></div></a>
-                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Sugarcane')}"><div class="dropdown-icon">&#127795;</div><div><h4>{tr('crop_sugarcane')}</h4><p>{tr('crop_sugarcane_desc')}</p></div></a>
-                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, crop='Soybean')}"><div class="dropdown-icon">&#127793;</div><div><h4>{tr('crop_soybean')}</h4><p>{tr('crop_soybean_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, area=selected_area, crop='Rice')}"><div class="dropdown-icon">&#127806;</div><div><h4>{tr('crop_rice')}</h4><p>{tr('crop_rice_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, area=selected_area, crop='Paddy')}"><div class="dropdown-icon">&#127807;</div><div><h4>{tr('crop_paddy')}</h4><p>{tr('crop_paddy_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, area=selected_area, crop='Pulses')}"><div class="dropdown-icon">&#129372;</div><div><h4>{tr('crop_pulses')}</h4><p>{tr('crop_pulses_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, area=selected_area, crop='Oilseeds')}"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_oilseeds')}</h4><p>{tr('crop_oilseeds_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, area=selected_area, crop='Other Kharif Crops')}"><div class="dropdown-icon">&#127793;</div><div><h4>{tr('crop_kharif')}</h4><p>{tr('crop_kharif_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, area=selected_area, crop='Wheat')}"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_wheat')}</h4><p>{tr('crop_wheat_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, area=selected_area, crop='Corn')}"><div class="dropdown-icon">&#127805;</div><div><h4>{tr('crop_corn')}</h4><p>{tr('crop_corn_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, area=selected_area, crop='Cotton')}"><div class="dropdown-icon">&#127806;</div><div><h4>{tr('crop_cotton')}</h4><p>{tr('crop_cotton_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, area=selected_area, crop='Sugarcane')}"><div class="dropdown-icon">&#127795;</div><div><h4>{tr('crop_sugarcane')}</h4><p>{tr('crop_sugarcane_desc')}</p></div></a>
+                        <a class="dropdown-item" href="{build_query_href(lang=current_lang, area=selected_area, crop='Soybean')}"><div class="dropdown-icon">&#127793;</div><div><h4>{tr('crop_soybean')}</h4><p>{tr('crop_soybean_desc')}</p></div></a>
                     </div>
                 </div>
             </div>
@@ -2502,8 +2526,36 @@ def page_landing():
     </div>
     """, unsafe_allow_html=True)
 
+    area_choices = [tr("area_selector_placeholder"), *STATE_OPTIONS]
+    current_area_option = selected_area if selected_area else tr("area_selector_placeholder")
+    try:
+        current_area_index = area_choices.index(current_area_option)
+    except ValueError:
+        current_area_index = 0
+
+    st.markdown(f"### {tr('area_selector_title')}")
+    st.caption(tr("area_selector_desc"))
+    chosen_area_option = st.selectbox(
+        tr("area_selector_label"),
+        area_choices,
+        index=current_area_index,
+        key="landing_area_selector",
+        format_func=lambda value: translate_state_value(value) if value in STATE_OPTIONS else value,
+    )
+
+    chosen_area = chosen_area_option if chosen_area_option in STATE_OPTIONS else None
+    if chosen_area != selected_area:
+        st.query_params["lang"] = current_lang
+        if chosen_area:
+            st.query_params["area"] = chosen_area
+        elif "area" in st.query_params:
+            del st.query_params["area"]
+        if selected_crop:
+            st.query_params["crop"] = selected_crop
+        st.rerun()
+
     if selected_crop:
-        render_crop_guide_section(selected_crop)
+        render_crop_guide_section(selected_crop, selected_area)
 
     st.markdown(f"""
     <div id="features" class="section-shell">
