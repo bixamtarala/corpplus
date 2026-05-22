@@ -1130,7 +1130,6 @@ TRANSLATIONS = {
         "nav_products": "Products",
         "nav_industry": "Industry",
         "nav_solutions": "Solutions",
-        "nav_crop_knowledge": "Crop Intelligence",
         "nav_resources": "Resources",
         "nav_company": "Company",
         "nav_user": "User",
@@ -1457,7 +1456,6 @@ TRANSLATIONS = {
         "nav_products": "ఉత్పత్తులు",
         "nav_industry": "పరిశ్రమ",
         "nav_solutions": "పరిష్కారాలు",
-        "nav_crop_knowledge": "పంట ఇంటెలిజెన్స్",
         "nav_resources": "వనరులు",
         "nav_company": "సంస్థ",
         "nav_user": "వినియోగదారులు",
@@ -2448,15 +2446,6 @@ def page_landing():
                 </div>
             </div>
             <div class="nav-item">
-                <div class="nav-link">{tr('nav_crop_knowledge')}</div>
-                <div class="nav-dropdown compact">
-                    <div class="dropdown-list">
-                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127793;</div><div><h4>{tr('crop_signals')}</h4><p>{tr('crop_signals_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#128161;</div><div><h4>{tr('decision_guidance')}</h4><p>{tr('decision_guidance_desc')}</p></div></a>
-                    </div>
-                </div>
-            </div>
-            <div class="nav-item">
                 <div class="nav-link">{tr('nav_resources')} <span class="nav-menu-caret">&#9662;</span></div>
                 <div class="nav-dropdown compact">
                     <div class="dropdown-list">
@@ -2498,7 +2487,6 @@ def page_landing():
             <a class="mobile-shortcut" href="#features">{tr('nav_products')}</a>
             <a class="mobile-shortcut" href="#workflows">{tr('nav_industry')}</a>
             <a class="mobile-shortcut" href="#trust">{tr('nav_solutions')}</a>
-            <a class="mobile-shortcut" href="#features">{tr('nav_crop_knowledge')}</a>
             <a class="mobile-shortcut" href="{build_query_href(lang='en')}">{tr('language_english')}</a>
             <a class="mobile-shortcut" href="{build_query_href(lang='te')}">{tr('language_telugu')}</a>
         </div>
