@@ -2283,14 +2283,6 @@ def verify_server_side_otp(phone, otp_input):
     return False
 
 
-def enter_demo_mode():
-    """Open the dashboard in lightweight demo mode."""
-    reset_auth_flow()
-    st.session_state.user = -1
-    st.session_state.user_role = "farmer"
-    st.session_state.page = "dashboard"
-    st.rerun()
-
 # ============================================================================
 # DATABASE HELPER FUNCTIONS
 # ============================================================================
@@ -2418,9 +2410,6 @@ def page_landing():
         clear_action_query_param()
         reset_auth_flow()
         go_to_page("register")
-    if landing_action == "demo":
-        clear_action_query_param()
-        enter_demo_mode()
 
     current_lang = get_language()
     selected_crop = get_selected_crop()
@@ -2481,8 +2470,8 @@ def page_landing():
                 <div class="nav-link">{tr('nav_crop_knowledge')}</div>
                 <div class="nav-dropdown compact">
                     <div class="dropdown-list">
-                        <a class="dropdown-item" href="#demo"><div class="dropdown-icon">&#127793;</div><div><h4>{tr('crop_signals')}</h4><p>{tr('crop_signals_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#demo"><div class="dropdown-icon">&#128161;</div><div><h4>{tr('decision_guidance')}</h4><p>{tr('decision_guidance_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#127793;</div><div><h4>{tr('crop_signals')}</h4><p>{tr('crop_signals_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#128161;</div><div><h4>{tr('decision_guidance')}</h4><p>{tr('decision_guidance_desc')}</p></div></a>
                     </div>
                 </div>
             </div>
@@ -2490,8 +2479,8 @@ def page_landing():
                 <div class="nav-link">{tr('nav_resources')} <span class="nav-menu-caret">&#9662;</span></div>
                 <div class="nav-dropdown compact">
                     <div class="dropdown-list">
-                        <a class="dropdown-item" href="#demo"><div class="dropdown-icon">&#128218;</div><div><h4>{tr('guides')}</h4><p>{tr('guides_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#demo"><div class="dropdown-icon">&#128202;</div><div><h4>{tr('case_examples')}</h4><p>{tr('case_examples_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#features"><div class="dropdown-icon">&#128218;</div><div><h4>{tr('guides')}</h4><p>{tr('guides_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#128202;</div><div><h4>{tr('case_examples')}</h4><p>{tr('case_examples_desc')}</p></div></a>
                     </div>
                 </div>
             </div>
@@ -2499,8 +2488,8 @@ def page_landing():
                 <div class="nav-link">{tr('nav_company')} <span class="nav-menu-caret">&#9662;</span></div>
                 <div class="nav-dropdown compact">
                     <div class="dropdown-list">
-                        <a class="dropdown-item" href="#demo"><div class="dropdown-icon">&#127759;</div><div><h4>{tr('about_croppulse')}</h4><p>{tr('about_croppulse_desc')}</p></div></a>
-                        <a class="dropdown-item" href="#demo"><div class="dropdown-icon">&#128233;</div><div><h4>{tr('contact')}</h4><p>{tr('contact_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#workflows"><div class="dropdown-icon">&#127759;</div><div><h4>{tr('about_croppulse')}</h4><p>{tr('about_croppulse_desc')}</p></div></a>
+                        <a class="dropdown-item" href="#help"><div class="dropdown-icon">&#128233;</div><div><h4>{tr('contact')}</h4><p>{tr('contact_desc')}</p></div></a>
                     </div>
                 </div>
             </div>
@@ -2528,12 +2517,12 @@ def page_landing():
             <a class="mobile-shortcut" href="#features">{tr('nav_products')}</a>
             <a class="mobile-shortcut" href="#workflows">{tr('nav_industry')}</a>
             <a class="mobile-shortcut" href="#trust">{tr('nav_solutions')}</a>
-            <a class="mobile-shortcut" href="#demo">{tr('continue_to_demo')}</a>
+            <a class="mobile-shortcut" href="#features">{tr('nav_crop_knowledge')}</a>
             <a class="mobile-shortcut" href="{build_query_href(lang='en')}">{tr('language_english')}</a>
             <a class="mobile-shortcut" href="{build_query_href(lang='te')}">{tr('language_telugu')}</a>
         </div>
         <div class="nav-actions">
-            <a class="nav-chip primary" href="#demo">&#8981;</a>
+            <a class="nav-chip primary" href="#features">&#8981;</a>
         </div>
     </div>
     </div>
@@ -2790,24 +2779,7 @@ def page_landing():
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown(f"""
-    <div id="demo" class="demo-shell">
-        <div class="pill" style="margin: 0 auto 16px auto; background: rgba(255,255,255,0.14); color: white;">{tr('demo_pill')}</div>
-        <p class="demo-title">{tr('demo_title')}</p>
-        <p class="demo-copy">{tr('demo_desc')}</p>
-        <div class="demo-pills">
-            <span class="demo-pill">{tr('demo_p1')}</span>
-            <span class="demo-pill">{tr('demo_p2')}</span>
-            <span class="demo-pill">{tr('demo_p3')}</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown(f"### {tr('continue_demo')}")
-    st.caption(tr('continue_demo_desc'))
-    st.text_input(tr('work_email'), placeholder="your@email.com", key="landing_demo_email")
-    if st.button(tr('continue_to_demo'), key="landing_demo_continue", use_container_width=True):
-        enter_demo_mode()
+    st.markdown('<div id="help"></div>', unsafe_allow_html=True)
     if st.button(tr('create_account'), key="landing_demo_register", use_container_width=True):
         reset_auth_flow()
         go_to_page("register")
@@ -2970,45 +2942,6 @@ def page_dashboard():
         
         if st.session_state.user_role == "farmer":
             dashboard_data = get_farmer_dashboard(st.session_state.user)
-
-            if st.session_state.user == -1:
-                st.info(tr("demo_mode_info"))
-
-                demo_col1, demo_col2, demo_col3 = st.columns(3)
-
-                with demo_col1:
-                    st.markdown("""
-                    <div class="dashboard-card">
-                        <h4>""" + tr("best_time_to_sell") + """</h4>
-                        <p style="font-size: 28px; color: #27ae60;">""" + tr("next_48_hours") + """</p>
-                        <p>""" + tr("buyer_demand_strong") + """</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-
-                with demo_col2:
-                    st.markdown("""
-                    <div class="dashboard-card">
-                        <h4>""" + tr("active_buyer_interest") + """</h4>
-                        <p style="font-size: 28px; color: #3498db;">""" + tr("traders_count", count=12) + """</p>
-                        <p>""" + tr("verified_buyers_watching") + """</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-
-                with demo_col3:
-                    st.markdown("""
-                    <div class="dashboard-card">
-                        <h4>""" + tr("weather_watch") + """</h4>
-                        <p style="font-size: 28px; color: #f39c12;">""" + tr("rain_alert") + """</p>
-                        <p>""" + tr("prepare_harvest") + """</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-
-                st.markdown("""
-                <div class="dashboard-card">
-                    <h4>""" + tr("demo_overview") + """</h4>
-                    <p>""" + tr("demo_overview_desc") + """</p>
-                </div>
-                """, unsafe_allow_html=True)
             
             if dashboard_data["profile"]:
                 profile = dashboard_data["profile"]
