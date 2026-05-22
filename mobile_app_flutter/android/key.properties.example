@@ -1,0 +1,4 @@
+storePassword=replace-with-store-password
+keyPassword=replace-with-key-password
+keyAlias=croppulse-release
+storeFile=../croppulse-release.jks
