@@ -5,12 +5,17 @@ name: Mobile Android Delivery
     branches: [ main ]
   workflow_dispatch:
 
+concurrency:
+  group: mobile-android-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
 jobs:
   build-android:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     defaults:
       run:
