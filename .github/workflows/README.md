@@ -51,6 +51,18 @@ This directory contains automated CI/CD workflows for the Croppulse application 
 - GitHub Actions run artifact: `croppulse-android-apk-<run number>`
 - GitHub prerelease tag: `mobile-latest`
 
+**Optional Firebase App Distribution setup:**
+- The workflow will distribute the APK to Firebase testers only when all three repository secrets below are configured.
+- Add them in GitHub: `Settings` -> `Secrets and variables` -> `Actions` -> `New repository secret`
+- Required secrets:
+   - `FIREBASE_APP_ID`: the Android app ID from Firebase App Distribution for this mobile app
+   - `FIREBASE_SERVICE_ACCOUNT`: the full JSON contents of a Firebase service account key with App Distribution access
+   - `FIREBASE_TESTER_GROUPS`: one or more Firebase tester group aliases, separated by commas
+- To get `FIREBASE_APP_ID`, open Firebase Console -> Project Settings -> Your apps -> Android app -> App ID.
+- To get `FIREBASE_SERVICE_ACCOUNT`, create a service account key in Google Cloud/Firebase with permission to upload App Distribution releases, then paste the entire JSON file contents into the secret value.
+- To get `FIREBASE_TESTER_GROUPS`, use the group alias from Firebase App Distribution, for example `internal-testers` or `qa-team,stakeholders`.
+- Once those secrets are present, every successful `mobile-android.yml` run will continue publishing the GitHub APK and will also push the same APK to Firebase App Distribution.
+
 ## Local Testing
 
 Before pushing, test locally:
