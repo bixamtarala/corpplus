@@ -18,7 +18,7 @@ const _streamlitUrl = String.fromEnvironment(
 );
 const _useNativeApp = bool.fromEnvironment(
   'CROPPULSE_USE_NATIVE_APP',
-  defaultValue: false,
+  defaultValue: true,
 );
 
 void main() {
