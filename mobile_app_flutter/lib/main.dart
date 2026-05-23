@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'providers/auth_provider.dart';
 import 'screens/farmer_hub_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/intelligence_screen.dart';
-import 'screens/login_screen.dart';
 import 'screens/marketplace_screen.dart';
 import 'screens/startup_mode_selector_screen.dart';
 import 'screens/profile_screen.dart';
@@ -51,16 +49,6 @@ class NativeAppGate extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authControllerProvider);
-
-    if (!authState.isInitialized) {
-      return const SplashScreen();
-    }
-
-    if (!authState.isAuthenticated) {
-      return const LoginScreen();
-    }
-
     return const MainNavigationScreen();
   }
 }

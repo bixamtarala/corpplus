@@ -91,7 +91,24 @@ class MarketplaceController extends StateNotifier<MarketplaceState> {
   Future<void> createListing(MarketplaceListingRequest request) async {
     final session = _ref.read(authControllerProvider).session;
     if (session == null || session.accessToken.isEmpty) {
-      state = state.copyWith(errorMessage: 'Sign in first to create a listing.', clearStatus: true);
+      final listing = MarketplaceListing(
+        cropId: request.cropId,
+        quantityKg: request.quantityKg,
+        qualityGrade: request.qualityGrade,
+        pricePerKg: request.pricePerKg,
+        availableDate: request.availableDate,
+        description: request.description,
+        listingId: 'guest-${DateTime.now().millisecondsSinceEpoch}',
+        userId: 'guest-user',
+        createdAt: DateTime.now(),
+        status: 'draft',
+        views: 0,
+      );
+      state = state.copyWith(
+        sellOrders: [listing, ...state.sellOrders],
+        statusMessage: 'Guest mode: listing saved locally as a draft.',
+        clearError: true,
+      );
       return;
     }
 
@@ -119,7 +136,21 @@ class MarketplaceController extends StateNotifier<MarketplaceState> {
   Future<void> makeOffer(MarketplaceOfferRequest request) async {
     final session = _ref.read(authControllerProvider).session;
     if (session == null || session.accessToken.isEmpty) {
-      state = state.copyWith(errorMessage: 'Sign in first to place an offer.', clearStatus: true);
+      final offer = MarketplaceOffer(
+        listingId: request.listingId,
+        offeredPricePerKg: request.offeredPricePerKg,
+        quantityKg: request.quantityKg,
+        pickupLocation: request.pickupLocation,
+        message: request.message,
+        offerId: 'guest-offer-${DateTime.now().millisecondsSinceEpoch}',
+        createdAt: DateTime.now(),
+        status: 'draft',
+      );
+      state = state.copyWith(
+        latestOffer: offer,
+        statusMessage: 'Guest mode: offer saved locally and ready for later backend sync.',
+        clearError: true,
+      );
       return;
     }
 
