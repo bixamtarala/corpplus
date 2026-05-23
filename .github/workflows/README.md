@@ -42,21 +42,9 @@ This directory contains automated CI/CD workflows for the Croppulse application 
    - Updates a rolling prerelease tagged `mobile-latest`
    - Attaches the latest `app-release.apk` to that prerelease
 
-3. **Firebase App Distribution**
-   - Optional
-   - Runs only when the required repository secrets are configured
-   - Distributes the same APK to your tester group(s)
-
-**Required repository secrets for Firebase distribution:**
-- `FIREBASE_APP_ID`
-- `FIREBASE_SERVICE_ACCOUNT`
-  Store the Firebase service account JSON as the full secret value.
-- `FIREBASE_TESTER_GROUPS`
-  Example: `internal-testers`
-
 **Notes for Android signing:**
 - The current Android Gradle config falls back to debug signing when no release keystore is present.
-- That is fine for internal testing, GitHub artifacts, and Firebase App Distribution.
+- That is fine for internal testing and GitHub artifact/release delivery.
 - For production-grade signed builds, add your Android keystore and key properties separately.
 
 **Where to get the APK after each push:**
@@ -110,11 +98,6 @@ streamlit run streamlit_app_phase2.py
 - Ensure your Streamlit Cloud account is connected to the GitHub repository
 - Check Streamlit Cloud dashboard for error logs
 - Verify app configuration in Streamlit Cloud settings
-
-### Mobile APK not reaching Firebase testers
-- Confirm `FIREBASE_APP_ID`, `FIREBASE_SERVICE_ACCOUNT`, and `FIREBASE_TESTER_GROUPS` exist in repository secrets
-- Confirm the Firebase app is an Android app that matches `com.croppulse.mobile`
-- Check the Mobile Android Delivery workflow logs in GitHub Actions
 
 ### Mobile APK release missing on GitHub
 - Check the `mobile-android.yml` workflow run logs

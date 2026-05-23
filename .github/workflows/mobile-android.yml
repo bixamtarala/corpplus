@@ -12,11 +12,6 @@ jobs:
   build-android:
     runs-on: ubuntu-latest
 
-    env:
-      FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
-      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      FIREBASE_TESTER_GROUPS: ${{ secrets.FIREBASE_TESTER_GROUPS }}
-
     defaults:
       run:
         working-directory: mobile_app_flutter
@@ -70,22 +65,3 @@ jobs:
           Triggered by: `${{ github.event_name }}`
 
           Download the attached `app-release.apk` artifact from this prerelease.
-
-    - name: Distribute to Firebase App Distribution
-      if: env.FIREBASE_APP_ID != '' && env.FIREBASE_SERVICE_ACCOUNT != '' && env.FIREBASE_TESTER_GROUPS != ''
-      uses: wzieba/Firebase-Distribution-Github-Action@v1
-      with:
-        appId: ${{ env.FIREBASE_APP_ID }}
-        serviceCredentialsFileContent: ${{ env.FIREBASE_SERVICE_ACCOUNT }}
-        groups: ${{ env.FIREBASE_TESTER_GROUPS }}
-        file: mobile_app_flutter/build/app/outputs/flutter-apk/app-release.apk
-        releaseNotes: |
-          CropPulse Android build
-          Commit: ${{ github.sha }}
-          Run: ${{ github.run_number }}
-
-    - name: Firebase distribution status
-      if: env.FIREBASE_APP_ID == '' || env.FIREBASE_SERVICE_ACCOUNT == '' || env.FIREBASE_TESTER_GROUPS == ''
-      run: |
-        echo "Firebase App Distribution skipped."
-        echo "Add FIREBASE_APP_ID, FIREBASE_SERVICE_ACCOUNT, and FIREBASE_TESTER_GROUPS repository secrets to enable it."
