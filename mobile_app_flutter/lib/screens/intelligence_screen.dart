@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
-import '../data/commodity_catalog.dart';
 import '../theme/app_theme.dart';
+import '../widgets/commodity_selector_field.dart';
 import 'price_insight_screen.dart';
 
-class IntelligenceScreen extends StatelessWidget {
+class IntelligenceScreen extends StatefulWidget {
   const IntelligenceScreen({super.key});
+
+  @override
+  State<IntelligenceScreen> createState() => _IntelligenceScreenState();
+}
+
+class _IntelligenceScreenState extends State<IntelligenceScreen> {
+  String _selectedCommodity = 'Rice';
 
   @override
   Widget build(BuildContext context) {
@@ -18,16 +25,14 @@ class IntelligenceScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Commodity Selector
-            DropdownButtonFormField<String>(
-              initialValue: 'Rice',
-              items: CommodityCatalog.all
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
-              onChanged: (_) {},
-              decoration: InputDecoration(
-                labelText: 'Select Commodity',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
+            CommoditySelectorField(
+              value: _selectedCommodity,
+              labelText: 'Select Commodity',
+              onChanged: (value) {
+                setState(() {
+                  _selectedCommodity = value;
+                });
+              },
             ),
             const SizedBox(height: 24),
 
@@ -76,7 +81,7 @@ class IntelligenceScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) => const PriceInsightScreen(),
+                          builder: (_) => PriceInsightScreen(initialCrop: _selectedCommodity),
                         ),
                       );
                     },

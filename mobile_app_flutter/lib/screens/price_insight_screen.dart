@@ -6,16 +6,19 @@ import '../data/commodity_catalog.dart';
 import '../models/price_insight.dart';
 import '../providers/api_providers.dart';
 import '../theme/app_theme.dart';
+import '../widgets/commodity_selector_field.dart';
 
 class PriceInsightScreen extends ConsumerStatefulWidget {
-  const PriceInsightScreen({super.key});
+  const PriceInsightScreen({super.key, this.initialCrop});
+
+  final String? initialCrop;
 
   @override
   ConsumerState<PriceInsightScreen> createState() => _PriceInsightScreenState();
 }
 
 class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
-  static const List<String> _crops = CommodityCatalog.all;
+  static final List<String> _crops = CommodityCatalog.all;
   static const List<String> _states = ['Tamil Nadu', 'Punjab', 'Karnataka'];
 
   final TextEditingController _quantityController = TextEditingController(text: '500');
@@ -23,6 +26,15 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
   String _selectedState = _states.first;
   bool _isLoading = false;
   PriceInsight? _insight;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialCrop = widget.initialCrop;
+    if (initialCrop != null && _crops.contains(initialCrop)) {
+      _selectedCrop = initialCrop;
+    }
+  }
 
   Future<void> _fetchInsight() async {
     final quantity = double.tryParse(_quantityController.text.trim());
@@ -128,17 +140,10 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          DropdownButtonFormField<String>(
-            initialValue: _selectedCrop,
-            items: _crops
-                .map((crop) => DropdownMenuItem<String>(value: crop, child: Text(crop)))
-                .toList(),
-            decoration: const InputDecoration(labelText: 'Crop'),
+          CommoditySelectorField(
+            value: _selectedCrop,
+            labelText: 'Crop',
             onChanged: (value) {
-              if (value == null) {
-                return;
-              }
-
               setState(() {
                 _selectedCrop = value;
               });

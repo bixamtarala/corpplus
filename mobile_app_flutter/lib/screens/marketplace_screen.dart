@@ -6,6 +6,7 @@ import '../data/commodity_catalog.dart';
 import '../models/marketplace.dart';
 import '../providers/marketplace_provider.dart';
 import '../theme/app_theme.dart';
+import '../widgets/commodity_selector_field.dart';
 
 class MarketplaceScreen extends ConsumerStatefulWidget {
   const MarketplaceScreen({super.key});
@@ -67,20 +68,14 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
           child: Row(
             children: [
               Expanded(
-                child: DropdownButtonFormField<String>(
-                  initialValue: _selectedCrop,
-                  items: CommodityCatalog.all
-                      .map((crop) => DropdownMenuItem<String>(value: crop, child: Text(crop)))
-                      .toList(),
+                child: CommoditySelectorField(
+                  value: _selectedCrop,
+                  labelText: 'Crop',
                   onChanged: (value) {
-                    if (value == null) {
-                      return;
-                    }
                     setState(() {
                       _selectedCrop = value;
                     });
                   },
-                  decoration: const InputDecoration(labelText: 'Crop'),
                 ),
               ),
               const SizedBox(width: 12),
