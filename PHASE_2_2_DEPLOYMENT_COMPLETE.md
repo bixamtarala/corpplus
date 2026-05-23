@@ -13,8 +13,8 @@
 ### 1. ✅ Updated Streamlit Frontend (croppulse_app.py)
 
 **Changes Made:**
-- Integrated live Railway FastAPI backend API calls
-- Added proper API URL configuration: `https://web-production-7295a.up.railway.app`
+- Integrated live backend API calls behind `BACKEND_API_URL`
+- Removed the stale hardcoded Railway API URL and switched to explicit configuration
 - Implemented error handling and fallback chain
 - Updated imports to include `requests` library
 - Removed dependency on hardcoded test data
@@ -24,12 +24,12 @@
 # Line 13-14: API Configuration
 BACKEND_API_URL = os.getenv(
     "BACKEND_API_URL", 
-    "https://web-production-7295a.up.railway.app"
+   ""
 )
 
 # Lines 366-393: New load_data_from_api() function
 def load_data_from_api():
-    """Load commodity price data from CropPulse Backend API (Railway)"""
+   """Load commodity price data from CropPulse Backend API when configured."""
     response = requests.get(
         f"{BACKEND_API_URL}/api/v1/prices/latest?commodity=rice",
         headers={"X-API-Key": API_KEY},
@@ -179,7 +179,7 @@ Status: Pushed to main branch ✅
    - After app deploys, click ⋮ → "Manage Secrets"
    - Add:
      ```toml
-     BACKEND_API_URL = "https://web-production-7295a.up.railway.app"
+       BACKEND_API_URL = "https://your-active-api-host"
    API_KEY = "<set-a-strong-admin-key>"
      ```
 
@@ -235,7 +235,7 @@ streamlit deploy \
 
 ### Streamlit Cloud Secrets (in UI)
 ```toml
-BACKEND_API_URL = "https://web-production-7295a.up.railway.app"
+BACKEND_API_URL = "https://your-active-api-host"
 API_KEY = "<set-a-strong-admin-key>"
 ENVIRONMENT = "production"
 ```
@@ -249,7 +249,7 @@ ENVIRONMENT = "development"
 
 ### Testing Against Live Backend
 ```toml
-BACKEND_API_URL = "https://web-production-7295a.up.railway.app"
+BACKEND_API_URL = "https://your-active-api-host"
 API_KEY = "<set-a-strong-admin-key>"
 ENVIRONMENT = "testing"
 ```
@@ -287,7 +287,7 @@ Once deployed to Streamlit Cloud, verify:
 | Metric | Target | Notes |
 |--------|--------|-------|
 | Page Load | < 3s | Streamlit Cloud optimized |
-| API Response | < 500ms | Railway backend |
+| API Response | < 500ms | Configured backend |
 | Cache TTL | 5 min | Price data |
 | Concurrent Users | 100+ | Streamlit Cloud free tier |
 | Uptime | 99.9% | Both platforms SLA |
@@ -299,7 +299,7 @@ Once deployed to Streamlit Cloud, verify:
 ### Issue: "Cannot connect to API"
 
 **Check:**
-1. Railway backend is running: `https://web-production-7295a.up.railway.app/health`
+1. `BACKEND_API_URL` points to a reachable backend health endpoint
 2. Secrets set correctly in Streamlit Cloud
 3. API_KEY matches backend configuration
 4. Network connectivity between services
@@ -333,7 +333,7 @@ Once deployed to Streamlit Cloud, verify:
 
 ## Success Criteria - Phase 2.2 Complete ✅
 
-- [x] Streamlit frontend updated to use Railway API
+- [x] Streamlit frontend updated to use explicit `BACKEND_API_URL` configuration
 - [x] API integration tested and verified
 - [x] Environment variables configured
 - [x] Secrets management in place

@@ -92,7 +92,7 @@ LANDING_PAGE_URL      | https://croppulse.com
 
 ### Example:
 ```
-https://croppulse-api.up.railway.app
+https://your-service-name.up.railway.app
 ```
 
 **Save this URL!** You'll need it for Streamlit and testing.
@@ -134,7 +134,7 @@ curl -I "$URL/health"
 
 ---
 
-## STEP 7️⃣: Connect Streamlit to Railway API (2 min)
+## STEP 7️⃣: Connect Streamlit to Your Backend (2 min)
 
 ### Action:
 
@@ -147,7 +147,7 @@ curl -I "$URL/health"
 
 3. Replace with:
    ```python
-   API_URL = "https://YOUR_RAILWAY_URL"  # Your actual Railway URL
+   API_URL = "https://your-active-api-host"  # Your actual backend URL
    ```
 
 4. Save the file
@@ -163,7 +163,7 @@ curl -I "$URL/health"
 **What happens:**
 - Streamlit Cloud detects changes
 - Auto-redeployes Streamlit app
-- Streamlit now uses Railway API
+- Streamlit now uses your configured backend URL
 - Takes 1-2 minutes
 
 ---
@@ -234,7 +234,7 @@ Deployment is complete when:
 - [ ] PostgreSQL connected and variable set
 - [ ] All environment variables configured
 - [ ] Health check returns 200
-- [ ] Streamlit connects to Railway API
+- [ ] Streamlit connects to the configured backend
 - [ ] Dashboard loads without errors
 - [ ] All 22 API endpoints accessible
 - [ ] Security headers present
@@ -295,11 +295,11 @@ Solution:
 
 | Component | Status | URL |
 |-----------|--------|-----|
-| FastAPI Backend | 🟢 Live | `https://YOUR_URL.up.railway.app` |
+| FastAPI Backend | 🟢 Live | `https://your-service-name.up.railway.app` |
 | PostgreSQL DB | 🟢 Live | (auto-connected) |
 | Streamlit Frontend | 🟢 Live | `https://croppulse.streamlit.app` |
-| API Docs | 🟢 Live | `https://YOUR_URL.up.railway.app/api/docs` |
-| Health Check | 🟢 Live | `https://YOUR_URL.up.railway.app/health` |
+| API Docs | 🟢 Live | `https://your-service-name.up.railway.app/api/docs` |
+| Health Check | 🟢 Live | `https://your-service-name.up.railway.app/health` |
 
 ---
 
@@ -331,7 +331,7 @@ Once complete:
 
 ```
 🎉 Phase 2 Backend is deployed to production!
-🎉 Streamlit frontend connected to Railway API!
+🎉 Streamlit frontend connected to your configured backend!
 🎉 PostgreSQL database operational!
 🎉 TIER 1 security active on all 22 endpoints!
 🎉 Ready for farmer & trader onboarding!

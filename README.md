@@ -13,6 +13,15 @@ This app already includes:
 
 You do not need a separate FastAPI service for the active public app path.
 
+### Deployment Source Of Truth
+
+For current deployment instructions, use:
+- `DEPLOY_TO_STREAMLIT_CLOUD.md` for the active Streamlit deployment flow
+- `STREAMLIT_CLOUD_DEPLOYMENT.md` for Streamlit environment and backend configuration notes
+- `DEPLOYMENT_GUIDE.md` for the static landing page deployment options
+
+Older Railway-focused documents have been archived under `archive/railway/` and are historical reference only.
+
 ### Streamlit Cloud Setup
 
 1. Push the repo to GitHub.

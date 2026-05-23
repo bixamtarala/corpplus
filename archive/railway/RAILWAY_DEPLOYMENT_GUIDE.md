@@ -153,13 +153,13 @@ LANDING_PAGE_URL=https://croppulse.com
 ### 5.2 Get Deployment URL
 - Railway assigns auto URL: `https://your-service-name.up.railway.app`
 - Public domain section shows live API URL
-- Example: `https://croppulse-api.up.railway.app`
+- Example: `https://your-service-name.up.railway.app`
 
 ### 5.3 Test API Endpoints
 
 ```bash
 # Test health check
-curl https://croppulse-api.up.railway.app/health
+curl https://your-service-name.up.railway.app/health
 
 # Expected response:
 {
@@ -171,13 +171,13 @@ curl https://croppulse-api.up.railway.app/health
 
 # Test with API key
 curl -H "X-API-Key: croppulse_farmer_secret_key_12345" \
-  https://croppulse-api.up.railway.app/api/v1/prices/latest?commodity=rice
+  https://your-service-name.up.railway.app/api/v1/prices/latest?commodity=rice
 ```
 
 ### 5.4 Verify Security Features
 ```bash
 # Check security headers
-curl -i https://croppulse-api.up.railway.app/health | grep -E "x-frame-options|content-security-policy|hsts"
+curl -i https://your-service-name.up.railway.app/health | grep -E "x-frame-options|content-security-policy|hsts"
 
 # Should see:
 # x-frame-options: DENY
@@ -189,14 +189,14 @@ curl -i https://croppulse-api.up.railway.app/health | grep -E "x-frame-options|c
 
 ## Step 6: Connect to Streamlit Frontend
 
-### 6.1 Update Streamlit app to use Railway API
+### 6.1 Update Streamlit app to use your backend URL
 In `croppulse_app.py`:
 ```python
 # Replace:
 API_URL = "http://localhost:8000"
 
 # With:
-API_URL = "https://croppulse-api.up.railway.app"
+API_URL = "https://your-active-api-host"
 ```
 
 ### 6.2 Verify CORS is working
@@ -204,7 +204,7 @@ API_URL = "https://croppulse-api.up.railway.app"
 curl -H "Origin: https://croppulse.streamlit.app" \
   -H "Access-Control-Request-Method: POST" \
   -X OPTIONS \
-  https://croppulse-api.up.railway.app/api/v1/users
+  https://your-service-name.up.railway.app/api/v1/users
 ```
 
 Should return CORS headers:
@@ -348,10 +348,10 @@ curl https://api.croppulse.com/health
 
 After successful deployment, update these:
 
-**API URL:** `https://croppulse-api.up.railway.app` (or `https://api.croppulse.com`)
-**API Docs:** `https://croppulse-api.up.railway.app/api/docs`
-**ReDoc:** `https://croppulse-api.up.railway.app/api/redoc`
-**OpenAPI:** `https://croppulse-api.up.railway.app/api/openapi.json`
+**API URL:** `https://your-service-name.up.railway.app` (or `https://api.croppulse.com`)
+**API Docs:** `https://your-service-name.up.railway.app/api/docs`
+**ReDoc:** `https://your-service-name.up.railway.app/api/redoc`
+**OpenAPI:** `https://your-service-name.up.railway.app/api/openapi.json`
 
 **Streamlit Frontend:** `https://croppulse.streamlit.app`
 **Landing Page:** `https://croppulse.com`

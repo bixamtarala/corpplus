@@ -89,7 +89,7 @@ docker-compose down
 ✅ **Dockerfile** - Container image definition
 ✅ **docker-compose.yml** - Local testing with PostgreSQL + Redis
 ✅ **.env.example** - Environment variables template
-✅ **RAILWAY_DEPLOYMENT_GUIDE.md** - Complete deployment guide
+✅ **DEPLOY_TO_STREAMLIT_CLOUD.md** - Active Streamlit deployment guide
 
 ---
 
@@ -101,7 +101,7 @@ docker-compose down
 - [ ] Environment variables configured
 - [ ] Deployment successful
 - [ ] Health check returns 200
-- [ ] Update Streamlit to use Railway API URL
+- [ ] Update Streamlit to use your active backend URL (if you are using an external API)
 
 ---
 
@@ -135,7 +135,9 @@ Health: https://your-app.up.railway.app/health
 
 ---
 
-For detailed instructions, see: **RAILWAY_DEPLOYMENT_GUIDE.md**
+For detailed instructions, see: **DEPLOY_TO_STREAMLIT_CLOUD.md**
+
+Older Railway-focused docs have been archived under `archive/railway/` for historical reference only.
 
 **Status:** ✅ Ready to deploy
 **Version:** FastAPI 0.104.0+ with TIER 1 Security

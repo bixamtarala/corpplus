@@ -102,15 +102,15 @@ df = pd.read_csv('commodity_prices.csv')
 
 **After:**
 ```python
-# Live API data from Railway
-BACKEND_API_URL = "https://web-production-7295a.up.railway.app"
+# Live API data from an explicitly configured backend
+BACKEND_API_URL = "https://your-active-api-host"
 response = requests.get(f"{BACKEND_API_URL}/api/v1/prices/latest")
 data = response.json()
 ```
 
 ### Fallback Chain
 
-1. **Primary:** CropPulse Backend API (Railway)
+1. **Primary:** CropPulse Backend API (when `BACKEND_API_URL` is configured)
 2. **Secondary:** eNAM API (if available)
 3. **Tertiary:** CSV demo data (local testing)
 
@@ -138,7 +138,7 @@ The app will:
 Add in Dashboard → App settings → Secrets:
 
 ```toml
-BACKEND_API_URL = "https://web-production-7295a.up.railway.app"
+BACKEND_API_URL = "https://your-active-api-host"
 API_KEY = "<set-a-strong-admin-key>"
 ```
 
@@ -157,10 +157,10 @@ API_KEY = "<set-a-strong-admin-key>"
 
 ### Issue: "Connection refused" or "Cannot reach API"
 
-**Cause:** Railway backend not accessible
+**Cause:** Configured backend not accessible
 
 **Solution:**
-1. Verify Railway API is running: `https://web-production-7295a.up.railway.app/`
+1. Verify the URL in `BACKEND_API_URL` is correct and reachable
 2. Check API key is correct in secrets
 3. Verify CORS is enabled on backend
 

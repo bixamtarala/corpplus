@@ -36,7 +36,7 @@ import streamlit as st
 # API Configuration
 BACKEND_API_URL = os.getenv(
     "BACKEND_API_URL", 
-    "https://web-production-7295a.up.railway.app"
+    ""
 )
 API_KEY = os.getenv("API_KEY")
 

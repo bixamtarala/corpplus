@@ -20,14 +20,14 @@ Release APK:
 
 ```powershell
 Set-Location C:\Users\LENOVO\Desktop\Agritech\mobile_app_flutter
-C:\Users\LENOVO\Downloads\flutter_windows_3.41.9-stable\flutter\bin\flutter.bat build apk --release --dart-define=CROPPULSE_API_BASE_URL=https://web-production-7295a.up.railway.app
+C:\Users\LENOVO\Downloads\flutter_windows_3.41.9-stable\flutter\bin\flutter.bat build apk --release --dart-define=CROPPULSE_API_BASE_URL=https://your-active-api-host
 ```
 
 Play Store App Bundle:
 
 ```powershell
 Set-Location C:\Users\LENOVO\Desktop\Agritech\mobile_app_flutter
-C:\Users\LENOVO\Downloads\flutter_windows_3.41.9-stable\flutter\bin\flutter.bat build appbundle --release --dart-define=CROPPULSE_API_BASE_URL=https://web-production-7295a.up.railway.app
+C:\Users\LENOVO\Downloads\flutter_windows_3.41.9-stable\flutter\bin\flutter.bat build appbundle --release --dart-define=CROPPULSE_API_BASE_URL=https://your-active-api-host
 ```
 
 ## Output Paths
@@ -37,6 +37,7 @@ C:\Users\LENOVO\Downloads\flutter_windows_3.41.9-stable\flutter\bin\flutter.bat 
 
 ## Important Notes
 
+- Replace `https://your-active-api-host` with the backend URL you actually use, or omit the define if the build should not talk to a live API.
 - Do not commit `android/key.properties`.
 - Do not commit `.jks` or `.keystore` files.
 - Without a real keystore, Flutter falls back to debug signing for local release tests, which is not Play Store-ready.

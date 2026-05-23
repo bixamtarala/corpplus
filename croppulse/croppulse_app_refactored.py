@@ -36,7 +36,7 @@ import streamlit as st
 # API Configuration
 BACKEND_API_URL = os.getenv(
     "BACKEND_API_URL", 
-    "https://web-production-7295a.up.railway.app"
+    ""
 )
 API_KEY = os.getenv("API_KEY")
 
@@ -237,7 +237,7 @@ st.markdown("""
 def load_data_from_api():
     """Load commodity price data from CropPulse Backend API"""
     try:
-        if not API_KEY:
+        if not API_KEY or not BACKEND_API_URL:
             return None
         headers = {"X-API-Key": API_KEY}
         secure_url = BACKEND_API_URL.replace("http://", "https://", 1)

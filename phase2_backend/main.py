@@ -3,12 +3,16 @@ CropPulse Phase 2 Backend - FastAPI Application with TIER 1 Security
 Main entry point for the REST API server with OWASP compliance
 """
 
+import asyncio
+from contextlib import asynccontextmanager
+import inspect
+
 from fastapi import FastAPI, HTTPException, Depends, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, EmailStr, validator, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional, List, Dict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 import os
 import logging
@@ -17,6 +21,10 @@ import hashlib
 import secrets
 import json
 from jose import JWTError, jwt
+
+# slowapi still calls asyncio.iscoroutinefunction, which is deprecated on Python 3.14+.
+if getattr(asyncio, "iscoroutinefunction", None) is not inspect.iscoroutinefunction:
+    asyncio.iscoroutinefunction = inspect.iscoroutinefunction
 
 # Security & Rate Limiting
 from slowapi import Limiter
@@ -118,7 +126,7 @@ def log_audit(
 ):
     """Log security-relevant actions for audit trail"""
     audit_entry = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
         "action": action,
         "user_id": user_id or "SYSTEM",
         "resource": resource,
@@ -132,6 +140,11 @@ def mask_phone(phone: str) -> str:
     return f"***{phone[-4:]}" if len(phone) >= 4 else "***"
 
 
+def utc_now() -> datetime:
+    """Return a timezone-aware UTC timestamp."""
+    return datetime.now(timezone.utc)
+
+
 def generate_secure_otp() -> str:
     return "".join(str(secrets.randbelow(10)) for _ in range(6))
 
@@ -141,7 +154,7 @@ def _hash_otp(otp: str) -> str:
 
 
 def purge_expired_otps() -> None:
-    now = datetime.utcnow()
+    now = utc_now()
     expired = [phone for phone, record in OTP_STORE.items() if record["expires_at"] <= now]
     for phone in expired:
         OTP_STORE.pop(phone, None)
@@ -151,7 +164,7 @@ def store_otp(phone: str, otp: str) -> None:
     purge_expired_otps()
     OTP_STORE[phone] = {
         "otp_hash": _hash_otp(otp),
-        "expires_at": datetime.utcnow() + timedelta(minutes=OTP_EXPIRATION_MINUTES),
+        "expires_at": utc_now() + timedelta(minutes=OTP_EXPIRATION_MINUTES),
         "attempts": 0,
     }
 
@@ -177,11 +190,11 @@ def verify_stored_otp(phone: str, otp: str) -> bool:
 
 
 def create_access_token(subject: str, extra_claims: Optional[Dict[str, object]] = None) -> str:
-    expires_at = datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS)
+    expires_at = utc_now() + timedelta(hours=JWT_EXPIRATION_HOURS)
     payload = {
         "sub": subject,
         "exp": expires_at,
-        "iat": datetime.utcnow(),
+        "iat": utc_now(),
     }
     if extra_claims:
         payload.update(extra_claims)
@@ -227,14 +240,16 @@ class UserProfile(BaseModel):
     api_key: Optional[str] = None
     created_at: Optional[str] = None
 
-    @validator('name')
+    @field_validator('name')
+    @classmethod
     def name_alphanumeric(cls, v):
         """Validate name contains only alphanumeric and spaces"""
         if not all(c.isalnum() or c.isspace() for c in v):
             raise ValueError('Name must contain only letters, numbers, and spaces')
         return v
 
-    @validator('state', 'village')
+    @field_validator('state', 'village')
+    @classmethod
     def location_validation(cls, v):
         """Validate location names"""
         if not all(c.isalpha() or c.isspace() for c in v):
@@ -252,7 +267,8 @@ class CommodityPrice(BaseModel):
     supply: float = Field(..., ge=0, le=100)
     demand: float = Field(..., ge=0, le=100)
 
-    @validator('commodity')
+    @field_validator('commodity')
+    @classmethod
     def commodity_validation(cls, v):
         """Validate commodity name"""
         allowed = {'rice', 'wheat', 'cotton', 'maize', 'sugar', 'tea', 'coffee'}
@@ -383,6 +399,47 @@ async def verify_jwt_token(authorization: str = Header(...)):
 # INITIALIZE FASTAPI APP
 # ============================================================================
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Handle application startup and shutdown without deprecated event hooks."""
+    try:
+        log_audit("APPLICATION_STARTUP", resource="system")
+        print("\n" + "="*60)
+        print("CropPulse API Starting...")
+        print("="*60)
+        print("✅ Security headers enabled")
+        print("✅ Rate limiting enabled (100 req/min)")
+        print("✅ Audit logging enabled")
+        print("✅ Input validation enabled")
+        print("✅ API key management enabled")
+        print("✅ 22 endpoints registered")
+        print("✅ PostgreSQL integration (ready)")
+        print("✅ TIER 1 OWASP security active")
+        print("="*60)
+        print(f"✅ Environment: {os.getenv('ENV', 'development')}")
+        print(f"✅ Port: {os.getenv('PORT', '8000')}")
+        print(f"✅ Debug: {os.getenv('DEBUG', 'false')}")
+        print("="*60 + "\n")
+
+        # TODO: Connect to PostgreSQL
+        # TODO: Initialize Redis
+        # TODO: Load ML models
+        # TODO: Verify environment variables
+        yield
+    except Exception as e:
+        print(f"ERROR during startup: {e}")
+        import traceback
+        traceback.print_exc()
+        raise
+    finally:
+        log_audit("APPLICATION_SHUTDOWN", resource="system")
+        print("CropPulse API Shutting Down...")
+
+        # TODO: Close database connections
+        # TODO: Close Redis connections
+        # TODO: Flush caches
+
+
 app = FastAPI(
     title="CropPulse API",
     description="Agricultural marketplace intelligence platform with OWASP security",
@@ -390,6 +447,7 @@ app = FastAPI(
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
+    lifespan=lifespan,
 )
 
 # Add state limiter
@@ -435,7 +493,7 @@ async def health_check(request: Request):
         "status": "healthy",
         "service": "CropPulse API",
         "version": "2.0.0",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -485,7 +543,7 @@ async def request_otp(request: Request, otp_req: OTPRequest):
         "message": "OTP sent successfully",
         "phone": mask_phone(otp_req.phone),
         "expires_in": 600,  # 10 minutes
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -512,7 +570,7 @@ async def verify_otp(request: Request, otp_verify: OTPVerify):
         "token": token,
         "token_type": "bearer",
         "user_id": otp_verify.phone,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -539,7 +597,7 @@ async def get_user(request: Request, user_id: int, token_payload: Dict = Depends
         "state": "Tamil Nadu",
         "village": "Karaikudi",
         "kyc_verified": True,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -572,7 +630,7 @@ async def create_user(request: Request, user: UserProfile):
             "name": user.name,
             "user_type": user.user_type,
         },
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -594,7 +652,7 @@ async def update_user(request: Request, user_id: int, user: UserProfile, token_p
     return {
         "message": "User updated successfully",
         "user_id": user_id,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -631,7 +689,7 @@ async def get_latest_prices(
                 "mandi": "Karaikudi",
                 "price": 3330,
                 "volatility": 4.07,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": utc_now().isoformat(),
             }
         ]
     }
@@ -657,7 +715,7 @@ async def get_price_history(request: Request, commodity: str, days: int = 30, ap
         "commodity": commodity,
         "days": days,
         "data": [],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -677,7 +735,7 @@ async def get_price_forecast(request: Request, commodity: str, days_ahead: int =
         "commodity": commodity,
         "forecast_days": days_ahead,
         "forecast": [],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -702,7 +760,7 @@ async def get_user_signals(request: Request, user_id: int, limit: int = 10, toke
     return {
         "user_id": user_id,
         "signals": [],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -724,7 +782,7 @@ async def generate_signals(request: Request, commodity: str, api_key: str = Depe
         "message": "Signals generated",
         "commodity": commodity,
         "signals_count": 5,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -748,7 +806,7 @@ async def create_order(request: Request, order: MarketplaceOrder, token_payload:
     return {
         "message": "Order created",
         "order_id": 1,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -776,7 +834,7 @@ async def get_open_orders(
     return {
         "orders": [],
         "total": 0,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -799,7 +857,7 @@ async def match_orders(request: Request, seller_order_id: int, buyer_order_id: i
     return {
         "message": "Orders matched successfully",
         "trade_id": 1,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -824,7 +882,7 @@ async def create_crop_plan(request: Request, user_id: int, crop: str, area_hecta
     return {
         "message": "Crop plan created",
         "plan_id": 1,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -855,7 +913,7 @@ async def get_best_time_to_sell(request: Request, user_id: int, commodity: str, 
         "expected_price": 3500,
         "confidence": 0.82,
         "reason": "Demand spike expected, prices forecasted to rise",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -884,7 +942,7 @@ async def get_market_trends(request: Request, commodity: str, period: str = "30d
         "period": period,
         "trend": "up",
         "volatility": 4.07,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -907,7 +965,7 @@ async def http_exception_handler(request, exc):
         content={
             "error": exc.detail,
             "status_code": exc.status_code,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": utc_now().isoformat(),
         },
     )
 
@@ -926,7 +984,7 @@ async def general_exception_handler(request, exc):
         status_code=500,
         content={
             "error": "Internal server error",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": utc_now().isoformat(),
         },
     )
 
@@ -935,48 +993,6 @@ async def general_exception_handler(request, exc):
 # STARTUP & SHUTDOWN
 # ============================================================================
 
-@app.on_event("startup")
-async def startup_event():
-    """Initialize on startup"""
-    try:
-        log_audit("APPLICATION_STARTUP", resource="system")
-        print("\n" + "="*60)
-        print("CropPulse API Starting...")
-        print("="*60)
-        print("✅ Security headers enabled")
-        print("✅ Rate limiting enabled (100 req/min)")
-        print("✅ Audit logging enabled")
-        print("✅ Input validation enabled")
-        print("✅ API key management enabled")
-        print("✅ 22 endpoints registered")
-        print("✅ PostgreSQL integration (ready)")
-        print("✅ TIER 1 OWASP security active")
-        print("="*60)
-        print(f"✅ Environment: {os.getenv('ENV', 'development')}")
-        print(f"✅ Port: {os.getenv('PORT', '8000')}")
-        print(f"✅ Debug: {os.getenv('DEBUG', 'false')}")
-        print("="*60 + "\n")
-        
-        # TODO: Connect to PostgreSQL
-        # TODO: Initialize Redis
-        # TODO: Load ML models
-        # TODO: Verify environment variables
-    except Exception as e:
-        print(f"ERROR during startup: {e}")
-        import traceback
-        traceback.print_exc()
-        raise
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Cleanup on shutdown"""
-    log_audit("APPLICATION_SHUTDOWN", resource="system")
-    print("CropPulse API Shutting Down...")
-    
-    # TODO: Close database connections
-    # TODO: Close Redis connections
-    # TODO: Flush caches
 
 
 # ============================================================================
