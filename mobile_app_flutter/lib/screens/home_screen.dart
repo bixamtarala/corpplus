@@ -16,33 +16,53 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 12,
         title: const Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text('🌾', style: TextStyle(fontSize: 28)),
-            SizedBox(width: 12),
-            Text('CropPulse'),
+            SizedBox(width: 10),
+            Flexible(
+              child: Text(
+                'CropPulse',
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: PopupMenuButton(
+            padding: const EdgeInsets.only(right: 12),
+            child: PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              tooltip: 'Select role',
               itemBuilder: (context) => [
-                const PopupMenuItem(child: Text('Farmer')),
-                const PopupMenuItem(child: Text('Trader')),
-                const PopupMenuItem(child: Text('Exporter')),
+                const PopupMenuItem<String>(value: 'Farmer', child: Text('Farmer')),
+                const PopupMenuItem<String>(value: 'Trader', child: Text('Trader')),
+                const PopupMenuItem<String>(value: 'Exporter', child: Text('Exporter')),
               ],
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 decoration: BoxDecoration(
                   border: Border.all(color: AppTheme.primaryGreen),
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
                 ),
                 child: const Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.person, size: 16, color: AppTheme.primaryGreen),
                     SizedBox(width: 6),
-                    Text('Role', style: TextStyle(fontSize: 12, color: AppTheme.primaryGreen)),
+                    Text(
+                      'Role',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.primaryGreen,
+                      ),
+                    ),
+                    SizedBox(width: 4),
+                    Icon(Icons.keyboard_arrow_down, size: 16, color: AppTheme.primaryGreen),
                   ],
                 ),
               ),
