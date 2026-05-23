@@ -1,6 +1,6 @@
 name: Mobile Android Delivery
 
-on:
+'on':
   push:
     branches: [ main ]
   workflow_dispatch:
