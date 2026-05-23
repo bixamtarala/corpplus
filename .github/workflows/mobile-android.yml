@@ -53,20 +53,32 @@ jobs:
         retention-days: 14
 
     - name: Publish rolling GitHub release
-      uses: ncipollo/release-action@v1
-      with:
-        tag: mobile-latest
-        name: CropPulse Android Latest
-        prerelease: true
-        allowUpdates: true
-        replacesArtifacts: true
-        artifactErrorsFailBuild: true
-        artifacts: mobile_app_flutter/build/app/outputs/flutter-apk/app-release.apk
-        body: |
-          Latest Android APK for CropPulse.
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        body=$(cat <<'EOF'
+        Latest Android APK for CropPulse.
 
-          Commit: `${{ github.sha }}`
-          Workflow run: `${{ github.run_number }}`
-          Triggered by: `${{ github.event_name }}`
+        Commit: `${{ github.sha }}`
+        Workflow run: `${{ github.run_number }}`
+        Triggered by: `${{ github.event_name }}`
 
-          Download the attached `app-release.apk` artifact from this prerelease.
+        Download the attached `app-release.apk` artifact from this prerelease.
+        EOF
+        )
+
+        if gh release view mobile-latest >/dev/null 2>&1; then
+          gh release edit mobile-latest \
+            --title "CropPulse Android Latest" \
+            --notes "$body" \
+            --target "${{ github.sha }}" \
+            --prerelease
+        else
+          gh release create mobile-latest \
+            --title "CropPulse Android Latest" \
+            --notes "$body" \
+            --target "${{ github.sha }}" \
+            --prerelease
+        fi
+
+        gh release upload mobile-latest build/app/outputs/flutter-apk/app-release.apk --clobber
