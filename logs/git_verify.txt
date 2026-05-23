@@ -1,0 +1,5 @@
+## main...origin/main
+ M mobile_app_flutter/.metadata
+?? logs/
+?? mobile_app_flutter/devtools_options.yaml
+?? mobile_app_flutter/web/
