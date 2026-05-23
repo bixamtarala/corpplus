@@ -12,6 +12,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  static const List<String> _roles = ['Farmer', 'Trader', 'Exporter'];
+  String _selectedRole = 'Farmer';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,11 +39,29 @@ class _HomeScreenState extends State<HomeScreen> {
             child: PopupMenuButton<String>(
               padding: EdgeInsets.zero,
               tooltip: 'Select role',
+              initialValue: _selectedRole,
               itemBuilder: (context) => [
-                const PopupMenuItem<String>(value: 'Farmer', child: Text('Farmer')),
-                const PopupMenuItem<String>(value: 'Trader', child: Text('Trader')),
-                const PopupMenuItem<String>(value: 'Exporter', child: Text('Exporter')),
+                for (final role in _roles)
+                  PopupMenuItem<String>(
+                    value: role,
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(role)),
+                        if (role == _selectedRole)
+                          const Icon(
+                            Icons.check,
+                            size: 18,
+                            color: AppTheme.primaryGreen,
+                          ),
+                      ],
+                    ),
+                  ),
               ],
+              onSelected: (role) {
+                setState(() {
+                  _selectedRole = role;
+                });
+              },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 decoration: BoxDecoration(
@@ -48,21 +69,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(10),
                   color: Colors.white,
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.person, size: 16, color: AppTheme.primaryGreen),
-                    SizedBox(width: 6),
+                    const Icon(Icons.person, size: 16, color: AppTheme.primaryGreen),
+                    const SizedBox(width: 6),
                     Text(
-                      'Role',
-                      style: TextStyle(
+                      _selectedRole,
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.primaryGreen,
                       ),
                     ),
-                    SizedBox(width: 4),
-                    Icon(Icons.keyboard_arrow_down, size: 16, color: AppTheme.primaryGreen),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.keyboard_arrow_down, size: 16, color: AppTheme.primaryGreen),
                   ],
                 ),
               ),
