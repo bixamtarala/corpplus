@@ -56,7 +56,7 @@ class FarmerProfileController extends StateNotifier<FarmerProfileState> {
     if (session == null || session.accessToken.isEmpty) {
       state = state.copyWith(
         profile: state.profile ?? _guestProfile(),
-        statusMessage: 'Guest mode: using a local farmer profile draft until login is added back.',
+        statusMessage: 'Preview mode: using a local farmer profile draft on this device.',
         clearError: true,
       );
       return;
@@ -94,7 +94,7 @@ class FarmerProfileController extends StateNotifier<FarmerProfileState> {
     if (session == null || session.accessToken.isEmpty) {
       state = state.copyWith(
         profile: _guestProfile(request: request),
-        statusMessage: 'Guest mode: profile saved locally on this device.',
+        statusMessage: 'Preview mode: profile saved locally on this device.',
         clearError: true,
       );
       return;

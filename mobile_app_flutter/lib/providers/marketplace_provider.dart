@@ -106,7 +106,7 @@ class MarketplaceController extends StateNotifier<MarketplaceState> {
       );
       state = state.copyWith(
         sellOrders: [listing, ...state.sellOrders],
-        statusMessage: 'Guest mode: listing saved locally as a draft.',
+        statusMessage: 'Preview mode: listing saved locally as a draft.',
         clearError: true,
       );
       return;
@@ -148,7 +148,7 @@ class MarketplaceController extends StateNotifier<MarketplaceState> {
       );
       state = state.copyWith(
         latestOffer: offer,
-        statusMessage: 'Guest mode: offer saved locally and ready for later backend sync.',
+        statusMessage: 'Preview mode: offer saved locally for later sync.',
         clearError: true,
       );
       return;

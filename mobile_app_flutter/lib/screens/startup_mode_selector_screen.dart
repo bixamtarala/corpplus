@@ -113,7 +113,7 @@ class _StartupModeSelectorScreenState extends State<StartupModeSelectorScreen> {
                           icon: Icons.phone_android,
                           title: 'Native App',
                           description:
-                              'Use the Flutter mobile interface for OTP login, marketplace, intelligence, and profile flows.',
+                              'Use the Flutter mobile interface for marketplace, intelligence, profile, and preview flows.',
                           isRecommended: _savedMode == AppLaunchMode.nativeApp,
                           buttonLabel: 'Open Native App',
                           onPressed: () => _openMode(AppLaunchMode.nativeApp),

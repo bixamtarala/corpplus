@@ -113,10 +113,10 @@ class ProfileScreen extends ConsumerWidget {
             _buildMenuItem(Icons.favorite_border, 'Saved Listings', () {}),
             _buildMenuItem(Icons.settings, 'Settings', () {}),
             _buildMenuItem(Icons.help_outline, 'Help & Support', () {}),
-            _buildMenuItem(Icons.lock_outline, 'Authentication Coming Soon', () {
+            _buildMenuItem(Icons.lock_outline, 'Account Sync Coming Later', () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Login is temporarily disabled while the mobile app is being finalized.'),
+                  content: Text('Account sync will be added after the core mobile experience is finalized.'),
                 ),
               );
             }),
