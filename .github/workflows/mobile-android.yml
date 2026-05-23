@@ -1,0 +1,91 @@
+name: Mobile Android Delivery
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    env:
+      FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      FIREBASE_TESTER_GROUPS: ${{ secrets.FIREBASE_TESTER_GROUPS }}
+
+    defaults:
+      run:
+        working-directory: mobile_app_flutter
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Java 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '17'
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.41.9'
+        channel: stable
+        cache: true
+
+    - name: Flutter pub get
+      run: flutter pub get
+
+    - name: Build Android release APK
+      run: flutter build apk --release
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: croppulse-android-apk-${{ github.run_number }}
+        path: mobile_app_flutter/build/app/outputs/flutter-apk/app-release.apk
+        if-no-files-found: error
+        retention-days: 14
+
+    - name: Publish rolling GitHub release
+      uses: ncipollo/release-action@v1
+      with:
+        tag: mobile-latest
+        name: CropPulse Android Latest
+        prerelease: true
+        allowUpdates: true
+        replacesArtifacts: true
+        artifactErrorsFailBuild: true
+        artifacts: mobile_app_flutter/build/app/outputs/flutter-apk/app-release.apk
+        body: |
+          Latest Android APK for CropPulse.
+
+          Commit: `${{ github.sha }}`
+          Workflow run: `${{ github.run_number }}`
+          Triggered by: `${{ github.event_name }}`
+
+          Download the attached `app-release.apk` artifact from this prerelease.
+
+    - name: Distribute to Firebase App Distribution
+      if: env.FIREBASE_APP_ID != '' && env.FIREBASE_SERVICE_ACCOUNT != '' && env.FIREBASE_TESTER_GROUPS != ''
+      uses: wzieba/Firebase-Distribution-Github-Action@v1
+      with:
+        appId: ${{ env.FIREBASE_APP_ID }}
+        serviceCredentialsFileContent: ${{ env.FIREBASE_SERVICE_ACCOUNT }}
+        groups: ${{ env.FIREBASE_TESTER_GROUPS }}
+        file: mobile_app_flutter/build/app/outputs/flutter-apk/app-release.apk
+        releaseNotes: |
+          CropPulse Android build
+          Commit: ${{ github.sha }}
+          Run: ${{ github.run_number }}
+
+    - name: Firebase distribution status
+      if: env.FIREBASE_APP_ID == '' || env.FIREBASE_SERVICE_ACCOUNT == '' || env.FIREBASE_TESTER_GROUPS == ''
+      run: |
+        echo "Firebase App Distribution skipped."
+        echo "Add FIREBASE_APP_ID, FIREBASE_SERVICE_ACCOUNT, and FIREBASE_TESTER_GROUPS repository secrets to enable it."
