@@ -5,20 +5,9 @@ import 'screens/farmer_hub_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/intelligence_screen.dart';
 import 'screens/marketplace_screen.dart';
-import 'screens/startup_mode_selector_screen.dart';
 import 'screens/profile_screen.dart';
-import 'screens/streamlit_webview_screen.dart';
 import 'screens/trader_hub_screen.dart';
 import 'theme/app_theme.dart';
-
-const _streamlitUrl = String.fromEnvironment(
-  'CROPPULSE_STREAMLIT_URL',
-  defaultValue: 'https://corpplus.streamlit.app',
-);
-const _useNativeApp = bool.fromEnvironment(
-  'CROPPULSE_USE_NATIVE_APP',
-  defaultValue: true,
-);
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -33,13 +22,7 @@ class MyApp extends ConsumerWidget {
       title: 'CropPulse',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: StartupModeSelectorScreen(
-        defaultMode: _useNativeApp
-            ? AppLaunchMode.nativeApp
-            : AppLaunchMode.webApp,
-        nativeScreen: const NativeAppGate(),
-        webScreen: const StreamlitWebViewScreen(url: _streamlitUrl),
-      ),
+      home: const NativeAppGate(),
     );
   }
 }
