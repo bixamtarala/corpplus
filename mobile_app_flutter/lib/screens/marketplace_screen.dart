@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../data/commodity_catalog.dart';
 import '../models/marketplace.dart';
 import '../providers/marketplace_provider.dart';
 import '../theme/app_theme.dart';
@@ -68,7 +69,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
               Expanded(
                 child: DropdownButtonFormField<String>(
                   initialValue: _selectedCrop,
-                  items: const ['Rice', 'Wheat', 'Cotton']
+                  items: CommodityCatalog.all
                       .map((crop) => DropdownMenuItem<String>(value: crop, child: Text(crop)))
                       .toList(),
                   onChanged: (value) {

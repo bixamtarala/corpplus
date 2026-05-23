@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../data/commodity_catalog.dart';
 import '../theme/app_theme.dart';
 import 'price_insight_screen.dart';
 
@@ -19,7 +20,7 @@ class IntelligenceScreen extends StatelessWidget {
             // Commodity Selector
             DropdownButtonFormField<String>(
               initialValue: 'Rice',
-              items: ['Rice', 'Wheat', 'Cotton']
+              items: CommodityCatalog.all
                   .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                   .toList(),
               onChanged: (_) {},

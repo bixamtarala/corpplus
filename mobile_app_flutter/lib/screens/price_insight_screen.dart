@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../data/commodity_catalog.dart';
 import '../models/price_insight.dart';
 import '../providers/api_providers.dart';
 import '../theme/app_theme.dart';
@@ -14,7 +15,7 @@ class PriceInsightScreen extends ConsumerStatefulWidget {
 }
 
 class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
-  static const List<String> _crops = ['Rice', 'Wheat', 'Cotton'];
+  static const List<String> _crops = CommodityCatalog.all;
   static const List<String> _states = ['Tamil Nadu', 'Punjab', 'Karnataka'];
 
   final TextEditingController _quantityController = TextEditingController(text: '500');
