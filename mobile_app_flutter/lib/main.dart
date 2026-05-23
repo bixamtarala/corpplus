@@ -7,6 +7,7 @@ import 'screens/home_screen.dart';
 import 'screens/intelligence_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/marketplace_screen.dart';
+import 'screens/startup_mode_selector_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/streamlit_webview_screen.dart';
 import 'screens/trader_hub_screen.dart';
@@ -30,21 +31,37 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authControllerProvider);
-    final home = _useNativeApp
-        ? authState.isInitialized
-            ? authState.isAuthenticated
-                ? const MainNavigationScreen()
-                : const LoginScreen()
-            : const SplashScreen()
-        : const StreamlitWebViewScreen(url: _streamlitUrl);
-
     return MaterialApp(
       title: 'CropPulse',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: home,
+      home: StartupModeSelectorScreen(
+        defaultMode: _useNativeApp
+            ? AppLaunchMode.nativeApp
+            : AppLaunchMode.webApp,
+        nativeScreen: const NativeAppGate(),
+        webScreen: const StreamlitWebViewScreen(url: _streamlitUrl),
+      ),
     );
+  }
+}
+
+class NativeAppGate extends ConsumerWidget {
+  const NativeAppGate({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authControllerProvider);
+
+    if (!authState.isInitialized) {
+      return const SplashScreen();
+    }
+
+    if (!authState.isAuthenticated) {
+      return const LoginScreen();
+    }
+
+    return const MainNavigationScreen();
   }
 }
 
