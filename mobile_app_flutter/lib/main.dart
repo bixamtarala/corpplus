@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'models/app_update_info.dart';
 import 'screens/farmer_hub_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/intelligence_screen.dart';
 import 'screens/marketplace_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/trader_hub_screen.dart';
+import 'services/app_update_service.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -74,7 +77,10 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
+  final AppUpdateService _updateService = AppUpdateService();
+
   int _selectedIndex = 0;
+  bool _updateCheckStarted = false;
 
   static const List<Widget> _screens = [
     HomeScreen(),
@@ -84,6 +90,109 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     MarketplaceScreen(),
     ProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkForAvailableUpdate();
+    });
+  }
+
+  Future<void> _checkForAvailableUpdate() async {
+    if (_updateCheckStarted) {
+      return;
+    }
+
+    _updateCheckStarted = true;
+
+    final update = await _updateService.getAvailableUpdate();
+    if (!mounted || update == null) {
+      return;
+    }
+
+    final shouldPrompt = await _updateService.shouldPromptForVersion(update.versionCode);
+    if (!mounted || !shouldPrompt) {
+      return;
+    }
+
+    await _showUpdateDialog(update);
+  }
+
+  Future<void> _showUpdateDialog(AppUpdateInfo update) async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: !update.forceUpdate,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Update available'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'CropPulse ${update.versionName} is ready to install.',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                update.releaseNotes ?? 'A newer mobile build is available with the latest app changes.',
+                style: const TextStyle(height: 1.4),
+              ),
+            ],
+          ),
+          actions: [
+            if (!update.forceUpdate)
+              TextButton(
+                onPressed: () async {
+                  await _updateService.dismissVersion(update.versionCode);
+                  if (dialogContext.mounted) {
+                    Navigator.of(dialogContext).pop();
+                  }
+                },
+                child: const Text('Later'),
+              ),
+            ElevatedButton(
+              onPressed: () async {
+                await _openUpdate(update);
+                if (!update.forceUpdate && dialogContext.mounted) {
+                  Navigator.of(dialogContext).pop();
+                }
+              },
+              child: Text(update.playStoreUrl != null ? 'Open store' : 'Download APK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _openUpdate(AppUpdateInfo update) async {
+    final candidateUrls = <String>{
+      if (update.playStoreUrl != null && update.playStoreUrl!.isNotEmpty) update.playStoreUrl!,
+      update.downloadUrl,
+    };
+
+    for (final url in candidateUrls) {
+      final uri = Uri.tryParse(url);
+      if (uri == null) {
+        continue;
+      }
+
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Could not open the update link.')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

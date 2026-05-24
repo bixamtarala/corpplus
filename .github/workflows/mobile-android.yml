@@ -38,11 +38,67 @@ jobs:
         channel: stable
         cache: true
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Read mobile version
+      id: mobile_version
+      run: |
+        version_line=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+        version_name="${version_line%%+*}"
+        version_code="${version_line##*+}"
+
+        echo "version_name=$version_name" >> "$GITHUB_OUTPUT"
+        echo "version_code=$version_code" >> "$GITHUB_OUTPUT"
+
+    - name: Prepare Android signing files
+      if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
+      run: |
+        mkdir -p keystore
+        echo '${{ secrets.ANDROID_KEYSTORE_BASE64 }}' | base64 --decode > keystore/croppulse-upload.jks
+
+        cat > android/key.properties <<EOF
+        storeFile=../keystore/croppulse-upload.jks
+        storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+        keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+        EOF
+
     - name: Flutter pub get
       run: flutter pub get
 
     - name: Build Android release APK
       run: flutter build apk --release
+
+    - name: Build Android release App Bundle
+      if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
+      run: flutter build appbundle --release
+
+    - name: Generate update metadata
+      run: |
+        mkdir -p build/update
+        published_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        play_store_url='${{ vars.CROPPULSE_PLAY_STORE_URL }}'
+
+        if [ -z "$play_store_url" ]; then
+          play_store_url='https://play.google.com/store/apps/details?id=com.croppulse.mobile'
+        fi
+
+        cat > build/update/update-metadata.json <<EOF
+        {
+          "app": "CropPulse",
+          "package_name": "com.croppulse.mobile",
+          "version_name": "${{ steps.mobile_version.outputs.version_name }}",
+          "version_code": ${{ steps.mobile_version.outputs.version_code }},
+          "download_url": "https://github.com/${{ github.repository }}/releases/download/mobile-latest/app-release.apk",
+          "play_store_url": "$play_store_url",
+          "release_notes": "CropPulse ${{ steps.mobile_version.outputs.version_name }} (${{ steps.mobile_version.outputs.version_code }}) built from commit ${{ github.sha }}",
+          "published_at": "$published_at",
+          "force_update": false
+        }
+        EOF
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
@@ -52,18 +108,39 @@ jobs:
         if-no-files-found: error
         retention-days: 14
 
+    - name: Upload AAB artifact
+      if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: croppulse-android-aab-${{ github.run_number }}
+        path: mobile_app_flutter/build/app/outputs/bundle/release/app-release.aab
+        if-no-files-found: error
+        retention-days: 14
+
+    - name: Upload update metadata artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: croppulse-update-metadata-${{ github.run_number }}
+        path: mobile_app_flutter/build/update/update-metadata.json
+        if-no-files-found: error
+        retention-days: 14
+
     - name: Publish rolling GitHub release
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
         body=$(cat <<'EOF'
-        Latest Android APK for CropPulse.
+        Latest Android release assets for CropPulse.
 
+        Version: `${{ steps.mobile_version.outputs.version_name }} (${{ steps.mobile_version.outputs.version_code }})`
         Commit: `${{ github.sha }}`
         Workflow run: `${{ github.run_number }}`
         Triggered by: `${{ github.event_name }}`
 
-        Download the attached `app-release.apk` artifact from this prerelease.
+        Assets:
+        - `app-release.apk` for side-load installs and Firebase App Distribution
+        - `update-metadata.json` for in-app update checks
+        - `app-release.aab` when signing secrets are configured for Play internal testing
         EOF
         )
 
@@ -81,4 +158,48 @@ jobs:
             --prerelease
         fi
 
-        gh release upload mobile-latest build/app/outputs/flutter-apk/app-release.apk --clobber
+        assets=(
+          build/app/outputs/flutter-apk/app-release.apk
+          build/update/update-metadata.json
+        )
+
+        if [ -f build/app/outputs/bundle/release/app-release.aab ]; then
+          assets+=(build/app/outputs/bundle/release/app-release.aab)
+        fi
+
+        gh release upload mobile-latest "${assets[@]}" --clobber
+
+    - name: Install Firebase CLI
+      if: ${{ secrets.FIREBASE_APP_ID_ANDROID != '' && secrets.FIREBASE_SERVICE_ACCOUNT_JSON != '' }}
+      run: npm install --global firebase-tools
+
+    - name: Distribute APK to Firebase App Distribution
+      if: ${{ secrets.FIREBASE_APP_ID_ANDROID != '' && secrets.FIREBASE_SERVICE_ACCOUNT_JSON != '' }}
+      env:
+        FIREBASE_APP_ID_ANDROID: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
+        FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        FIREBASE_TESTER_GROUPS: ${{ vars.FIREBASE_TESTER_GROUPS }}
+      run: |
+        credentials_path="$RUNNER_TEMP/firebase-service-account.json"
+        printf '%s' "$FIREBASE_SERVICE_ACCOUNT_JSON" > "$credentials_path"
+        export GOOGLE_APPLICATION_CREDENTIALS="$credentials_path"
+
+        groups="$FIREBASE_TESTER_GROUPS"
+        if [ -z "$groups" ]; then
+          groups='internal-testers'
+        fi
+
+        firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
+          --app "$FIREBASE_APP_ID_ANDROID" \
+          --groups "$groups" \
+          --release-notes "CropPulse ${{ steps.mobile_version.outputs.version_name }} (${{ steps.mobile_version.outputs.version_code }}) - ${{ github.sha }}"
+
+    - name: Upload App Bundle to Google Play internal testing
+      if: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON != '' && secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        packageName: com.croppulse.mobile
+        releaseFiles: mobile_app_flutter/build/app/outputs/bundle/release/app-release.aab
+        track: internal
+        status: completed

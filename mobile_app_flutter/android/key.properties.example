@@ -1,7 +1,4 @@
 storeFile=../keystore/croppulse-upload.jks
-storePassword=CHANGE_ME
+storePassword=replace-with-store-password
 keyAlias=croppulse-upload
-keyPassword=CHANGE_MEstorePassword=replace-with-store-password
 keyPassword=replace-with-key-password
-keyAlias=croppulse-release
-storeFile=../croppulse-release.jks
