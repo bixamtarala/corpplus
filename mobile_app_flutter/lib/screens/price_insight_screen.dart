@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../data/commodity_catalog.dart';
+import '../localization/app_strings.dart';
 import '../models/price_insight.dart';
 import '../providers/api_providers.dart';
 import '../theme/app_theme.dart';
@@ -37,10 +38,11 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
   }
 
   Future<void> _fetchInsight() async {
+    final l10n = AppStrings.of(context);
     final quantity = double.tryParse(_quantityController.text.trim());
     if (quantity == null || quantity <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid quantity in kilograms.')),
+        SnackBar(content: Text(l10n.text('enter_valid_quantity'))),
       );
       return;
     }
@@ -75,11 +77,12 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppStrings.of(context);
     final currency = NumberFormat.currency(locale: 'en_IN', symbol: 'Rs ', decimalDigits: 0);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Price Advisor'),
+        title: Text(l10n.text('price_advisor_title')),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -92,11 +95,11 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
                 gradient: AppTheme.blueGradient,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Live selling guidance',
+                    l10n.text('live_selling_guidance'),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 22,
@@ -105,7 +108,7 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Query the CropPulse Phase 2 intelligence API for recommended price, nearby mandi comparisons, and best selling window.',
+                    l10n.text('live_selling_guidance_desc'),
                     style: TextStyle(color: Colors.white, height: 1.4),
                   ),
                 ],
@@ -125,6 +128,7 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
   }
 
   Widget _buildFormCard() {
+    final l10n = AppStrings.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -135,14 +139,14 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Request inputs',
+          Text(
+            l10n.text('request_inputs'),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           CommoditySelectorField(
             value: _selectedCrop,
-            labelText: 'Crop',
+            labelText: l10n.text('crop'),
             onChanged: (value) {
               setState(() {
                 _selectedCrop = value;
@@ -155,7 +159,7 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
             items: _states
                 .map((state) => DropdownMenuItem<String>(value: state, child: Text(state)))
                 .toList(),
-            decoration: const InputDecoration(labelText: 'State'),
+            decoration: InputDecoration(labelText: l10n.text('state')),
             onChanged: (value) {
               if (value == null) {
                 return;
@@ -181,7 +185,7 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
             child: ElevatedButton.icon(
               onPressed: _isLoading ? null : _fetchInsight,
               icon: const Icon(Icons.auto_graph),
-              label: const Text('Fetch recommendation'),
+              label: Text(l10n.text('fetch_recommendation')),
             ),
           ),
         ],
@@ -190,6 +194,7 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
   }
 
   Widget _buildInsightResult(PriceInsight insight, NumberFormat currency) {
+    final l10n = AppStrings.of(context);
     final sortedMarkets = insight.nearbyPrices.entries.toList()
       ..sort((left, right) => right.value.compareTo(left.value));
 
@@ -205,8 +210,8 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
               color: AppTheme.warningOrange.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Text(
-              'Showing offline fallback data because the mobile app could not reach the API.',
+            child: Text(
+              l10n.text('offline_fallback'),
               style: TextStyle(color: AppTheme.darkText),
             ),
           ),
@@ -222,7 +227,7 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${insight.crop} Recommendation',
+                l10n.text('recommendation_suffix', params: {'crop': insight.crop}),
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
@@ -230,7 +235,7 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
                 children: [
                   Expanded(
                     child: _MetricTile(
-                      label: 'Recommended price',
+                      label: l10n.text('recommended_price'),
                       value: '${currency.format(insight.recommendedPrice)}/kg',
                       color: AppTheme.primaryGreen,
                     ),
@@ -238,7 +243,7 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _MetricTile(
-                      label: 'Market trend',
+                      label: l10n.text('market_trend'),
                       value: insight.marketTrend,
                       color: AppTheme.primaryBlue,
                     ),
@@ -247,7 +252,7 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Best selling time: ${insight.bestSellingTime}',
+                l10n.text('best_selling_time', params: {'value': insight.bestSellingTime}),
                 style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
@@ -256,8 +261,8 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
                 style: const TextStyle(fontSize: 13, color: AppTheme.lightText, height: 1.4),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Nearby markets',
+              Text(
+                l10n.text('nearby_markets'),
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),

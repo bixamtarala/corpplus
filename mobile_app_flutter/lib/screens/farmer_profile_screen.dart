@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../localization/app_strings.dart';
 import '../models/farmer_profile.dart';
 import '../providers/farmer_profile_provider.dart';
 import '../theme/app_theme.dart';
@@ -46,6 +47,7 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppStrings.of(context);
     final profileState = ref.watch(farmerProfileControllerProvider);
     final profile = profileState.profile;
 
@@ -54,7 +56,7 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Farmer Profile')),
+      appBar: AppBar(title: Text(l10n.text('farmer_profile_title'))),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -91,14 +93,14 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
                     onPressed: profileState.isLoading
                         ? null
                         : () => ref.read(farmerProfileControllerProvider.notifier).loadProfile(),
-                    child: const Text('Sync Profile'),
+                    child: Text(l10n.text('sync_profile')),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: profileState.isSaving ? null : _saveProfile,
-                    child: Text(profileState.isSaving ? 'Saving...' : 'Save Profile'),
+                    child: Text(profileState.isSaving ? l10n.text('saving') : l10n.text('save_profile')),
                   ),
                 ),
               ],
@@ -126,6 +128,7 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
   }
 
   void _saveProfile() {
+    final l10n = AppStrings.of(context);
     final landSize = double.tryParse(_landSizeController.text.trim());
     final latitude = double.tryParse(_latitudeController.text.trim());
     final longitude = double.tryParse(_longitudeController.text.trim());
@@ -139,7 +142,7 @@ class _FarmerProfileScreenState extends ConsumerState<FarmerProfileScreen> {
         latitude == null ||
         longitude == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Fill every required field with valid values.')),
+        SnackBar(content: Text(l10n.text('fill_required_fields'))),
       );
       return;
     }
@@ -169,6 +172,7 @@ class _ProfileSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppStrings.of(context);
     final createdAt = DateFormat('dd MMM yyyy').format(profile.createdAt);
 
     return Container(
@@ -182,14 +186,14 @@ class _ProfileSummary extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Backend Profile Snapshot', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(l10n.text('backend_profile_snapshot'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
-          Text('Name: ${profile.name}'),
-          Text('Phone: ${profile.phone}'),
-          Text('KYC: ${profile.kycStatus}'),
-          Text('Land Size: ${profile.landSizeAcres} acres'),
-          Text('Village: ${profile.village}, ${profile.district}, ${profile.state}'),
-          Text('Created: $createdAt'),
+          Text('${l10n.text('name')}: ${profile.name}'),
+          Text('${l10n.text('phone')}: ${profile.phone}'),
+          Text('${l10n.text('kyc')}: ${profile.kycStatus}'),
+          Text(l10n.text('land_size', params: {'value': profile.landSizeAcres.toString()})),
+          Text('${l10n.text('village')}: ${profile.village}, ${profile.district}, ${profile.state}'),
+          Text(l10n.text('created', params: {'value': createdAt})),
         ],
       ),
     );
@@ -221,6 +225,7 @@ class _ProfileForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppStrings.of(context);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -231,39 +236,39 @@ class _ProfileForm extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Farmer Profile Form', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(l10n.text('farmer_profile_form'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
-          TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Name')),
+          TextField(controller: nameController, decoration: InputDecoration(labelText: l10n.text('name'))),
           const SizedBox(height: 12),
-          TextField(controller: stateController, decoration: const InputDecoration(labelText: 'State')),
+          TextField(controller: stateController, decoration: InputDecoration(labelText: l10n.text('state'))),
           const SizedBox(height: 12),
-          TextField(controller: districtController, decoration: const InputDecoration(labelText: 'District')),
+          TextField(controller: districtController, decoration: InputDecoration(labelText: l10n.text('district'))),
           const SizedBox(height: 12),
-          TextField(controller: villageController, decoration: const InputDecoration(labelText: 'Village')),
+          TextField(controller: villageController, decoration: InputDecoration(labelText: l10n.text('village'))),
           const SizedBox(height: 12),
           TextField(
             controller: landSizeController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(labelText: 'Land Size (acres)'),
+            decoration: InputDecoration(labelText: l10n.text('land_size_acres')),
           ),
           const SizedBox(height: 12),
-          TextField(controller: soilTypeController, decoration: const InputDecoration(labelText: 'Soil Type')),
+          TextField(controller: soilTypeController, decoration: InputDecoration(labelText: l10n.text('soil_type'))),
           const SizedBox(height: 12),
           TextField(
             controller: latitudeController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(labelText: 'Latitude'),
+            decoration: InputDecoration(labelText: l10n.text('latitude')),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: longitudeController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(labelText: 'Longitude'),
+            decoration: InputDecoration(labelText: l10n.text('longitude')),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: bankAccountController,
-            decoration: const InputDecoration(labelText: 'Bank Account (optional)'),
+            decoration: InputDecoration(labelText: l10n.text('bank_account_optional')),
           ),
         ],
       ),

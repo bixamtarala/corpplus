@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../localization/app_strings.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 
@@ -24,6 +25,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppStrings.of(context);
     final authState = ref.watch(authControllerProvider);
 
     return Scaffold(
@@ -51,18 +53,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Sign in to CropPulse', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                      Text(l10n.text('sign_in_title'), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Use your mobile number to request an OTP from the Phase 2 backend. The current backend accepts the mock code 123456.',
+                      Text(
+                        l10n.text('sign_in_desc'),
                         style: TextStyle(color: AppTheme.lightText, height: 1.5),
                       ),
                       const SizedBox(height: 24),
                       TextField(
                         controller: _phoneController,
                         keyboardType: TextInputType.phone,
-                        decoration: const InputDecoration(
-                          labelText: 'Phone number',
+                        decoration: InputDecoration(
+                          labelText: l10n.text('phone_number'),
                           hintText: '9876543210',
                           prefixText: '+91 ',
                         ),
@@ -72,8 +74,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         TextField(
                           controller: _otpController,
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'OTP',
+                          decoration: InputDecoration(
+                            labelText: l10n.text('otp'),
                             hintText: '123456',
                           ),
                         ),
@@ -101,7 +103,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               : authState.isOtpRequested
                                   ? _onVerifyOtp
                                   : _onRequestOtp,
-                          child: Text(authState.isOtpRequested ? 'Verify OTP' : 'Request OTP'),
+                          child: Text(authState.isOtpRequested ? l10n.text('verify_otp') : l10n.text('request_otp')),
                         ),
                       ),
                       if (authState.isOtpRequested) ...[
@@ -110,7 +112,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           width: double.infinity,
                           child: OutlinedButton(
                             onPressed: authState.isLoading ? null : _onRequestOtp,
-                            child: const Text('Resend OTP'),
+                            child: Text(l10n.text('resend_otp')),
                           ),
                         ),
                       ],

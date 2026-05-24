@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../localization/app_strings.dart';
 import '../models/marketplace.dart';
 import '../providers/marketplace_provider.dart';
 import '../theme/app_theme.dart';
@@ -31,16 +32,17 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppStrings.of(context);
     final marketplaceState = ref.watch(marketplaceControllerProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('🛒 Marketplace'),
+        title: Text('🛒 ${l10n.text('marketplace_title')}'),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'Buy Orders'),
-            Tab(text: 'Sell Orders'),
+          tabs: [
+            Tab(text: l10n.text('buy_orders')),
+            Tab(text: l10n.text('sell_orders')),
           ],
         ),
       ),
@@ -60,16 +62,32 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   }
 
   Widget _buildBuyOrdersTab(MarketplaceState marketplaceState) {
+    final l10n = AppStrings.of(context);
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryGreen.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              l10n.text('customer_buy_banner'),
+              style: const TextStyle(height: 1.35, color: AppTheme.darkText),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
           child: Row(
             children: [
               Expanded(
                 child: CommoditySelectorField(
                   value: _selectedCrop,
-                  labelText: 'Crop',
+                  labelText: l10n.text('crop'),
                   onChanged: (value) {
                     setState(() {
                       _selectedCrop = value;
@@ -81,7 +99,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
               Expanded(
                 child: TextField(
                   controller: _stateFilterController,
-                  decoration: const InputDecoration(labelText: 'State filter'),
+                  decoration: InputDecoration(labelText: l10n.text('state_filter')),
                 ),
               ),
             ],
@@ -101,7 +119,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
                           );
                     },
               icon: const Icon(Icons.sync),
-              label: const Text('Sync Listings'),
+              label: Text(l10n.text('sync_listings')),
             ),
           ),
         ),
@@ -127,6 +145,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   }
 
   Widget _buildSellOrdersTab(MarketplaceState marketplaceState) {
+    final l10n = AppStrings.of(context);
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -138,8 +157,8 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppTheme.lightGray),
             ),
-            child: const Text(
-              'No live sell listings yet. Use the add button to publish one to the marketplace backend.',
+            child: Text(
+              l10n.text('no_live_sell_listings'),
               style: TextStyle(height: 1.4),
             ),
           ),
@@ -149,6 +168,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   }
 
   Future<void> _showCreateListingSheet(BuildContext context) async {
+    final l10n = AppStrings.of(context);
     final cropController = TextEditingController(text: 'rice_crop_1');
     final quantityController = TextEditingController(text: '1000');
     final qualityController = TextEditingController(text: 'A');
@@ -167,19 +187,19 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Create Listing', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(l10n.text('create_listing'), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
-                TextField(controller: cropController, decoration: const InputDecoration(labelText: 'Crop ID')),
+                TextField(controller: cropController, decoration: InputDecoration(labelText: l10n.text('crop_id'))),
                 const SizedBox(height: 12),
-                TextField(controller: quantityController, decoration: const InputDecoration(labelText: 'Quantity (kg)'), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+                TextField(controller: quantityController, decoration: InputDecoration(labelText: l10n.text('quantity_kg')), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
                 const SizedBox(height: 12),
-                TextField(controller: qualityController, decoration: const InputDecoration(labelText: 'Quality Grade')),
+                TextField(controller: qualityController, decoration: InputDecoration(labelText: l10n.text('quality_grade'))),
                 const SizedBox(height: 12),
-                TextField(controller: priceController, decoration: const InputDecoration(labelText: 'Price per kg'), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+                TextField(controller: priceController, decoration: InputDecoration(labelText: l10n.text('price_per_kg')), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
                 const SizedBox(height: 12),
-                TextField(controller: dateController, decoration: const InputDecoration(labelText: 'Available Date (YYYY-MM-DD)')),
+                TextField(controller: dateController, decoration: InputDecoration(labelText: l10n.text('available_date'))),
                 const SizedBox(height: 12),
-                TextField(controller: descriptionController, decoration: const InputDecoration(labelText: 'Description')),
+                TextField(controller: descriptionController, decoration: InputDecoration(labelText: l10n.text('description'))),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -189,7 +209,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
                       final price = double.tryParse(priceController.text.trim());
                       if (quantity == null || price == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Enter valid numeric values for quantity and price.')),
+                          SnackBar(content: Text(l10n.text('enter_valid_quantity_price'))),
                         );
                         return;
                       }
@@ -206,7 +226,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
                           );
                       Navigator.of(context).pop();
                     },
-                    child: const Text('Publish Listing'),
+                    child: Text(l10n.text('publish_listing')),
                   ),
                 ),
               ],
@@ -218,10 +238,11 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
   }
 
   Future<void> _showMakeOfferSheet(BuildContext context, MarketplaceSearchResult order) async {
+    final l10n = AppStrings.of(context);
     final priceController = TextEditingController(text: order.pricePerKg.toStringAsFixed(0));
     final quantityController = TextEditingController(text: order.quantityKg.toStringAsFixed(0));
     final pickupController = TextEditingController(text: '${order.district}, ${order.state}');
-    final messageController = TextEditingController(text: 'Ready to purchase quickly.');
+    final messageController = TextEditingController(text: l10n.text('ready_to_purchase'));
 
     await showModalBottomSheet<void>(
       context: context,
@@ -234,15 +255,15 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Make Offer for ${order.crop}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(l10n.text('make_offer_for', params: {'crop': order.crop}), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
-                TextField(controller: priceController, decoration: const InputDecoration(labelText: 'Offer price per kg'), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+                TextField(controller: priceController, decoration: InputDecoration(labelText: l10n.text('offer_price_per_kg')), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
                 const SizedBox(height: 12),
-                TextField(controller: quantityController, decoration: const InputDecoration(labelText: 'Quantity (kg)'), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+                TextField(controller: quantityController, decoration: InputDecoration(labelText: l10n.text('quantity_kg')), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
                 const SizedBox(height: 12),
-                TextField(controller: pickupController, decoration: const InputDecoration(labelText: 'Pickup location')),
+                TextField(controller: pickupController, decoration: InputDecoration(labelText: l10n.text('pickup_location'))),
                 const SizedBox(height: 12),
-                TextField(controller: messageController, decoration: const InputDecoration(labelText: 'Message')),
+                TextField(controller: messageController, decoration: InputDecoration(labelText: l10n.text('message'))),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -252,7 +273,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
                       final quantity = double.tryParse(quantityController.text.trim());
                       if (price == null || quantity == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Enter valid numeric values for offer and quantity.')),
+                          SnackBar(content: Text(l10n.text('enter_valid_offer_quantity'))),
                         );
                         return;
                       }
@@ -268,7 +289,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen>
                           );
                       Navigator.of(context).pop();
                     },
-                    child: const Text('Submit Offer'),
+                    child: Text(l10n.text('submit_offer')),
                   ),
                 ),
               ],
@@ -295,6 +316,7 @@ class _BuyOrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppStrings.of(context);
     final currency = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -330,7 +352,7 @@ class _BuyOrderCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Text(order.farmerName, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(l10n.text('seller', params: {'name': order.farmerName}), style: const TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -340,12 +362,12 @@ class _BuyOrderCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 4),
-          Text('Available: ${order.availableDate}', style: const TextStyle(fontSize: 12, color: AppTheme.lightText)),
+          Text(l10n.text('available', params: {'value': order.availableDate}), style: const TextStyle(fontSize: 12, color: AppTheme.lightText)),
           const SizedBox(height: 12),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen, minimumSize: const Size(double.infinity, 36)),
             onPressed: onMakeOffer,
-            child: const Text('Make Offer', style: TextStyle(color: Colors.white)),
+            child: Text(l10n.text('make_offer'), style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -360,6 +382,7 @@ class _SellOrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppStrings.of(context);
     final currency = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -384,7 +407,7 @@ class _SellOrderCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text('${currency.format(listing.pricePerKg)}/kg'),
           const SizedBox(height: 4),
-          Text('Available on ${listing.availableDate} · ${listing.views} views', style: const TextStyle(fontSize: 12, color: AppTheme.lightText)),
+          Text(l10n.text('available_on_views', params: {'date': listing.availableDate, 'views': listing.views.toString()}), style: const TextStyle(fontSize: 12, color: AppTheme.lightText)),
           if (listing.description != null && listing.description!.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(listing.description!, style: const TextStyle(fontSize: 12, color: AppTheme.lightText)),

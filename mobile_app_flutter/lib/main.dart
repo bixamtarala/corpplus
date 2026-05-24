@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'localization/app_strings.dart';
 import 'models/app_update_info.dart';
+import 'screens/customer_hub_screen.dart';
 import 'screens/farmer_hub_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/intelligence_screen.dart';
@@ -21,10 +23,15 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(appLocaleProvider);
+
     return MaterialApp(
-      title: 'CropPulse',
+      onGenerateTitle: (context) => AppStrings.of(context).text('app_title'),
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      locale: locale,
+      supportedLocales: AppStrings.supportedLocales,
+      localizationsDelegates: const [AppStrings.delegate],
       home: const NativeAppGate(),
     );
   }
@@ -87,6 +94,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     IntelligenceScreen(),
     FarmerHubScreen(),
     TraderHubScreen(),
+    CustomerHubScreen(),
     MarketplaceScreen(),
     ProfileScreen(),
   ];
@@ -196,6 +204,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppStrings.of(context);
+
     return Scaffold(
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -206,36 +216,41 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           });
         },
         type: BottomNavigationBarType.fixed,
-        items: const [
+        items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
-            label: 'Home',
+            label: l10n.text('nav_home'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.trending_up_outlined),
             activeIcon: Icon(Icons.trending_up),
-            label: 'Intelligence',
+            label: l10n.text('nav_intelligence'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.grass_outlined),
             activeIcon: Icon(Icons.grass),
-            label: 'Farmer',
+            label: l10n.text('nav_farmer'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.storefront_outlined),
             activeIcon: Icon(Icons.storefront),
-            label: 'Trader',
+            label: l10n.text('nav_trader'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_bag_outlined),
+            activeIcon: Icon(Icons.shopping_bag),
+            label: l10n.text('nav_customer'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart_outlined),
             activeIcon: Icon(Icons.shopping_cart),
-            label: 'Market',
+            label: l10n.text('nav_market'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
             activeIcon: Icon(Icons.person),
-            label: 'Profile',
+            label: l10n.text('nav_profile'),
           ),
         ],
       ),

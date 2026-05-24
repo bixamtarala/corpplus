@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../localization/app_strings.dart';
 import '../theme/app_theme.dart';
 import 'farmer_profile_screen.dart';
 import 'price_insight_screen.dart';
@@ -8,40 +9,41 @@ class FarmerHubScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppStrings.of(context);
     final modules = [
       {
         'icon': Icons.grass,
-        'title': 'Crop Planning',
-        'desc': 'Plan crops with profitability analysis',
+        'title': l10n.text('crop_planning'),
+        'desc': l10n.text('crop_planning_desc'),
       },
       {
         'icon': Icons.schedule,
-        'title': 'Best Time to Sell',
-        'desc': 'AI predicts optimal harvest date',
+        'title': l10n.text('best_time_sell'),
+        'desc': l10n.text('best_time_sell_desc'),
       },
       {
         'icon': Icons.cloud,
-        'title': 'Weather Alerts',
-        'desc': 'Real-time weather & disease alerts',
+        'title': l10n.text('weather_alerts'),
+        'desc': l10n.text('weather_alerts_desc'),
       },
       {
         'icon': Icons.people,
-        'title': 'Buyer Discovery',
-        'desc': 'Connect with verified buyers',
+        'title': l10n.text('buyer_discovery'),
+        'desc': l10n.text('buyer_discovery_desc'),
       },
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('👨‍🌾 Farmer Hub'),
+        title: Text('👨‍🌾 ${l10n.text('farmer_hub_title')}'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Farmer Operating System',
+            Text(
+              l10n.text('farmer_operating_system'),
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -81,7 +83,7 @@ class FarmerHubScreen extends StatelessWidget {
                         minimumSize: const Size(double.infinity, 40),
                       ),
                       onPressed: () {
-                        if (module['title'] == 'Crop Planning') {
+                        if (module['title'] == l10n.text('crop_planning')) {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => const FarmerProfileScreen(),
@@ -90,7 +92,7 @@ class FarmerHubScreen extends StatelessWidget {
                           return;
                         }
 
-                        if (module['title'] == 'Best Time to Sell') {
+                        if (module['title'] == l10n.text('best_time_sell')) {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => const PriceInsightScreen(),
@@ -99,7 +101,7 @@ class FarmerHubScreen extends StatelessWidget {
                           return;
                         }
                       },
-                      child: const Text('Open', style: TextStyle(color: Colors.white)),
+                      child: Text(l10n.text('open'), style: const TextStyle(color: Colors.white)),
                     ),
                   ],
                 ),

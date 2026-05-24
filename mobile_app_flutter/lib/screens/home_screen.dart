@@ -1,33 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../localization/app_strings.dart';
 import '../theme/app_theme.dart';
 import '../widgets/intelligence_card.dart';
 import '../widgets/quick_stats.dart';
 import 'price_insight_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  static const List<String> _roles = ['Farmer', 'Trader', 'Exporter'];
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  static const List<String> _roles = ['Farmer', 'Trader', 'Customer', 'Exporter'];
   String _selectedRole = 'Farmer';
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppStrings.of(context);
+    final locale = ref.watch(appLocaleProvider);
+
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 12,
-        title: const Row(
+        title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('🌾', style: TextStyle(fontSize: 28)),
-            SizedBox(width: 10),
+            const Text('🌾', style: TextStyle(fontSize: 28)),
+            const SizedBox(width: 10),
             Flexible(
               child: Text(
-                'CropPulse',
+                l10n.text('app_title'),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -35,10 +41,55 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: PopupMenuButton<Locale>(
+              tooltip: l10n.text('select_language'),
+              onSelected: (value) {
+                ref.read(appLocaleProvider.notifier).state = value;
+              },
+              itemBuilder: (context) => [
+                for (final item in AppStrings.supportedLocales)
+                  PopupMenuItem<Locale>(
+                    value: item,
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(l10n.languageLabel(item))),
+                        if (item.languageCode == locale.languageCode)
+                          const Icon(Icons.check, size: 18, color: AppTheme.primaryGreen),
+                      ],
+                    ),
+                  ),
+              ],
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppTheme.primaryBlue),
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.language, size: 16, color: AppTheme.primaryBlue),
+                    const SizedBox(width: 6),
+                    Text(
+                      l10n.languageLabel(locale),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.primaryBlue,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Padding(
             padding: const EdgeInsets.only(right: 12),
             child: PopupMenuButton<String>(
               padding: EdgeInsets.zero,
-              tooltip: 'Select role',
+              tooltip: l10n.text('select_role'),
               initialValue: _selectedRole,
               itemBuilder: (context) => [
                 for (final role in _roles)
@@ -46,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     value: role,
                     child: Row(
                       children: [
-                        Expanded(child: Text(role)),
+                        Expanded(child: Text(l10n.roleLabel(role))),
                         if (role == _selectedRole)
                           const Icon(
                             Icons.check,
@@ -75,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const Icon(Icons.person, size: 16, color: AppTheme.primaryGreen),
                     const SizedBox(width: 6),
                     Text(
-                      _selectedRole,
+                      l10n.roleLabel(_selectedRole),
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -100,11 +151,11 @@ class _HomeScreenState extends State<HomeScreen> {
             Center(
               child: Column(
                 children: [
-                  const Text('📈 Daily Intelligence Feed',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  Text(l10n.text('daily_feed_title'),
+                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
-                  Text('Real-time market alerts & AI recommendations',
-                      style: TextStyle(fontSize: 14, color: AppTheme.lightText)),
+                  Text(l10n.text('daily_feed_subtitle'),
+                      style: const TextStyle(fontSize: 14, color: AppTheme.lightText)),
                 ],
               ),
             ),
@@ -127,8 +178,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Need a selling recommendation?',
+                  Text(
+                    l10n.text('need_recommendation'),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -136,8 +187,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Open the price advisor to fetch live market guidance from the Phase 2 API or use offline fallback data.',
+                  Text(
+                    l10n.text('need_recommendation_desc'),
                     style: TextStyle(color: Colors.white, height: 1.4),
                   ),
                   const SizedBox(height: 16),
@@ -153,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       );
                     },
-                    child: const Text('Open Price Advisor'),
+                    child: Text(l10n.text('open_price_advisor')),
                   ),
                 ],
               ),
@@ -170,33 +221,34 @@ class IntelligenceAlerts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppStrings.of(context);
     final alerts = [
       {
         'emoji': '📈',
-        'title': 'Rice prices rising (8.5%)',
-        'subtitle': 'Peak demand expected in next 48 hours',
-        'action': '🎯 Best selling window opening',
+        'title': l10n.text('alert_rice_title'),
+        'subtitle': l10n.text('alert_rice_subtitle'),
+        'action': l10n.text('alert_rice_action'),
         'severity': 'high',
       },
       {
         'emoji': '🔥',
-        'title': 'Peak demand conditions',
-        'subtitle': 'Demand at 92% - Maximum buyer interest',
-        'action': '💰 Optimal selling window',
+        'title': l10n.text('alert_peak_title'),
+        'subtitle': l10n.text('alert_peak_subtitle'),
+        'action': l10n.text('alert_peak_action'),
         'severity': 'high',
       },
       {
         'emoji': '⛈️',
-        'title': 'Heavy rainfall expected',
-        'subtitle': 'May reduce supply in next 2-3 weeks',
-        'action': '📊 Monitor supply closely',
+        'title': l10n.text('alert_rain_title'),
+        'subtitle': l10n.text('alert_rain_subtitle'),
+        'action': l10n.text('alert_rain_action'),
         'severity': 'medium',
       },
       {
         'emoji': '⏰',
-        'title': 'Best time to sell: Next 48 hours',
-        'subtitle': 'Price forecast: ₹2,650/kg (peak demand)',
-        'action': '🎯 Recommend selling now',
+        'title': l10n.text('alert_sell_title'),
+        'subtitle': l10n.text('alert_sell_subtitle'),
+        'action': l10n.text('alert_sell_action'),
         'severity': 'high',
       },
     ];

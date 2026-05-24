@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../localization/app_strings.dart';
 import '../models/farmer_profile.dart';
 import 'api_providers.dart';
 import 'auth_provider.dart';
@@ -52,11 +53,12 @@ class FarmerProfileController extends StateNotifier<FarmerProfileState> {
   final Ref _ref;
 
   Future<void> loadProfile() async {
+    final l10n = AppStrings(_ref.read(appLocaleProvider));
     final session = _ref.read(authControllerProvider).session;
     if (session == null || session.accessToken.isEmpty) {
       state = state.copyWith(
         profile: state.profile ?? _guestProfile(),
-        statusMessage: 'Preview mode: using a local farmer profile draft on this device.',
+        statusMessage: l10n.text('preview_local_draft'),
         clearError: true,
       );
       return;
@@ -71,13 +73,13 @@ class FarmerProfileController extends StateNotifier<FarmerProfileState> {
       state = state.copyWith(
         isLoading: false,
         profile: profile,
-        statusMessage: 'Farmer profile synced successfully.',
+        statusMessage: l10n.text('farmer_profile_synced_success'),
         clearError: true,
       );
     } on DioException catch (error) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: error.response?.data['detail']?.toString() ?? 'Could not load farmer profile.',
+        errorMessage: error.response?.data['detail']?.toString() ?? l10n.text('could_not_load_farmer_profile'),
         clearStatus: true,
       );
     } on FormatException catch (error) {
@@ -90,11 +92,12 @@ class FarmerProfileController extends StateNotifier<FarmerProfileState> {
   }
 
   Future<void> saveProfile(FarmerProfileRequest request) async {
+    final l10n = AppStrings(_ref.read(appLocaleProvider));
     final session = _ref.read(authControllerProvider).session;
     if (session == null || session.accessToken.isEmpty) {
       state = state.copyWith(
         profile: _guestProfile(request: request),
-        statusMessage: 'Preview mode: profile saved locally on this device.',
+        statusMessage: l10n.text('preview_saved_locally'),
         clearError: true,
       );
       return;
@@ -110,13 +113,13 @@ class FarmerProfileController extends StateNotifier<FarmerProfileState> {
       state = state.copyWith(
         isSaving: false,
         profile: profile,
-        statusMessage: 'Farmer profile saved successfully.',
+        statusMessage: l10n.text('farmer_profile_saved_success'),
         clearError: true,
       );
     } on DioException catch (error) {
       state = state.copyWith(
         isSaving: false,
-        errorMessage: error.response?.data['detail']?.toString() ?? 'Could not save farmer profile.',
+        errorMessage: error.response?.data['detail']?.toString() ?? l10n.text('could_not_save_farmer_profile'),
         clearStatus: true,
       );
     } on FormatException catch (error) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../localization/app_strings.dart';
 import '../theme/app_theme.dart';
 
 class TraderHubScreen extends StatelessWidget {
@@ -6,31 +7,32 @@ class TraderHubScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppStrings.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('🧑‍💼 Trader Hub'),
+        title: Text('🧑‍💼 ${l10n.text('trader_hub_title')}'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Procurement Intelligence',
+            Text(
+              l10n.text('procurement_intelligence'),
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            _buildModuleCard('📦', 'Supply Visibility', 'Real-time inventory across mandis'),
-            _buildModuleCard('🔍', 'Demand Forecasting', 'Predict buyer demand by region'),
-            _buildModuleCard('💰', 'Regional Arbitrage', 'Identify price gaps for profit'),
-            _buildModuleCard('📊', 'Inventory Tracking', 'Track purchased inventory'),
+            _buildModuleCard(l10n, '📦', l10n.text('supply_visibility'), l10n.text('supply_visibility_desc')),
+            _buildModuleCard(l10n, '🔍', l10n.text('demand_forecasting'), l10n.text('demand_forecasting_desc')),
+            _buildModuleCard(l10n, '💰', l10n.text('regional_arbitrage'), l10n.text('regional_arbitrage_desc')),
+            _buildModuleCard(l10n, '📊', l10n.text('inventory_tracking'), l10n.text('inventory_tracking_desc')),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildModuleCard(String icon, String title, String desc) {
+  Widget _buildModuleCard(AppStrings l10n, String icon, String title, String desc) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -60,7 +62,7 @@ class TraderHubScreen extends StatelessWidget {
               minimumSize: const Size(double.infinity, 40),
             ),
             onPressed: () {},
-            child: const Text('Open', style: TextStyle(color: Colors.white)),
+            child: Text(l10n.text('open'), style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),

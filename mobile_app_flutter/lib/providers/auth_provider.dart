@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../localization/app_strings.dart';
 import '../models/auth_session.dart';
 import 'api_providers.dart';
 
@@ -106,6 +107,7 @@ class AuthController extends StateNotifier<AuthState> {
   }
 
   Future<void> requestOtp(String phoneNumber) async {
+    final l10n = AppStrings(_ref.read(appLocaleProvider));
     state = state.copyWith(
       isLoading: true,
       phoneNumber: phoneNumber,
@@ -120,14 +122,14 @@ class AuthController extends StateNotifier<AuthState> {
         isLoading: false,
         isOtpRequested: true,
         phoneNumber: result.phone,
-        statusMessage: '${result.message}. Use the mock code 123456 for now.',
+        statusMessage: '${result.message}. ${l10n.text('mock_code_suffix')}',
         clearError: true,
       );
     } on DioException catch (error) {
       state = state.copyWith(
         isInitialized: true,
         isLoading: false,
-        errorMessage: error.response?.data['detail']?.toString() ?? 'Could not request OTP.',
+        errorMessage: error.response?.data['detail']?.toString() ?? l10n.text('could_not_request_otp'),
         clearStatus: true,
       );
     } on FormatException catch (error) {
@@ -141,6 +143,7 @@ class AuthController extends StateNotifier<AuthState> {
   }
 
   Future<void> verifyOtp(String otp) async {
+    final l10n = AppStrings(_ref.read(appLocaleProvider));
     state = state.copyWith(isLoading: true, clearError: true, clearStatus: true);
 
     try {
@@ -162,14 +165,14 @@ class AuthController extends StateNotifier<AuthState> {
         session: session,
         phoneNumber: session.phone,
         displayName: _displayNameFromPhone(session.phone),
-        statusMessage: 'Signed in successfully.',
+        statusMessage: l10n.text('signed_in_successfully'),
         clearError: true,
       );
     } on DioException catch (error) {
       state = state.copyWith(
         isInitialized: true,
         isLoading: false,
-        errorMessage: error.response?.data['detail']?.toString() ?? 'Could not verify OTP.',
+        errorMessage: error.response?.data['detail']?.toString() ?? l10n.text('could_not_verify_otp'),
         clearStatus: true,
       );
     } on FormatException catch (error) {
