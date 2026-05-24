@@ -19,7 +19,7 @@ class PriceInsightScreen extends ConsumerStatefulWidget {
 
 class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
   static final List<String> _crops = CommodityCatalog.all;
-  static const List<String> _states = ['Tamil Nadu', 'Punjab', 'Karnataka'];
+  static final List<String> _states = CommodityCatalog.allStates;
 
   final TextEditingController _quantityController = TextEditingController(text: '500');
   String _selectedCrop = _crops.first;
