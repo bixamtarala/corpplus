@@ -40,105 +40,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: PopupMenuButton<Locale>(
-              tooltip: l10n.text('select_language'),
-              onSelected: (value) {
-                ref.read(appLocaleProvider.notifier).state = value;
-              },
-              itemBuilder: (context) => [
-                for (final item in AppStrings.supportedLocales)
-                  PopupMenuItem<Locale>(
-                    value: item,
-                    child: Row(
-                      children: [
-                        Expanded(child: Text(l10n.languageLabel(item))),
-                        if (item.languageCode == locale.languageCode)
-                          const Icon(Icons.check, size: 18, color: AppTheme.primaryGreen),
-                      ],
-                    ),
+          PopupMenuButton<Locale>(
+            tooltip: l10n.text('select_language'),
+            icon: const Icon(Icons.language, color: AppTheme.primaryBlue),
+            onSelected: (value) {
+              ref.read(appLocaleProvider.notifier).state = value;
+            },
+            itemBuilder: (context) => [
+              for (final item in AppStrings.supportedLocales)
+                PopupMenuItem<Locale>(
+                  value: item,
+                  child: Row(
+                    children: [
+                      Expanded(child: Text(l10n.languageLabel(item))),
+                      if (item.languageCode == locale.languageCode)
+                        const Icon(Icons.check, size: 18, color: AppTheme.primaryGreen),
+                    ],
                   ),
-              ],
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppTheme.primaryBlue),
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.language, size: 16, color: AppTheme.primaryBlue),
-                    const SizedBox(width: 6),
-                    Text(
-                      l10n.languageLabel(locale),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.primaryBlue,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              tooltip: l10n.text('select_role'),
-              initialValue: _selectedRole,
-              itemBuilder: (context) => [
-                for (final role in _roles)
-                  PopupMenuItem<String>(
-                    value: role,
-                    child: Row(
-                      children: [
-                        Expanded(child: Text(l10n.roleLabel(role))),
-                        if (role == _selectedRole)
-                          const Icon(
-                            Icons.check,
-                            size: 18,
-                            color: AppTheme.primaryGreen,
-                          ),
-                      ],
-                    ),
-                  ),
-              ],
-              onSelected: (role) {
-                setState(() {
-                  _selectedRole = role;
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppTheme.primaryGreen),
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.person, size: 16, color: AppTheme.primaryGreen),
-                    const SizedBox(width: 6),
-                    Text(
-                      l10n.roleLabel(_selectedRole),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.primaryGreen,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.keyboard_arrow_down, size: 16, color: AppTheme.primaryGreen),
-                  ],
-                ),
-              ),
-            ),
+            ],
           ),
         ],
       ),
@@ -158,6 +78,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       style: const TextStyle(fontSize: 14, color: AppTheme.lightText)),
                 ],
               ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              l10n.text('select_role'),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final role in _roles)
+                  ChoiceChip(
+                    label: Text(l10n.roleLabel(role)),
+                    selected: role == _selectedRole,
+                    onSelected: (_) {
+                      setState(() {
+                        _selectedRole = role;
+                      });
+                    },
+                    selectedColor: AppTheme.primaryGreen.withValues(alpha: 0.15),
+                    labelStyle: TextStyle(
+                      color: role == _selectedRole ? AppTheme.primaryGreen : AppTheme.darkText,
+                      fontWeight: role == _selectedRole ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                    side: BorderSide(
+                      color: role == _selectedRole ? AppTheme.primaryGreen : AppTheme.lightGray,
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 24),
 

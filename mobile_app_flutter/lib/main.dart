@@ -205,54 +205,162 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppStrings.of(context);
+    final navItems = [
+      _NavItem(
+        icon: Icons.home_outlined,
+        activeIcon: Icons.home,
+        label: l10n.text('nav_home'),
+      ),
+      _NavItem(
+        icon: Icons.trending_up_outlined,
+        activeIcon: Icons.trending_up,
+        label: l10n.text('nav_intelligence'),
+      ),
+      _NavItem(
+        icon: Icons.grass_outlined,
+        activeIcon: Icons.grass,
+        label: l10n.text('nav_farmer'),
+      ),
+      _NavItem(
+        icon: Icons.storefront_outlined,
+        activeIcon: Icons.storefront,
+        label: l10n.text('nav_trader'),
+      ),
+      _NavItem(
+        icon: Icons.shopping_bag_outlined,
+        activeIcon: Icons.shopping_bag,
+        label: l10n.text('nav_customer'),
+      ),
+      _NavItem(
+        icon: Icons.shopping_cart_outlined,
+        activeIcon: Icons.shopping_cart,
+        label: l10n.text('nav_market'),
+      ),
+      _NavItem(
+        icon: Icons.person_outline,
+        activeIcon: Icons.person,
+        label: l10n.text('nav_profile'),
+      ),
+    ];
 
     return Scaffold(
       body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
+      bottomNavigationBar: _ScrollableNavigationBar(
+        items: navItems,
+        selectedIndex: _selectedIndex,
+        onSelected: (index) {
           setState(() {
             _selectedIndex = index;
           });
         },
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: l10n.text('nav_home'),
+      ),
+    );
+  }
+}
+
+class _NavItem {
+  const _NavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+  });
+
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+}
+
+class _ScrollableNavigationBar extends StatelessWidget {
+  const _ScrollableNavigationBar({
+    required this.items,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final List<_NavItem> items;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      elevation: 12,
+      color: Colors.white,
+      child: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: Row(
+            children: [
+              for (var index = 0; index < items.length; index++)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: _NavigationButton(
+                    item: items[index],
+                    selected: index == selectedIndex,
+                    onTap: () => onSelected(index),
+                  ),
+                ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.trending_up_outlined),
-            activeIcon: Icon(Icons.trending_up),
-            label: l10n.text('nav_intelligence'),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavigationButton extends StatelessWidget {
+  const _NavigationButton({
+    required this.item,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final _NavItem item;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          constraints: const BoxConstraints(minWidth: 92),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: selected ? AppTheme.primaryGreen.withValues(alpha: 0.12) : Colors.white,
+            border: Border.all(
+              color: selected ? AppTheme.primaryGreen : AppTheme.lightGray,
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.grass_outlined),
-            activeIcon: Icon(Icons.grass),
-            label: l10n.text('nav_farmer'),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                selected ? item.activeIcon : item.icon,
+                color: selected ? AppTheme.primaryGreen : AppTheme.lightText,
+                size: 22,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                item.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  color: selected ? AppTheme.primaryGreen : AppTheme.lightText,
+                ),
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.storefront_outlined),
-            activeIcon: Icon(Icons.storefront),
-            label: l10n.text('nav_trader'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag_outlined),
-            activeIcon: Icon(Icons.shopping_bag),
-            label: l10n.text('nav_customer'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart_outlined),
-            activeIcon: Icon(Icons.shopping_cart),
-            label: l10n.text('nav_market'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: l10n.text('nav_profile'),
-          ),
-        ],
+        ),
       ),
     );
   }
