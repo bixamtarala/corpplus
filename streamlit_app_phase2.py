@@ -10,6 +10,7 @@ import plotly.graph_objects as go
 import os
 import hashlib
 import secrets
+import re
 from urllib.parse import urlencode
 from passlib.context import CryptContext
 from db_config import (
@@ -1303,6 +1304,15 @@ TRANSLATIONS = {
         "area_selector_desc": "Choose your area once, then open any crop to view direct guidance for that crop.",
         "area_selector_label": "Area",
         "area_selector_placeholder": "Choose your area",
+        "crop_category_label": "Category",
+        "crop_selector_placeholder": "Choose crop",
+        "crop_category_all": "All Categories",
+        "crop_category_cereals": "Cereals & Millets",
+        "crop_category_pulses": "Pulses",
+        "crop_category_oilseeds": "Oilseeds",
+        "crop_category_vegetables": "Vegetables",
+        "crop_category_fruits": "Fruits & Plantation",
+        "crop_category_commercial": "Spices & Commercial Crops",
         "crop_area_notice": "Showing {crop} guidance for {area}.",
         "crop_area_required": "Select your area first to view crop guidance.",
         "crop_guide_title": "Crop guide",
@@ -1633,6 +1643,15 @@ TRANSLATIONS = {
         "area_selector_desc": "ఒకసారి మీ ప్రాంతాన్ని ఎంచుకున్న తర్వాత, ఏ పంటనైనా తెరిచి ఆ పంటకు నేరుగా మార్గదర్శకాన్ని చూడండి.",
         "area_selector_label": "ప్రాంతం",
         "area_selector_placeholder": "మీ ప్రాంతాన్ని ఎంచుకోండి",
+        "crop_category_label": "వర్గం",
+        "crop_selector_placeholder": "పంటను ఎంచుకోండి",
+        "crop_category_all": "అన్ని వర్గాలు",
+        "crop_category_cereals": "ధాన్యాలు & మిల్లెట్స్",
+        "crop_category_pulses": "పప్పుధాన్యాలు",
+        "crop_category_oilseeds": "నూనెగింజలు",
+        "crop_category_vegetables": "కూరగాయలు",
+        "crop_category_fruits": "పండ్లు & తోట పంటలు",
+        "crop_category_commercial": "మసాలా & వాణిజ్య పంటలు",
         "crop_area_notice": "{area} కోసం {crop} మార్గదర్శకం చూపబడుతోంది.",
         "crop_area_required": "పంట మార్గదర్శకాన్ని చూడడానికి ముందుగా మీ ప్రాంతాన్ని ఎంచుకోండి.",
         "crop_guide_title": "పంట మార్గదర్శిని",
@@ -1909,21 +1928,43 @@ def render_mobile_bottom_nav(active_section):
 
 
 STATE_OPTIONS = [
-    "Tamil Nadu",
     "Andhra Pradesh",
+    "Assam",
+    "Bihar",
+    "Chhattisgarh",
+    "Gujarat",
+    "Haryana",
     "Karnataka",
+    "Kerala",
+    "Madhya Pradesh",
     "Maharashtra",
+    "Odisha",
+    "Punjab",
+    "Rajasthan",
+    "Tamil Nadu",
     "Telangana",
     "Uttar Pradesh",
+    "West Bengal",
 ]
 
 STATE_KEYS = {
-    "Tamil Nadu": "state_tn",
     "Andhra Pradesh": "state_ap",
+    "Assam": "Assam",
+    "Bihar": "Bihar",
+    "Chhattisgarh": "Chhattisgarh",
+    "Gujarat": "Gujarat",
+    "Haryana": "Haryana",
     "Karnataka": "state_ka",
+    "Kerala": "Kerala",
+    "Madhya Pradesh": "Madhya Pradesh",
     "Maharashtra": "state_mh",
+    "Odisha": "Odisha",
+    "Punjab": "Punjab",
+    "Rajasthan": "Rajasthan",
+    "Tamil Nadu": "state_tn",
     "Telangana": "state_tg",
     "Uttar Pradesh": "state_up",
+    "West Bengal": "West Bengal",
 }
 
 SOIL_OPTIONS = ["Black Soil", "Red Soil", "Alluvial", "Laterite", "Clay"]
@@ -1936,7 +1977,77 @@ SOIL_KEYS = {
     "Clay": "soil_clay",
 }
 
-CROP_OPTIONS = ["Rice", "Paddy", "Pulses", "Oilseeds", "Wheat", "Corn", "Cotton", "Sugarcane", "Soybean"]
+CROP_CATEGORIES = {
+    "All Categories": [],
+    "Cereals & Millets": [
+        "Rice",
+        "Paddy",
+        "Wheat",
+        "Corn",
+        "Bajra",
+        "Jowar",
+        "Ragi",
+        "Barley",
+    ],
+    "Pulses": [
+        "Pulses",
+        "Tur",
+        "Urad",
+        "Moong",
+        "Chana",
+        "Masoor",
+    ],
+    "Oilseeds": [
+        "Oilseeds",
+        "Soybean",
+        "Groundnut",
+        "Mustard",
+        "Sesame",
+        "Sunflower",
+        "Castor",
+    ],
+    "Vegetables": [
+        "Onion",
+        "Tomato",
+        "Potato",
+        "Chilli",
+        "Brinjal",
+        "Okra",
+        "Cabbage",
+        "Cauliflower",
+    ],
+    "Fruits & Plantation": [
+        "Banana",
+        "Mango",
+        "Coconut",
+        "Arecanut",
+    ],
+    "Spices & Commercial Crops": [
+        "Cotton",
+        "Sugarcane",
+        "Turmeric",
+        "Coriander",
+        "Cumin",
+        "Black Pepper",
+    ],
+}
+
+CATEGORY_LABEL_KEYS = {
+    "All Categories": "crop_category_all",
+    "Cereals & Millets": "crop_category_cereals",
+    "Pulses": "crop_category_pulses",
+    "Oilseeds": "crop_category_oilseeds",
+    "Vegetables": "crop_category_vegetables",
+    "Fruits & Plantation": "crop_category_fruits",
+    "Spices & Commercial Crops": "crop_category_commercial",
+}
+
+CROP_OPTIONS = [
+    crop
+    for category, crops in CROP_CATEGORIES.items()
+    if category != "All Categories"
+    for crop in crops
+]
 
 CROP_KEYS = {
     "Rice": "crop_rice",
@@ -2079,6 +2190,135 @@ CROP_GUIDES = {
     },
 }
 
+DEFAULT_CROP_GUIDE_BY_CATEGORY = {
+    "Cereals & Millets": {
+        "season": "Usually aligned to Kharif or Rabi windows depending on irrigation and the local mandi cycle.",
+        "start_window": "Choose sowing based on monsoon onset, stored soil moisture, and local procurement timing.",
+        "duration": "Duration varies by crop and variety; use local extension guidance before locking the crop calendar.",
+        "seed_details": "Use certified seed or hybrid material matched to maturity duration, grain quality, and local buyer preference.",
+        "fertilizer": "Follow balanced NPK with soil-test-led sulfur and micronutrient correction where needed.",
+        "water": "Protect establishment, flowering, and grain-fill stages from moisture stress.",
+        "field_needs": "Prepare a clean seedbed, maintain weed control, and monitor lodging, pests, and harvest moisture.",
+        "key_actions": [
+            "Align the crop with your rainfall window and irrigation capacity.",
+            "Choose seed based on both yield and market preference.",
+            "Protect flowering and grain formation with timely water and nutrient support.",
+        ],
+    },
+    "Pulses": {
+        "season": "Pulses can fit Kharif, Rabi, or summer slots depending on the crop and local climate.",
+        "start_window": "Sow into good moisture and avoid delayed planting that compresses flowering and pod fill.",
+        "duration": "Pulse duration varies widely by crop type and local variety.",
+        "seed_details": "Prefer treated certified seed and the recommended Rhizobium or crop-specific inoculant.",
+        "fertilizer": "Keep nitrogen moderate and focus more on phosphorus, sulfur, and organic matter.",
+        "water": "Avoid waterlogging and protect flowering and pod-setting from long dry gaps.",
+        "field_needs": "Use a well-drained field with early weed control and pod-stage pest monitoring.",
+        "key_actions": [
+            "Pick the pulse crop that matches your season length.",
+            "Treat seed before sowing.",
+            "Avoid excess nitrogen and protect pod formation.",
+        ],
+    },
+    "Oilseeds": {
+        "season": "Oilseeds fit both Kharif and Rabi systems depending on the crop and regional rainfall.",
+        "start_window": "Start when the field has adequate moisture and a clean seedbed.",
+        "duration": "Most oilseeds fall within short to medium crop-duration windows.",
+        "seed_details": "Choose seed for oil recovery, disease tolerance, and buyer demand.",
+        "fertilizer": "Balanced nutrition with sulfur matters; check boron and zinc where local soils are deficient.",
+        "water": "Avoid stress at flowering and seed development.",
+        "field_needs": "Use a weed-free start, good drainage, and timely harvest to preserve quality.",
+        "key_actions": [
+            "Match the oilseed crop to rainfall and market channel.",
+            "Review sulfur and micronutrient needs early.",
+            "Protect flowering and seed formation from stress.",
+        ],
+    },
+    "Vegetables": {
+        "season": "Vegetables can be staggered across the year, but planting should still match temperature and water availability.",
+        "start_window": "Plan nursery or direct sowing around your local market window and expected field temperature.",
+        "duration": "Duration changes by crop, variety, and whether the target is fresh or bulk market supply.",
+        "seed_details": "Use high-quality seed suited to shelf life, disease pressure, and buyer preference.",
+        "fertilizer": "Vegetables respond strongly to balanced nutrition, organic matter, and frequent field observation.",
+        "water": "Maintain even moisture and avoid long stress gaps that reduce quality.",
+        "field_needs": "Disease monitoring, harvest timing, grading, and market transport planning are critical.",
+        "key_actions": [
+            "Choose the crop around nearby mandi or buyer demand.",
+            "Plan harvest and transport before peak picking begins.",
+            "Monitor quality closely because price drops fast when produce slips.",
+        ],
+    },
+    "Fruits & Plantation": {
+        "season": "Plantation and perennial crops require longer-cycle planning tied to climate and long-term field conditions.",
+        "start_window": "Use the local establishment window for planting material and monsoon support.",
+        "duration": "These crops are medium to long duration and require continuity in care and marketing.",
+        "seed_details": "Source healthy planting material from trusted nurseries or certified sources.",
+        "fertilizer": "Nutrition should follow crop age, soil condition, and expected yield load.",
+        "water": "Keep irrigation consistent during establishment and fruiting or nut-setting periods.",
+        "field_needs": "Spacing, pruning, disease management, and buyer planning matter more than a single-season schedule.",
+        "key_actions": [
+            "Use clean planting material from a reliable source.",
+            "Plan for the longer crop cycle before expanding area.",
+            "Align harvest quality with the buyer or processor channel.",
+        ],
+    },
+    "Spices & Commercial Crops": {
+        "season": "Commercial crops depend heavily on regional climate, buyer channel, and crop-cycle length.",
+        "start_window": "Set planting around the local agronomy window and downstream buyer demand.",
+        "duration": "Duration can range from short-season spices to long commercial crops.",
+        "seed_details": "Choose planting material or seed based on disease tolerance, quality traits, and market acceptance.",
+        "fertilizer": "Follow crop-specific nutrient planning and avoid late imbalance that hurts quality.",
+        "water": "Protect quality-sensitive stages from both water stress and waterlogging.",
+        "field_needs": "Quality, grading, and timing of harvest usually drive price as much as yield.",
+        "key_actions": [
+            "Match the crop to a clear buyer or processor channel.",
+            "Watch quality traits, not just yield.",
+            "Plan harvest timing around price and procurement movement.",
+        ],
+    },
+}
+
+
+def get_crop_category(crop_name):
+    for category, crops in CROP_CATEGORIES.items():
+        if crop_name in crops:
+            return category
+    return "All Categories"
+
+
+def get_selected_crop_category():
+    category_name = st.query_params.get("category")
+    if category_name in CROP_CATEGORIES:
+        return category_name
+
+    crop_name = st.query_params.get("crop")
+    if crop_name in CROP_OPTIONS:
+        return get_crop_category(crop_name)
+
+    session_category = st.session_state.get("selected_crop_category")
+    if session_category in CROP_CATEGORIES:
+        return session_category
+
+    return "All Categories"
+
+
+def build_default_crop_guide(crop_name):
+    category = get_crop_category(crop_name)
+    template = DEFAULT_CROP_GUIDE_BY_CATEGORY.get(category)
+    if not template:
+        return None
+
+    crop_label = translate_crop_value(crop_name)
+    return {
+        "season": template["season"],
+        "start_window": template["start_window"],
+        "duration": template["duration"],
+        "seed_details": template["seed_details"].replace("the crop", crop_label),
+        "fertilizer": template["fertilizer"],
+        "water": template["water"],
+        "field_needs": template["field_needs"],
+        "key_actions": template["key_actions"],
+    }
+
 
 def get_selected_crop():
     crop_name = st.query_params.get("crop")
@@ -2098,7 +2338,7 @@ def render_crop_guide_section(selected_crop, selected_area):
         st.info(tr("crop_area_required"))
         return
 
-    crop_guide = CROP_GUIDES.get(selected_crop)
+    crop_guide = CROP_GUIDES.get(selected_crop) or build_default_crop_guide(selected_crop)
     if not crop_guide:
         return
 
@@ -2507,6 +2747,10 @@ def page_landing():
 
     st.markdown('<div id="farmer-tools"></div>', unsafe_allow_html=True)
 
+    selected_category = get_selected_crop_category()
+    category_choices = list(CROP_CATEGORIES.keys())
+    available_crops = CROP_OPTIONS if selected_category == "All Categories" else CROP_CATEGORIES[selected_category]
+
     area_choices = [tr("area_selector_placeholder"), *STATE_OPTIONS]
     current_area_option = selected_area if selected_area else tr("area_selector_placeholder")
     try:
@@ -2514,26 +2758,81 @@ def page_landing():
     except ValueError:
         current_area_index = 0
 
+    try:
+        current_category_index = category_choices.index(selected_category)
+    except ValueError:
+        current_category_index = 0
+
+    crop_choices = [tr("crop_selector_placeholder"), *available_crops]
+    current_crop_option = selected_crop if selected_crop in available_crops else tr("crop_selector_placeholder")
+    try:
+        current_crop_index = crop_choices.index(current_crop_option)
+    except ValueError:
+        current_crop_index = 0
+
     st.markdown(f"### {tr('area_selector_title')}")
     st.caption(tr("area_selector_desc"))
-    chosen_area_option = st.selectbox(
-        tr("area_selector_label"),
-        area_choices,
-        index=current_area_index,
-        key="landing_area_selector",
-        format_func=lambda value: translate_state_value(value) if value in STATE_OPTIONS else value,
-    )
+
+    area_col, category_col, crop_col = st.columns(3)
+
+    with area_col:
+        chosen_area_option = st.selectbox(
+            tr("area_selector_label"),
+            area_choices,
+            index=current_area_index,
+            key="landing_area_selector",
+            format_func=lambda value: translate_state_value(value) if value in STATE_OPTIONS else value,
+        )
+
+    with category_col:
+        chosen_category = st.selectbox(
+            tr("crop_category_label"),
+            category_choices,
+            index=current_category_index,
+            format_func=lambda value: tr(CATEGORY_LABEL_KEYS.get(value, value)),
+        )
+
+    next_available_crops = CROP_OPTIONS if chosen_category == "All Categories" else CROP_CATEGORIES[chosen_category]
+    crop_choices = [tr("crop_selector_placeholder"), *next_available_crops]
+    current_crop_option = selected_crop if selected_crop in next_available_crops else tr("crop_selector_placeholder")
+    try:
+        current_crop_index = crop_choices.index(current_crop_option)
+    except ValueError:
+        current_crop_index = 0
+
+    with crop_col:
+        chosen_crop_option = st.selectbox(
+            tr("select_crop"),
+            crop_choices,
+            index=current_crop_index,
+            format_func=lambda value: translate_crop_value(value) if value in CROP_OPTIONS else value,
+        )
 
     chosen_area = chosen_area_option if chosen_area_option in STATE_OPTIONS else None
-    if chosen_area != selected_area:
+    chosen_crop = chosen_crop_option if chosen_crop_option in CROP_OPTIONS else None
+    if chosen_crop and chosen_crop not in next_available_crops:
+        chosen_crop = None
+
+    if (
+        chosen_area != selected_area
+        or chosen_category != selected_category
+        or chosen_crop != selected_crop
+    ):
         st.session_state.selected_area = chosen_area
+        st.session_state.selected_crop_category = chosen_category
         st.query_params["lang"] = current_lang
         if chosen_area:
             st.query_params["area"] = chosen_area
         elif "area" in st.query_params:
             del st.query_params["area"]
-        if selected_crop:
-            st.query_params["crop"] = selected_crop
+        if chosen_category and chosen_category != "All Categories":
+            st.query_params["category"] = chosen_category
+        elif "category" in st.query_params:
+            del st.query_params["category"]
+        if chosen_crop:
+            st.query_params["crop"] = chosen_crop
+        elif "crop" in st.query_params:
+            del st.query_params["crop"]
         st.rerun()
 
     if selected_crop:
