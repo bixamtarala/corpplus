@@ -87,10 +87,16 @@ jobs:
       run: flutter build appbundle --release
 
     - name: Generate update metadata
+      id: release_assets
       run: |
         mkdir -p build/update
         published_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        short_sha="${GITHUB_SHA::7}"
+        stamped_apk_name="croppulse-mobile-${short_sha}.apk"
         play_store_url="$CROPPULSE_PLAY_STORE_URL"
+
+        echo "short_sha=$short_sha" >> "$GITHUB_OUTPUT"
+        echo "stamped_apk_name=$stamped_apk_name" >> "$GITHUB_OUTPUT"
 
         if [ -z "$play_store_url" ]; then
           play_store_url='https://play.google.com/store/apps/details?id=com.croppulse.mobile'
@@ -110,11 +116,15 @@ jobs:
         }
         EOF
 
+        cp build/app/outputs/flutter-apk/app-release.apk "build/app/outputs/flutter-apk/${stamped_apk_name}"
+
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
         name: croppulse-android-apk-${{ github.run_number }}
-        path: mobile_app_flutter/build/app/outputs/flutter-apk/app-release.apk
+        path: |
+          mobile_app_flutter/build/app/outputs/flutter-apk/app-release.apk
+          mobile_app_flutter/build/app/outputs/flutter-apk/${{ steps.release_assets.outputs.stamped_apk_name }}
         if-no-files-found: error
         retention-days: 14
 
@@ -149,10 +159,13 @@ jobs:
 
         Assets:
         - `app-release.apk` for side-load installs and Firebase App Distribution
+        - `${{ steps.release_assets.outputs.stamped_apk_name }}` for commit-specific delivery
         - `update-metadata.json` for in-app update checks
         - `app-release.aab` when signing secrets are configured for Play internal testing
         EOF
         )
+
+        stamped_apk="build/app/outputs/flutter-apk/${{ steps.release_assets.outputs.stamped_apk_name }}"
 
         if gh release view mobile-latest >/dev/null 2>&1; then
           gh release edit mobile-latest \
@@ -168,8 +181,16 @@ jobs:
             --prerelease
         fi
 
+        existing_assets=$(gh release view mobile-latest --json assets --jq '.assets[].name')
+        while IFS= read -r asset_name; do
+          if [[ "$asset_name" == croppulse-mobile-*.apk ]]; then
+            gh release delete-asset mobile-latest "$asset_name" --yes
+          fi
+        done <<< "$existing_assets"
+
         assets=(
           build/app/outputs/flutter-apk/app-release.apk
+          "$stamped_apk"
           build/update/update-metadata.json
         )
 
