@@ -16,6 +16,16 @@ jobs:
   build-android:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      FIREBASE_APP_ID_ANDROID: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
+      FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+      PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+      FIREBASE_TESTER_GROUPS: ${{ vars.FIREBASE_TESTER_GROUPS }}
+      CROPPULSE_PLAY_STORE_URL: ${{ vars.CROPPULSE_PLAY_STORE_URL }}
 
     defaults:
       run:
@@ -54,16 +64,16 @@ jobs:
         echo "version_code=$version_code" >> "$GITHUB_OUTPUT"
 
     - name: Prepare Android signing files
-      if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
+      if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' && env.ANDROID_KEYSTORE_PASSWORD != '' && env.ANDROID_KEY_ALIAS != '' && env.ANDROID_KEY_PASSWORD != '' }}
       run: |
         mkdir -p keystore
-        echo '${{ secrets.ANDROID_KEYSTORE_BASE64 }}' | base64 --decode > keystore/croppulse-upload.jks
+        printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > keystore/croppulse-upload.jks
 
         cat > android/key.properties <<EOF
         storeFile=../keystore/croppulse-upload.jks
-        storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-        keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
-        keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+        storePassword=$ANDROID_KEYSTORE_PASSWORD
+        keyAlias=$ANDROID_KEY_ALIAS
+        keyPassword=$ANDROID_KEY_PASSWORD
         EOF
 
     - name: Flutter pub get
@@ -73,14 +83,14 @@ jobs:
       run: flutter build apk --release
 
     - name: Build Android release App Bundle
-      if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
+      if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' && env.ANDROID_KEYSTORE_PASSWORD != '' && env.ANDROID_KEY_ALIAS != '' && env.ANDROID_KEY_PASSWORD != '' }}
       run: flutter build appbundle --release
 
     - name: Generate update metadata
       run: |
         mkdir -p build/update
         published_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-        play_store_url='${{ vars.CROPPULSE_PLAY_STORE_URL }}'
+        play_store_url="$CROPPULSE_PLAY_STORE_URL"
 
         if [ -z "$play_store_url" ]; then
           play_store_url='https://play.google.com/store/apps/details?id=com.croppulse.mobile'
@@ -109,7 +119,7 @@ jobs:
         retention-days: 14
 
     - name: Upload AAB artifact
-      if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
+      if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' && env.ANDROID_KEYSTORE_PASSWORD != '' && env.ANDROID_KEY_ALIAS != '' && env.ANDROID_KEY_PASSWORD != '' }}
       uses: actions/upload-artifact@v4
       with:
         name: croppulse-android-aab-${{ github.run_number }}
@@ -170,15 +180,11 @@ jobs:
         gh release upload mobile-latest "${assets[@]}" --clobber
 
     - name: Install Firebase CLI
-      if: ${{ secrets.FIREBASE_APP_ID_ANDROID != '' && secrets.FIREBASE_SERVICE_ACCOUNT_JSON != '' }}
+      if: ${{ env.FIREBASE_APP_ID_ANDROID != '' && env.FIREBASE_SERVICE_ACCOUNT_JSON != '' }}
       run: npm install --global firebase-tools
 
     - name: Distribute APK to Firebase App Distribution
-      if: ${{ secrets.FIREBASE_APP_ID_ANDROID != '' && secrets.FIREBASE_SERVICE_ACCOUNT_JSON != '' }}
-      env:
-        FIREBASE_APP_ID_ANDROID: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
-        FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
-        FIREBASE_TESTER_GROUPS: ${{ vars.FIREBASE_TESTER_GROUPS }}
+      if: ${{ env.FIREBASE_APP_ID_ANDROID != '' && env.FIREBASE_SERVICE_ACCOUNT_JSON != '' }}
       run: |
         credentials_path="$RUNNER_TEMP/firebase-service-account.json"
         printf '%s' "$FIREBASE_SERVICE_ACCOUNT_JSON" > "$credentials_path"
@@ -195,10 +201,10 @@ jobs:
           --release-notes "CropPulse ${{ steps.mobile_version.outputs.version_name }} (${{ steps.mobile_version.outputs.version_code }}) - ${{ github.sha }}"
 
     - name: Upload App Bundle to Google Play internal testing
-      if: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON != '' && secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
+      if: ${{ env.PLAY_SERVICE_ACCOUNT_JSON != '' && env.ANDROID_KEYSTORE_BASE64 != '' && env.ANDROID_KEYSTORE_PASSWORD != '' && env.ANDROID_KEY_ALIAS != '' && env.ANDROID_KEY_PASSWORD != '' }}
       uses: r0adkll/upload-google-play@v1
       with:
-        serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        serviceAccountJsonPlainText: ${{ env.PLAY_SERVICE_ACCOUNT_JSON }}
         packageName: com.croppulse.mobile
         releaseFiles: mobile_app_flutter/build/app/outputs/bundle/release/app-release.aab
         track: internal
