@@ -140,26 +140,77 @@ class _CommodityPickerSheetState extends State<_CommodityPickerSheet> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                _FilterChipRow(
-                  title: 'Category',
-                  values: [_allCategories, ...CommodityCatalog.categories],
-                  selectedValue: _selectedCategory,
-                  onSelected: (value) {
-                    setState(() {
-                      _selectedCategory = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 10),
-                _FilterChipRow(
-                  title: 'State',
-                  values: [_allStates, ...CommodityCatalog.allStates],
-                  selectedValue: _selectedState,
-                  onSelected: (value) {
-                    setState(() {
-                      _selectedState = value;
-                    });
-                  },
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          initialValue: _selectedCategory,
+                          decoration: const InputDecoration(
+                            labelText: 'Category',
+                          ),
+                          isExpanded: true,
+                          items: [
+                            _allCategories,
+                            ...CommodityCatalog.categories,
+                          ]
+                              .map(
+                                (value) => DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(
+                                    value,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) {
+                            if (value == null) {
+                              return;
+                            }
+
+                            setState(() {
+                              _selectedCategory = value;
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          initialValue: _selectedState,
+                          decoration: const InputDecoration(
+                            labelText: 'State',
+                          ),
+                          isExpanded: true,
+                          items: [
+                            _allStates,
+                            ...CommodityCatalog.allStates,
+                          ]
+                              .map(
+                                (value) => DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(
+                                    value,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) {
+                            if (value == null) {
+                              return;
+                            }
+
+                            setState(() {
+                              _selectedState = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Expanded(
@@ -222,54 +273,6 @@ class _CommodityPickerSheetState extends State<_CommodityPickerSheet> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _FilterChipRow extends StatelessWidget {
-  const _FilterChipRow({
-    required this.title,
-    required this.values,
-    required this.selectedValue,
-    required this.onSelected,
-  });
-
-  final String title;
-  final List<String> values;
-  final String selectedValue;
-  final ValueChanged<String> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            title,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-          ),
-        ),
-        const SizedBox(height: 8),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            children: [
-              for (final value in values)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    label: Text(value),
-                    selected: selectedValue == value,
-                    onSelected: (_) => onSelected(value),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
