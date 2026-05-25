@@ -19,7 +19,9 @@ void main() {
 }
 
 class MyApp extends ConsumerWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, this.updateService});
+
+  final AppUpdateService? updateService;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,17 +34,19 @@ class MyApp extends ConsumerWidget {
       locale: locale,
       supportedLocales: AppStrings.supportedLocales,
       localizationsDelegates: const [AppStrings.delegate],
-      home: const NativeAppGate(),
+      home: NativeAppGate(updateService: updateService),
     );
   }
 }
 
 class NativeAppGate extends ConsumerWidget {
-  const NativeAppGate({super.key});
+  const NativeAppGate({super.key, this.updateService});
+
+  final AppUpdateService? updateService;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const MainNavigationScreen();
+    return MainNavigationScreen(updateService: updateService);
   }
 }
 
@@ -77,14 +81,16 @@ class SplashScreen extends StatelessWidget {
 }
 
 class MainNavigationScreen extends StatefulWidget {
-  const MainNavigationScreen({super.key});
+  const MainNavigationScreen({super.key, this.updateService});
+
+  final AppUpdateService? updateService;
 
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  final AppUpdateService _updateService = AppUpdateService();
+  late final AppUpdateService _updateService;
 
   int _selectedIndex = 0;
   bool _updateCheckStarted = false;
@@ -102,6 +108,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   void initState() {
     super.initState();
+    _updateService = widget.updateService ?? AppUpdateService();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkForAvailableUpdate();
     });
