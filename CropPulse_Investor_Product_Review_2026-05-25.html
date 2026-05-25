@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CropPulse Investor Product Review</title>
+  <style>
+    :root {
+      --green: #1f8f4d;
+      --green-dark: #176b39;
+      --blue: #1f5fa8;
+      --gold: #b8871b;
+      --text: #1f2937;
+      --muted: #5b6472;
+      --line: #d9e2ec;
+      --bg: #f5f8fb;
+      --card: #ffffff;
+      --risk: #9b1c1c;
+      --warn: #92400e;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.45;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: var(--card);
+      padding: 18mm 16mm 18mm 16mm;
+    }
+
+    .cover {
+      background: linear-gradient(135deg, #f7fbf8 0%, #eef6ff 100%);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20mm 16mm;
+      min-height: 255mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--green-dark);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 13px;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--green);
+      color: #fff;
+      font-size: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.1;
+      color: #10243a;
+    }
+
+    h2 {
+      margin: 0 0 10px 0;
+      font-size: 22px;
+      color: #10243a;
+      border-bottom: 2px solid #e7eef5;
+      padding-bottom: 6px;
+    }
+
+    h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      color: #143454;
+    }
+
+    p { margin: 0 0 10px 0; }
+
+    .subtitle {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 135mm;
+      margin-top: 12px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .meta-card,
+    .card,
+    .mini-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .meta-card {
+      padding: 12px 14px;
+    }
+
+    .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #10243a;
+    }
+
+    .section {
+      margin-top: 12mm;
+      page-break-inside: avoid;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .card {
+      padding: 14px 15px;
+    }
+
+    .mini-card {
+      padding: 12px 13px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    li { margin-bottom: 6px; }
+
+    .status {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .status.good { background: #e6f7ed; color: #166534; }
+    .status.caution { background: #fff4db; color: var(--warn); }
+    .status.risk { background: #fde8e8; color: var(--risk); }
+
+    .score {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--green-dark);
+      margin-bottom: 6px;
+    }
+
+    .callout {
+      border-left: 4px solid var(--green);
+      background: #f5fbf7;
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    .warning {
+      border-left-color: var(--gold);
+      background: #fffaf0;
+    }
+
+    .risk-box {
+      border-left-color: #c2410c;
+      background: #fff7ed;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 13px;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f3f7fb;
+      color: #10243a;
+      font-weight: 700;
+    }
+
+    .footer-note {
+      margin-top: 8mm;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .small { font-size: 12px; color: var(--muted); }
+
+    @media print {
+      body { background: #fff; }
+      .page { margin: 0; width: auto; min-height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="cover">
+      <div>
+        <div class="brand">
+          <span class="brand-mark">🌾</span>
+          <span>CropPulse</span>
+        </div>
+        <div style="margin-top: 28mm;">
+          <h1>Investor Product Review</h1>
+          <p class="subtitle">Independent repo-based assessment of the current CropPulse web app and mobile app, prepared as an investor-facing product snapshot.</p>
+        </div>
+        <div class="meta">
+          <div class="meta-card">
+            <div class="label">Review Date</div>
+            <div class="value">May 25, 2026</div>
+          </div>
+          <div class="meta-card">
+            <div class="label">Web Surface</div>
+            <div class="value">Streamlit-first app</div>
+          </div>
+          <div class="meta-card">
+            <div class="label">Mobile Version</div>
+            <div class="value">1.0.2 (4)</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="callout">
+          <strong>Bottom line:</strong> CropPulse presents as a credible Phase 1 agricultural intelligence and marketplace product with real product breadth across web and mobile. It is strongest as an investor story when framed as a validated operational platform in expansion, not as a fully completed agricultural operating system.
+        </div>
+        <p class="footer-note">Prepared from the current repository state, active app entrypoints, release workflow, and internal status documents.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Executive Assessment</h2>
+      <div class="grid-3">
+        <div class="card">
+          <div class="score">8.1 / 10</div>
+          <h3>Investor Readiness</h3>
+          <p>The product is strong enough for investor outreach when positioned as a live, expanding agri-market intelligence platform with mobile distribution, early traction, and clear execution priorities.</p>
+        </div>
+        <div class="card">
+          <span class="status good">What Is Working</span>
+          <ul>
+            <li>Active public web app with user journeys, localization, and marketplace surface</li>
+            <li>Native Flutter mobile app with seven product sections and Android delivery automation</li>
+            <li>Documented traction, testing evidence, and repeatable release workflow</li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="status caution">What To Say Carefully</span>
+          <ul>
+            <li>Do not present the business as a fully mature national operating system yet</li>
+            <li>Do not overstate marketplace completion, payments, or production backend depth</li>
+            <li>Lead with intelligence, coordination, and expansion readiness</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout warning">
+        <strong>Recommended investor framing:</strong> CropPulse is a validated agricultural intelligence and coordination platform that already serves live users and is now expanding across farmer, trader, and customer workflows through a Streamlit-first web app and a distributable Flutter mobile app.
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Current Product Snapshot</h2>
+      <table>
+        <tr>
+          <th>Area</th>
+          <th>Current State</th>
+          <th>Investor Relevance</th>
+        </tr>
+        <tr>
+          <td>Web</td>
+          <td>Active Streamlit app with landing page, OTP flows, farmer workflows, marketplace surface, crop and area filters, and English/Telugu support</td>
+          <td>Fastest route to public demo, customer discovery, and investor walkthroughs</td>
+        </tr>
+        <tr>
+          <td>Mobile</td>
+          <td>Native Flutter app with Home, Intelligence, Farmer, Trader, Customer, Market, and Profile sections plus in-app update checks</td>
+          <td>Shows expansion beyond dashboard tooling into mobile distribution and role-specific usage</td>
+        </tr>
+        <tr>
+          <td>Traction</td>
+          <td>Repo-stated Phase 1 metrics: 500 traders, $5K monthly revenue, 50 daily transactions</td>
+          <td>Provides early commercial proof, even if geographically narrow</td>
+        </tr>
+        <tr>
+          <td>Testing</td>
+          <td>Repo-documented 43 of 43 tests passing across SaaS, algorithm, API error, and security/load suites</td>
+          <td>Supports technical diligence and reduces prototype-risk perception</td>
+        </tr>
+        <tr>
+          <td>Release Operations</td>
+          <td>GitHub Actions builds Android APKs, update metadata, and rolling release assets</td>
+          <td>Signals operational maturity beyond an internal demo</td>
+        </tr>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>Web App Review</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>What the web app currently demonstrates</h3>
+          <ul>
+            <li>Public landing experience with product narrative and navigation</li>
+            <li>Phone-based OTP registration and sign-in flows</li>
+            <li>Localized user experience in English and Telugu</li>
+            <li>Crop, category, and area selection workflows for market exploration</li>
+            <li>Farmer-oriented workflows around crop planning, selling guidance, and deal coordination</li>
+            <li>Marketplace and intelligence surfaces presented inside one app shell</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Why the web app matters for investors</h3>
+          <ul>
+            <li>It is the fastest demo surface for showing product breadth end to end</li>
+            <li>It lowers deployment complexity by using a Streamlit-first public path</li>
+            <li>It already communicates the vision of intelligence + workflow + marketplace coordination</li>
+            <li>It is practical for pilots, demos, and iterative feature validation without a full frontend rebuild</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout">
+        <strong>Assessment:</strong> The web product is more than a landing page. It is a live operational demo environment with user flow, state, localization, and workflow depth sufficient for investor demonstrations and early market validation.
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Mobile App Review</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>What the mobile app currently demonstrates</h3>
+          <ul>
+            <li>Native Flutter app with seven navigable sections</li>
+            <li>Farmer, trader, and customer role positioning in one product surface</li>
+            <li>Marketplace listing, offer, and buying copy aligned to current use cases</li>
+            <li>English, Hindi, and Telugu localization framework</li>
+            <li>Dedicated customer hub that broadens the platform story beyond producers and traders</li>
+            <li>In-app update checking tied to GitHub release metadata</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Why the mobile app matters for investors</h3>
+          <ul>
+            <li>Shows the team can ship beyond the web and support direct Android distribution</li>
+            <li>Strengthens the rural and field-usage narrative where mobile is the primary channel</li>
+            <li>Supports multilingual adoption and role-based market expansion</li>
+            <li>Demonstrates a delivery pipeline with release automation instead of one-off APK exports</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout">
+        <strong>Assessment:</strong> The mobile app is not just a wrapper. It is a meaningful native product layer that extends CropPulse into multilingual, role-based field usage and signals execution momentum.
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Investor Strengths</h2>
+      <div class="grid-2">
+        <div class="mini-card">
+          <h3>1. Product Breadth</h3>
+          <p>CropPulse spans intelligence, farmer workflows, trader workflows, customer access, marketplace coordination, and mobile distribution in one repo.</p>
+        </div>
+        <div class="mini-card">
+          <h3>2. Clear Agri Use Case</h3>
+          <p>The product is anchored in concrete agricultural decisions: pricing, timing, crop coordination, market access, and buyer visibility.</p>
+        </div>
+        <div class="mini-card">
+          <h3>3. Delivery Evidence</h3>
+          <p>There is working deployment guidance, test documentation, release automation, and a rolling Android release process.</p>
+        </div>
+        <div class="mini-card">
+          <h3>4. Multilingual Direction</h3>
+          <p>Language support is already part of the user experience, which is strategically relevant for rural adoption.</p>
+        </div>
+        <div class="mini-card">
+          <h3>5. Commercial Narrative</h3>
+          <p>Repo documentation presents early users, early revenue, and a credible expansion thesis into higher-value workflows.</p>
+        </div>
+        <div class="mini-card">
+          <h3>6. Capital Efficiency</h3>
+          <p>Using Streamlit-first web delivery and APK-based Android distribution keeps the product moving without heavyweight infrastructure.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Material Risks And Gaps</h2>
+      <table>
+        <tr>
+          <th>Risk</th>
+          <th>Current Read</th>
+          <th>Investor Interpretation</th>
+        </tr>
+        <tr>
+          <td>Roadmap vs. current-state gap</td>
+          <td>Vision documents are materially ahead of current production evidence.</td>
+          <td>This is normal for an early platform, but claims must stay disciplined in fundraising materials.</td>
+        </tr>
+        <tr>
+          <td>Backend and payments depth</td>
+          <td>Marketplace, payments, KYC, and some backend flows are not yet proven as full production workflows in the repo.</td>
+          <td>Investors should view this as a product expansion opportunity, not a solved infrastructure layer.</td>
+        </tr>
+        <tr>
+          <td>Scalability unknowns</td>
+          <td>The active public app is Streamlit-first, which is efficient for launch but not proof of national-scale concurrency.</td>
+          <td>This raises execution risk only at the next scale stage, not at the current traction stage.</td>
+        </tr>
+        <tr>
+          <td>Metric consistency</td>
+          <td>Some strategy docs present inconsistent revenue and maturity claims.</td>
+          <td>Investor materials should use one disciplined narrative to avoid avoidable diligence friction.</td>
+        </tr>
+      </table>
+      <div class="callout risk-box">
+        <strong>Important:</strong> The strongest investor narrative is not “CropPulse has already completed the agricultural OS.” It is “CropPulse has validated the intelligence layer and is now expanding into the transaction and workflow layer.”
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Why The Opportunity Is Still Attractive</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Execution momentum</h3>
+          <p>The repo shows rapid product iteration across web, mobile, localization, customer access, release automation, and testing. That velocity matters at this stage.</p>
+        </div>
+        <div class="card">
+          <h3>Expansion logic is coherent</h3>
+          <p>The move from traders to farmers, then to customers, and later into payments and coordination is strategically coherent and product-visible today.</p>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top: 12px;">
+        <div class="card">
+          <h3>Practical next use of capital</h3>
+          <p>Capital can be tied directly to production backend maturity, transaction rails, KYC, analytics, mobile growth, and market onboarding rather than speculative R&amp;D.</p>
+        </div>
+        <div class="card">
+          <h3>Investor ask quality</h3>
+          <p>This is best pitched as funding to accelerate a working product into a stronger operating platform, not as funding to start from zero.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Recommended Investor Message</h2>
+      <div class="callout">
+        CropPulse has already demonstrated a live agricultural intelligence and coordination product with early user traction, multilingual experience, and both web and Android distribution. The next financing step should be framed around deepening the transaction layer, backend robustness, and farmer-side workflow execution rather than inventing the product category from scratch.
+      </div>
+      <div class="footer-note">
+        Review basis: current Streamlit public app, current Flutter mobile app, repo-documented test and deployment evidence, and internal readiness/status documents reviewed on May 25, 2026.
+      </div>
+    </section>
+  </div>
+</body>
+</html>
