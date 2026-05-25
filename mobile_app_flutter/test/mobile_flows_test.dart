@@ -161,6 +161,29 @@ void main() {
 
     expect(find.text('Daily Intelligence Feed'), findsOneWidget);
   });
+
+  testWidgets('home screen keeps all role options on one line on narrow screens', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      _buildTestApp(
+        const HomeScreen(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final farmerY = tester.getTopLeft(find.text('Farmer')).dy;
+    final traderY = tester.getTopLeft(find.text('Trader')).dy;
+    final customerY = tester.getTopLeft(find.text('Customer')).dy;
+    final exporterY = tester.getTopLeft(find.text('Exporter')).dy;
+
+    expect(traderY, closeTo(farmerY, 2));
+    expect(customerY, closeTo(farmerY, 2));
+    expect(exporterY, closeTo(farmerY, 2));
+  });
 }
 
 Widget _buildTestApp(Widget child, {List<Override> overrides = const []}) {

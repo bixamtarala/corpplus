@@ -117,28 +117,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+            Row(
               children: [
-                for (final role in _roles)
-                  ChoiceChip(
-                    label: Text(l10n.roleLabel(role)),
-                    selected: role == _selectedRole,
-                    onSelected: (_) {
-                      setState(() {
-                        _selectedRole = role;
-                      });
-                    },
-                    selectedColor: AppTheme.primaryGreen.withValues(alpha: 0.15),
-                    labelStyle: TextStyle(
-                      color: role == _selectedRole ? AppTheme.primaryGreen : AppTheme.darkText,
-                      fontWeight: role == _selectedRole ? FontWeight.w700 : FontWeight.w500,
-                    ),
-                    side: BorderSide(
-                      color: role == _selectedRole ? AppTheme.primaryGreen : AppTheme.lightGray,
+                for (var index = 0; index < _roles.length; index++) ...[
+                  if (index > 0) const SizedBox(width: 8),
+                  Expanded(
+                    child: _RoleButton(
+                      label: l10n.roleLabel(_roles[index]),
+                      selected: _roles[index] == _selectedRole,
+                      onTap: () {
+                        setState(() {
+                          _selectedRole = _roles[index];
+                        });
+                      },
                     ),
                   ),
+                ],
               ],
             ),
             const SizedBox(height: 24),
@@ -192,6 +186,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RoleButton extends StatelessWidget {
+  const _RoleButton({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: selected ? AppTheme.primaryGreen.withValues(alpha: 0.15) : Colors.white,
+            border: Border.all(
+              color: selected ? AppTheme.primaryGreen : AppTheme.lightGray,
+            ),
+          ),
+          child: Center(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                maxLines: 1,
+                style: TextStyle(
+                  color: selected ? AppTheme.primaryGreen : AppTheme.darkText,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
