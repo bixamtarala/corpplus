@@ -66,6 +66,7 @@ class FarmerHubScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(module.icon, size: 28, color: AppTheme.primaryGreen),
                         const SizedBox(width: 12),
@@ -75,9 +76,10 @@ class FarmerHubScreen extends StatelessWidget {
                             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                         ),
-                        _AvailabilityPill(label: l10n.text('available_now')),
                       ],
                     ),
+                    const SizedBox(height: 10),
+                    _AvailabilityPill(label: l10n.text('available_now')),
                     const SizedBox(height: 8),
                     Text(
                       module.desc,

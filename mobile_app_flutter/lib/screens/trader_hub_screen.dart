@@ -73,17 +73,19 @@ class TraderHubScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(module.icon, style: const TextStyle(fontSize: 24)),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(module.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               ),
-              _AvailabilityPill(
-                label: l10n.text(isEnabled ? 'available_now' : 'coming_soon'),
-                color: isEnabled ? AppTheme.primaryBlue : AppTheme.warningOrange,
-              ),
             ],
+          ),
+          const SizedBox(height: 10),
+          _AvailabilityPill(
+            label: l10n.text(isEnabled ? 'available_now' : 'coming_soon'),
+            color: isEnabled ? AppTheme.primaryBlue : AppTheme.warningOrange,
           ),
           const SizedBox(height: 8),
           Text(module.desc, style: const TextStyle(fontSize: 13, color: AppTheme.lightText)),

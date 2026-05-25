@@ -7,10 +7,12 @@ import 'package:croppulse_mobile/providers/api_providers.dart';
 import 'package:croppulse_mobile/providers/marketplace_provider.dart';
 import 'package:croppulse_mobile/screens/home_screen.dart';
 import 'package:croppulse_mobile/screens/login_screen.dart';
+import 'package:croppulse_mobile/screens/trader_hub_screen.dart';
 import 'package:croppulse_mobile/services/api_service.dart';
 import 'package:croppulse_mobile/services/app_update_service.dart';
 import 'package:croppulse_mobile/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -184,17 +186,43 @@ void main() {
     expect(customerY, closeTo(farmerY, 2));
     expect(exporterY, closeTo(farmerY, 2));
   });
+
+  testWidgets('trader hub fits localized cards on narrow screens', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      _buildTestApp(
+        const TraderHubScreen(),
+        locale: const Locale('te'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('ప్రోక్యూర్‌మెంట్ ఇంటెలిజెన్స్'), findsOneWidget);
+    expect(find.text('సరఫరా విజిబిలిటీ'), findsOneWidget);
+    expect(find.text('ఇప్పుడు అందుబాటులో ఉంది'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
 }
 
-Widget _buildTestApp(Widget child, {List<Override> overrides = const []}) {
+Widget _buildTestApp(Widget child, {List<Override> overrides = const [], Locale? locale}) {
   return ProviderScope(
     overrides: overrides,
     child: MaterialApp(
       onGenerateTitle: (context) => AppStrings.of(context).text('app_title'),
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      locale: locale,
       supportedLocales: AppStrings.supportedLocales,
-      localizationsDelegates: const [AppStrings.delegate],
+      localizationsDelegates: const [
+        AppStrings.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
       home: child,
     ),
   );
