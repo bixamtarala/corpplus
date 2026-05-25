@@ -18,6 +18,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   static const List<String> _roles = ['Farmer', 'Trader', 'Customer', 'Exporter'];
   String _selectedRole = 'Farmer';
 
+  Future<void> _showLanguageSelector(AppStrings l10n, Locale currentLocale) async {
+    final selectedLocale = await showModalBottomSheet<Locale>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.text('select_language'),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 12),
+                for (final item in AppStrings.supportedLocales)
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      item.languageCode == currentLocale.languageCode
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_off,
+                      color: item.languageCode == currentLocale.languageCode
+                          ? AppTheme.primaryGreen
+                          : AppTheme.lightText,
+                    ),
+                    title: Text(l10n.languageLabel(item)),
+                    onTap: () {
+                      Navigator.of(sheetContext).pop(item);
+                    },
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (selectedLocale == null || !mounted) {
+      return;
+    }
+
+    ref.read(appLocaleProvider.notifier).state = selectedLocale;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppStrings.of(context);
@@ -40,25 +87,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ),
         actions: [
-          PopupMenuButton<Locale>(
+          IconButton(
             tooltip: l10n.text('select_language'),
             icon: const Icon(Icons.language, color: AppTheme.primaryBlue),
-            onSelected: (value) {
-              ref.read(appLocaleProvider.notifier).state = value;
-            },
-            itemBuilder: (context) => [
-              for (final item in AppStrings.supportedLocales)
-                PopupMenuItem<Locale>(
-                  value: item,
-                  child: Row(
-                    children: [
-                      Expanded(child: Text(l10n.languageLabel(item))),
-                      if (item.languageCode == locale.languageCode)
-                        const Icon(Icons.check, size: 18, color: AppTheme.primaryGreen),
-                    ],
-                  ),
-                ),
-            ],
+            onPressed: () => _showLanguageSelector(l10n, locale),
           ),
         ],
       ),
