@@ -5,6 +5,7 @@ import 'package:croppulse_mobile/models/auth_session.dart';
 import 'package:croppulse_mobile/models/marketplace.dart';
 import 'package:croppulse_mobile/providers/api_providers.dart';
 import 'package:croppulse_mobile/providers/marketplace_provider.dart';
+import 'package:croppulse_mobile/screens/home_screen.dart';
 import 'package:croppulse_mobile/screens/login_screen.dart';
 import 'package:croppulse_mobile/services/api_service.dart';
 import 'package:croppulse_mobile/services/app_update_service.dart';
@@ -125,6 +126,40 @@ void main() {
     expect(find.text('Fresh marketplace fixes and release wiring.'), findsOneWidget);
     expect(find.text('Later'), findsOneWidget);
     expect(find.text('Open store'), findsOneWidget);
+  });
+
+  testWidgets('home screen language picker updates across repeated selections', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MyApp(
+          updateService: FakeAppUpdateService(update: null),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Daily Intelligence Feed'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.language));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(ListTile).at(1));
+    await tester.pumpAndSettle();
+
+    expect(find.text('दैनिक इंटेलिजेंस फ़ीड'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.language));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(ListTile).at(2));
+    await tester.pumpAndSettle();
+
+    expect(find.text('దినసరి ఇంటెలిజెన్స్ ఫీడ్'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.language));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(ListTile).at(0));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Daily Intelligence Feed'), findsOneWidget);
   });
 }
 

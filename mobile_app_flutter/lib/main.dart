@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -33,7 +34,12 @@ class MyApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       locale: locale,
       supportedLocales: AppStrings.supportedLocales,
-      localizationsDelegates: const [AppStrings.delegate],
+      localizationsDelegates: const [
+        AppStrings.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
       home: NativeAppGate(updateService: updateService),
     );
   }
