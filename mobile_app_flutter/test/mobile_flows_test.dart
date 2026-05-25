@@ -7,6 +7,7 @@ import 'package:croppulse_mobile/providers/api_providers.dart';
 import 'package:croppulse_mobile/providers/marketplace_provider.dart';
 import 'package:croppulse_mobile/screens/home_screen.dart';
 import 'package:croppulse_mobile/screens/login_screen.dart';
+import 'package:croppulse_mobile/screens/marketplace_screen.dart';
 import 'package:croppulse_mobile/screens/trader_hub_screen.dart';
 import 'package:croppulse_mobile/services/api_service.dart';
 import 'package:croppulse_mobile/services/app_update_service.dart';
@@ -206,6 +207,31 @@ void main() {
     expect(find.text('ఇప్పుడు అందుబాటులో ఉంది'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('marketplace fits filters and tabs on narrow localized screens', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final fakeApi = FakeApiService(searchResults: const []);
+
+    await tester.pumpWidget(
+      _buildTestApp(
+        const MarketplaceScreen(),
+        locale: const Locale('te'),
+        overrides: [apiServiceProvider.overrideWithValue(fakeApi)],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('కొనుగోలు ఆర్డర్లు'), findsOneWidget);
+    expect(find.text('అమ్మకపు ఆర్డర్లు'), findsOneWidget);
+    expect(find.text('పంట'), findsOneWidget);
+    expect(find.text('రాష్ట్ర ఫిల్టర్'), findsOneWidget);
+    expect(find.text('లిస్టింగ్స్ సింక్ చేయండి'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 Widget _buildTestApp(Widget child, {List<Override> overrides = const [], Locale? locale}) {
@@ -229,10 +255,11 @@ Widget _buildTestApp(Widget child, {List<Override> overrides = const [], Locale?
 }
 
 class FakeApiService extends ApiService {
-  FakeApiService({this.otpResult, this.session}) : super();
+  FakeApiService({this.otpResult, this.session, this.searchResults}) : super();
 
   final OtpRequestResult? otpResult;
   final AuthSession? session;
+  final List<MarketplaceSearchResult>? searchResults;
   final List<String> requestedPhones = <String>[];
   final List<String> verifiedOtps = <String>[];
 
@@ -257,6 +284,16 @@ class FakeApiService extends ApiService {
           userId: 'fallback-user',
           phone: phoneNumber,
         );
+  }
+
+  @override
+  Future<List<MarketplaceSearchResult>> searchListings({
+    required String crop,
+    String? state,
+    String? quality,
+    double? maxPrice,
+  }) async {
+    return searchResults ?? const <MarketplaceSearchResult>[];
   }
 }
 
