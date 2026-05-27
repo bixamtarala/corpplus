@@ -155,9 +155,18 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
+            isExpanded: true,
             initialValue: _selectedState,
             items: _states
-                .map((state) => DropdownMenuItem<String>(value: state, child: Text(state)))
+                .map(
+                  (state) => DropdownMenuItem<String>(
+                    value: state,
+                    child: Text(
+                      state,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                )
                 .toList(),
             decoration: InputDecoration(labelText: l10n.text('state')),
             onChanged: (value) {
@@ -275,9 +284,16 @@ class _PriceInsightScreenState extends ConsumerState<PriceInsightScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(entry.key, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Expanded(
+                        child: Text(
+                          entry.key,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
                       Text(currency.format(entry.value)),
                     ],
                   ),

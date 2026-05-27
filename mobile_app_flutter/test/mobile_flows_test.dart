@@ -3,11 +3,15 @@ import 'package:croppulse_mobile/main.dart';
 import 'package:croppulse_mobile/models/app_update_info.dart';
 import 'package:croppulse_mobile/models/auth_session.dart';
 import 'package:croppulse_mobile/models/marketplace.dart';
+import 'package:croppulse_mobile/models/price_insight.dart';
 import 'package:croppulse_mobile/providers/api_providers.dart';
 import 'package:croppulse_mobile/providers/marketplace_provider.dart';
+import 'package:croppulse_mobile/screens/farmer_profile_screen.dart';
 import 'package:croppulse_mobile/screens/home_screen.dart';
+import 'package:croppulse_mobile/screens/intelligence_screen.dart';
 import 'package:croppulse_mobile/screens/login_screen.dart';
 import 'package:croppulse_mobile/screens/marketplace_screen.dart';
+import 'package:croppulse_mobile/screens/price_insight_screen.dart';
 import 'package:croppulse_mobile/screens/trader_hub_screen.dart';
 import 'package:croppulse_mobile/services/api_service.dart';
 import 'package:croppulse_mobile/services/app_update_service.dart';
@@ -232,6 +236,86 @@ void main() {
     expect(find.text('లిస్టింగ్స్ సింక్ చేయండి'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('intelligence screen fits localized advisor and supply cards on narrow screens', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      _buildTestApp(
+        const IntelligenceScreen(),
+        locale: const Locale('te'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('ఏఐ ప్రైస్ అడ్వైజర్'), findsOneWidget);
+    expect(find.text('ప్రైస్ అడ్వైజర్ తెరవండి'), findsOneWidget);
+    expect(find.textContaining('సరఫరా వర్సెస్ డిమాండ్'), findsOneWidget);
+    expect(find.text('కొనుగోలుదారుల ఆసక్తి'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('farmer profile actions fit localized labels on narrow screens', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      _buildTestApp(
+        const FarmerProfileScreen(),
+        locale: const Locale('te'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('ప్రొఫైల్ సింక్ చేయండి'), findsOneWidget);
+    expect(find.text('ప్రొఫైల్ సేవ్ చేయండి'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('price insight fits localized hero and result tiles on narrow screens', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final fakeApi = FakeApiService(
+      priceInsight: const PriceInsight(
+        crop: 'Rice',
+        recommendedPrice: 2650,
+        marketTrend: 'పెరుగుతోంది',
+        nearbyPrices: {
+          'Warangal Mandi': 2620,
+          'Khammam Mandi': 2675,
+        },
+        bestSellingTime: 'తదుపరి 48 గంటలు',
+        analysis: 'డిమాండ్ బలంగా ఉంది, కాబట్టి ధరల కదలికను గమనిస్తూ త్వరగా అమ్మడం మంచిది.',
+        source: InsightSource.fallback,
+      ),
+    );
+
+    await tester.pumpWidget(
+      _buildTestApp(
+        const PriceInsightScreen(initialCrop: 'Rice'),
+        locale: const Locale('te'),
+        overrides: [apiServiceProvider.overrideWithValue(fakeApi)],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('సిఫార్సు తెమ్మండి'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('లైవ్ అమ్మకాల మార్గదర్శకం'), findsOneWidget);
+    expect(find.text('సమీప మార్కెట్లు'), findsOneWidget);
+    expect(find.textContaining('అమ్మడానికి ఉత్తమ సమయం'), findsOneWidget);
+    expect(find.text('మార్కెట్ ధోరణి'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 Widget _buildTestApp(Widget child, {List<Override> overrides = const [], Locale? locale}) {
@@ -255,11 +339,12 @@ Widget _buildTestApp(Widget child, {List<Override> overrides = const [], Locale?
 }
 
 class FakeApiService extends ApiService {
-  FakeApiService({this.otpResult, this.session, this.searchResults}) : super();
+  FakeApiService({this.otpResult, this.session, this.searchResults, this.priceInsight}) : super();
 
   final OtpRequestResult? otpResult;
   final AuthSession? session;
   final List<MarketplaceSearchResult>? searchResults;
+  final PriceInsight? priceInsight;
   final List<String> requestedPhones = <String>[];
   final List<String> verifiedOtps = <String>[];
 
@@ -294,6 +379,20 @@ class FakeApiService extends ApiService {
     double? maxPrice,
   }) async {
     return searchResults ?? const <MarketplaceSearchResult>[];
+  }
+
+  @override
+  Future<PriceInsight> getPriceInsight(PriceInsightRequestPayload request) async {
+    return priceInsight ??
+        const PriceInsight(
+          crop: 'Rice',
+          recommendedPrice: 2500,
+          marketTrend: 'stable',
+          nearbyPrices: <String, double>{},
+          bestSellingTime: 'Next 3-5 days',
+          analysis: 'Fallback insight',
+          source: InsightSource.fallback,
+        );
   }
 }
 
