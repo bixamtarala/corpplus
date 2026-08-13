@@ -49,3 +49,9 @@ class AuthReadinessResponse(BaseModel):
     ready: bool
     provider: str | None
     detail: str
+
+
+class ServiceReadinessResponse(BaseModel):
+    ready: bool
+    database: str
+    authentication: str

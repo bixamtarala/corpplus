@@ -248,7 +248,8 @@ def test_provider_failure_returns_generic_unavailable(session_factory, auth_sett
         )
 
     assert response.status_code == 503
-    assert response.json()["detail"] == "Could not send verification code"
+    assert response.json()["error"]["message"] == "Could not send verification code"
+    assert response.json()["error"]["code"] == "service_unavailable"
 
 
 def test_auth_configuration_has_no_insecure_secret_fallback(monkeypatch) -> None:

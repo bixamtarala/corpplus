@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import os
+import re
+import uuid
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from .auth_config import AuthNotConfigured, CommerceAuthSettings
@@ -16,6 +20,8 @@ from .auth_service import (
     InvalidSession,
     OtpRateLimited,
 )
+from .api_errors import install_api_error_handlers
+from .catalog_router import router as catalog_router
 from .database import get_commerce_db
 from .models import CommerceUser
 from .otp_provider import OtpProvider, OtpProviderError, build_otp_provider
@@ -26,11 +32,13 @@ from .schemas import (
     OtpRequestResponse,
     OtpVerifyBody,
     RefreshBody,
+    ServiceReadinessResponse,
     TokenResponse,
 )
 
 
 API_PREFIX = "/api/commerce/v1"
+REQUEST_ID_PATTERN = re.compile(r"^[A-Za-z0-9._-]{8,64}$")
 
 
 def get_auth_settings() -> CommerceAuthSettings:
@@ -97,6 +105,8 @@ def create_app() -> FastAPI:
         docs_url=f"{API_PREFIX}/docs" if docs_enabled else None,
         openapi_url=f"{API_PREFIX}/openapi.json" if docs_enabled else None,
     )
+    install_api_error_handlers(application)
+    application.include_router(catalog_router)
 
     allowed_origins = [
         origin.strip() for origin in os.getenv("COMMERCE_ALLOWED_ORIGINS", "").split(",") if origin.strip()
@@ -107,21 +117,48 @@ def create_app() -> FastAPI:
             allow_origins=allowed_origins,
             allow_credentials=False,
             allow_methods=["GET", "POST"],
-            allow_headers=["Authorization", "Content-Type"],
+            allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+            expose_headers=["X-Request-ID"],
         )
 
     @application.middleware("http")
     async def security_headers(request: Request, call_next):
+        supplied_request_id = request.headers.get("X-Request-ID", "")
+        request.state.request_id = (
+            supplied_request_id if REQUEST_ID_PATTERN.fullmatch(supplied_request_id) else str(uuid.uuid4())
+        )
         response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "no-referrer"
         response.headers["Cache-Control"] = "no-store"
+        response.headers["X-Request-ID"] = request.state.request_id
         return response
 
     @application.get(f"{API_PREFIX}/health")
     def health() -> dict[str, str]:
         return {"status": "ok", "service": "croppulse-commerce"}
+
+    @application.get(f"{API_PREFIX}/readiness", response_model=ServiceReadinessResponse)
+    def readiness(db: Session = Depends(get_commerce_db)) -> ServiceReadinessResponse:
+        try:
+            db.execute(select(1))
+            database_status = "ready"
+        except SQLAlchemyError:
+            database_status = "unavailable"
+
+        try:
+            settings = CommerceAuthSettings.from_env()
+            build_otp_provider(expiry_seconds=settings.otp_expiry_seconds)
+            authentication_status = "configured"
+        except (AuthNotConfigured, ValueError):
+            authentication_status = "not_configured"
+
+        return ServiceReadinessResponse(
+            ready=(database_status == "ready" and authentication_status == "configured"),
+            database=database_status,
+            authentication=authentication_status,
+        )
 
     @application.get(f"{API_PREFIX}/auth/readiness", response_model=AuthReadinessResponse)
     def auth_readiness() -> AuthReadinessResponse:
