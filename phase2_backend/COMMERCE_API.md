@@ -39,6 +39,15 @@ POST   /api/commerce/v1/addresses
 PATCH  /api/commerce/v1/addresses/{address_id}
 DELETE /api/commerce/v1/addresses/{address_id}
 POST   /api/commerce/v1/addresses/{address_id}/default
+
+POST   /api/commerce/v1/cart/guest
+GET    /api/commerce/v1/cart
+PATCH  /api/commerce/v1/cart
+POST   /api/commerce/v1/cart/items
+PATCH  /api/commerce/v1/cart/items/{item_id}
+DELETE /api/commerce/v1/cart/items/{item_id}
+POST   /api/commerce/v1/cart/validate
+POST   /api/commerce/v1/cart/merge
 ```
 
 Catalog browsing is intentionally available to guests. Account and future mutation endpoints require authenticated server-side authorization.
@@ -126,9 +135,7 @@ Implemented as a separate review-only increment:
 Still separate future increments:
 
 - Expansion and operational approval of the final 75-150 SKU pilot catalog.
-- Persistent server-backed cart.
 - Location-aware inventory availability.
-- Persistent cart mutations and validation.
 - Checkout, orders, payments, fulfilment, and refunds.
 - Flutter API integration.
 

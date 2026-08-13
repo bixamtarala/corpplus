@@ -128,6 +128,8 @@ def test_alembic_upgrade_and_downgrade_chain(monkeypatch) -> None:
         assert EXPECTED_TABLES <= table_names
         address_indexes = {index["name"] for index in inspect(engine).get_indexes("commerce_addresses")}
         assert "uq_commerce_addresses_active_default" in address_indexes
+        cart_columns = {column["name"] for column in inspect(engine).get_columns("commerce_carts")}
+        assert "delivery_pincode" in cart_columns
 
         command.downgrade(config, "base")
         remaining = set(inspect(engine).get_table_names())

@@ -390,6 +390,7 @@ class Cart(TimestampMixin, Base):
     guest_token_hash: Mapped[str | None] = mapped_column(String(128))
     service_zone_id: Mapped[str | None] = mapped_column(ForeignKey("commerce_service_zones.id", ondelete="SET NULL"))
     address_id: Mapped[str | None] = mapped_column(ForeignKey("commerce_addresses.id", ondelete="SET NULL"))
+    delivery_pincode: Mapped[str | None] = mapped_column(String(6))
     price_list_id: Mapped[str | None] = mapped_column(ForeignKey("commerce_price_lists.id", ondelete="SET NULL"))
     currency: Mapped[str] = mapped_column(String(3), default="INR", nullable=False)
     status: Mapped[str] = mapped_column(String(16), default="active", nullable=False)

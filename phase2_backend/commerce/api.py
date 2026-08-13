@@ -101,6 +101,29 @@ def get_current_user(
         ) from exc
 
 
+def get_optional_current_user(
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_commerce_db),
+) -> CommerceUser | None:
+    if authorization is None:
+        return None
+    token = bearer_token(authorization)
+    try:
+        settings = CommerceAuthSettings.from_env()
+    except (AuthNotConfigured, ValueError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Mobile authentication is not configured",
+        ) from exc
+    try:
+        return CommerceAuthService(db=db, settings=settings).authenticate_access_token(token)
+    except InvalidSession as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired session",
+        ) from exc
+
+
 def create_app() -> FastAPI:
     environment = os.getenv("ENV", "development").strip().lower()
     docs_enabled = (
@@ -115,8 +138,10 @@ def create_app() -> FastAPI:
     install_api_error_handlers(application)
     application.include_router(catalog_router)
     from .address_router import router as address_router
+    from .cart_router import router as cart_router
 
     application.include_router(address_router)
+    application.include_router(cart_router)
 
     allowed_origins = [
         origin.strip() for origin in os.getenv("COMMERCE_ALLOWED_ORIGINS", "").split(",") if origin.strip()
@@ -127,7 +152,7 @@ def create_app() -> FastAPI:
             allow_origins=allowed_origins,
             allow_credentials=False,
             allow_methods=["GET", "POST", "PATCH", "DELETE"],
-            allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+            allow_headers=["Authorization", "Content-Type", "X-Guest-Cart-Token", "X-Request-ID"],
             expose_headers=["X-Request-ID"],
         )
 
