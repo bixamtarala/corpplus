@@ -32,6 +32,13 @@ GET  /api/commerce/v1/auth/me
 GET  /api/commerce/v1/catalog/categories
 GET  /api/commerce/v1/catalog/products
 GET  /api/commerce/v1/catalog/products/{slug}
+
+GET    /api/commerce/v1/serviceability?pincode={pincode}
+GET    /api/commerce/v1/addresses
+POST   /api/commerce/v1/addresses
+PATCH  /api/commerce/v1/addresses/{address_id}
+DELETE /api/commerce/v1/addresses/{address_id}
+POST   /api/commerce/v1/addresses/{address_id}/default
 ```
 
 Catalog browsing is intentionally available to guests. Account and future mutation endpoints require authenticated server-side authorization.
@@ -77,7 +84,7 @@ Only active categories, products, and SKUs are returned. Draft, paused, recalled
 
 Effective consumer pricing is read from the active price list configured by `COMMERCE_CONSUMER_PRICE_LIST_CODE`, which defaults to `consumer-inr`. Prices are returned as integer minor units (`amount_paise`) with currency and effective timestamps.
 
-Inventory/serviceability is deliberately not inferred yet. Until the customer supplies a validated service zone and the inventory API is complete, every SKU returns:
+Pincode serviceability can now be checked independently, but catalog inventory is still not inferred from it. Until the client supplies a selected service zone to a future inventory-aware catalog/cart contract, every SKU returns:
 
 ```json
 {
@@ -111,10 +118,15 @@ Implemented locally:
 - Cursor pagination and constrained query inputs.
 - Liveness/readiness separation.
 
+Implemented as a separate review-only increment:
+
+- An idempotent draft seed containing 6 categories and 12 product/SKU candidates.
+- The seed remains hidden, inactive, and separate from consumer pricing until operational approval.
+
 Still separate future increments:
 
-- Approved pilot catalog seed data.
-- Addresses and serviceability.
+- Expansion and operational approval of the final 75-150 SKU pilot catalog.
+- Persistent server-backed cart.
 - Location-aware inventory availability.
 - Persistent cart mutations and validation.
 - Checkout, orders, payments, fulfilment, and refunds.

@@ -75,13 +75,14 @@ class CommerceAuthService:
         *,
         db: Session,
         settings: CommerceAuthSettings,
-        provider: OtpProvider,
+        provider: OtpProvider | None = None,
     ) -> None:
         self.db = db
         self.settings = settings
         self.provider = provider
 
     def request_otp(self, *, phone: str, request_ip: str) -> OtpRequestResult:
+        provider = self._require_provider()
         phone_e164 = normalize_indian_phone(phone)
         phone_hash = self._identifier_hash("phone", phone_e164)
         ip_hash = self._identifier_hash("ip", request_ip or "unknown")
@@ -116,7 +117,7 @@ class CommerceAuthService:
         if (ip_requests or 0) >= self.settings.max_requests_per_ip:
             raise OtpRateLimited(self.settings.rate_window_seconds)
 
-        provider_challenge = self.provider.request_code(phone_e164)
+        provider_challenge = provider.request_code(phone_e164)
         expiry_seconds = min(
             provider_challenge.expires_in_seconds,
             self.settings.otp_expiry_seconds,
@@ -124,7 +125,7 @@ class CommerceAuthService:
         challenge = OtpChallenge(
             phone_hash=phone_hash,
             request_ip_hash=ip_hash,
-            provider=self.provider.name,
+            provider=provider.name,
             provider_reference=provider_challenge.reference,
             status="requested",
             failed_attempts=0,
@@ -143,6 +144,7 @@ class CommerceAuthService:
         )
 
     def verify_otp(self, *, challenge_id: str, phone: str, code: str) -> TokenPair:
+        provider = self._require_provider()
         phone_e164 = normalize_indian_phone(phone)
         phone_hash = self._identifier_hash("phone", phone_e164)
         now = utcnow()
@@ -180,7 +182,7 @@ class CommerceAuthService:
             self.db.commit()
             raise InvalidOtp("Invalid or expired verification code")
 
-        if not self.provider.verify_code(phone_e164, code):
+        if not provider.verify_code(phone_e164, code):
             challenge.failed_attempts += 1
             if challenge.failed_attempts >= challenge.max_attempts:
                 challenge.status = "failed"
@@ -331,3 +333,8 @@ class CommerceAuthService:
         if value.tzinfo is None:
             return value.replace(tzinfo=timezone.utc)
         return value
+
+    def _require_provider(self) -> OtpProvider:
+        if self.provider is None:
+            raise RuntimeError("OTP provider is required for verification operations")
+        return self.provider

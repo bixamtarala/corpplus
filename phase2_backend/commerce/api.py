@@ -71,6 +71,13 @@ def get_auth_service(
     return CommerceAuthService(db=db, settings=settings, provider=provider)
 
 
+def get_session_auth_service(
+    db: Session = Depends(get_commerce_db),
+    settings: CommerceAuthSettings = Depends(get_auth_settings),
+) -> CommerceAuthService:
+    return CommerceAuthService(db=db, settings=settings)
+
+
 def bearer_token(authorization: str = Header(...)) -> str:
     scheme, _, token = authorization.partition(" ")
     if scheme.lower() != "bearer" or not token:
@@ -83,7 +90,7 @@ def bearer_token(authorization: str = Header(...)) -> str:
 
 def get_current_user(
     token: str = Depends(bearer_token),
-    service: CommerceAuthService = Depends(get_auth_service),
+    service: CommerceAuthService = Depends(get_session_auth_service),
 ) -> CommerceUser:
     try:
         return service.authenticate_access_token(token)
@@ -107,6 +114,9 @@ def create_app() -> FastAPI:
     )
     install_api_error_handlers(application)
     application.include_router(catalog_router)
+    from .address_router import router as address_router
+
+    application.include_router(address_router)
 
     allowed_origins = [
         origin.strip() for origin in os.getenv("COMMERCE_ALLOWED_ORIGINS", "").split(",") if origin.strip()
@@ -116,7 +126,7 @@ def create_app() -> FastAPI:
             CORSMiddleware,
             allow_origins=allowed_origins,
             allow_credentials=False,
-            allow_methods=["GET", "POST"],
+            allow_methods=["GET", "POST", "PATCH", "DELETE"],
             allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
             expose_headers=["X-Request-ID"],
         )
@@ -238,7 +248,7 @@ def create_app() -> FastAPI:
     @application.post(f"{API_PREFIX}/auth/refresh", response_model=TokenResponse)
     def refresh(
         payload: RefreshBody,
-        service: CommerceAuthService = Depends(get_auth_service),
+        service: CommerceAuthService = Depends(get_session_auth_service),
     ) -> TokenResponse:
         try:
             tokens = service.refresh(payload.refresh_token)
@@ -252,7 +262,7 @@ def create_app() -> FastAPI:
     @application.post(f"{API_PREFIX}/auth/logout", status_code=status.HTTP_204_NO_CONTENT)
     def logout(
         payload: RefreshBody,
-        service: CommerceAuthService = Depends(get_auth_service),
+        service: CommerceAuthService = Depends(get_session_auth_service),
     ) -> Response:
         service.logout(payload.refresh_token)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
