@@ -5,6 +5,7 @@ import 'package:croppulse_mobile/models/auth_session.dart';
 import 'package:croppulse_mobile/models/marketplace.dart';
 import 'package:croppulse_mobile/models/price_insight.dart';
 import 'package:croppulse_mobile/providers/api_providers.dart';
+import 'package:croppulse_mobile/providers/commerce_provider.dart';
 import 'package:croppulse_mobile/providers/marketplace_provider.dart';
 import 'package:croppulse_mobile/screens/farmer_profile_screen.dart';
 import 'package:croppulse_mobile/screens/home_screen.dart';
@@ -29,180 +30,223 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  testWidgets('login screen requests and verifies OTP with provider overrides', (tester) async {
-    final fakeApi = FakeApiService(
-      otpResult: const OtpRequestResult(
-        phone: '+919876543210',
-        message: 'OTP sent',
-        expiresInSeconds: 600,
-      ),
-      session: const AuthSession(
-        accessToken: 'test-token',
-        tokenType: 'bearer',
-        userId: 'user-123',
-        phone: '+919876543210',
-      ),
+  testWidgets(
+    'login screen requests and verifies OTP with provider overrides',
+    (tester) async {
+      final fakeApi = FakeApiService(
+        otpResult: const OtpRequestResult(
+          phone: '+919876543210',
+          message: 'OTP sent',
+          expiresInSeconds: 600,
+        ),
+        session: const AuthSession(
+          accessToken: 'test-token',
+          tokenType: 'bearer',
+          userId: 'user-123',
+          phone: '+919876543210',
+        ),
+      );
+
+      await tester.pumpWidget(
+        _buildTestApp(
+          const LoginScreen(),
+          overrides: [apiServiceProvider.overrideWithValue(fakeApi)],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField).first, '9876543210');
+      await tester.tap(find.text('Request OTP'));
+      await tester.pumpAndSettle();
+
+      expect(fakeApi.requestedPhones, ['9876543210']);
+      expect(find.text('Verify OTP'), findsOneWidget);
+      expect(
+        find.textContaining('Use the mock code 123456 for now.'),
+        findsOneWidget,
+      );
+
+      await tester.enterText(find.byType(TextField).at(1), '123456');
+      await tester.tap(find.text('Verify OTP'));
+      await tester.pumpAndSettle();
+
+      expect(fakeApi.verifiedOtps, ['123456']);
+      expect(find.text('Signed in successfully.'), findsOneWidget);
+
+      final preferences = await SharedPreferences.getInstance();
+      expect(preferences.getString('auth_access_token'), 'test-token');
+      expect(preferences.getString('auth_phone'), '+919876543210');
+    },
+  );
+
+  test(
+    'marketplace controller keeps guest listings and offers as local drafts',
+    () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final controller = container.read(marketplaceControllerProvider.notifier);
+
+      await controller.createListing(
+        const MarketplaceListingRequest(
+          cropId: 'rice_crop_1',
+          quantityKg: 1000,
+          qualityGrade: 'A',
+          pricePerKg: 2400,
+          availableDate: '2026-09-20',
+          description: 'Guest draft listing',
+        ),
+      );
+
+      var marketplaceState = container.read(marketplaceControllerProvider);
+      expect(marketplaceState.sellOrders, hasLength(1));
+      expect(marketplaceState.sellOrders.first.status, 'draft');
+      expect(
+        marketplaceState.statusMessage,
+        'Preview mode: listing saved locally as a draft.',
+      );
+
+      await controller.makeOffer(
+        const MarketplaceOfferRequest(
+          listingId: 'listing-123',
+          offeredPricePerKg: 2350,
+          quantityKg: 500,
+          pickupLocation: 'Erode, Tamil Nadu',
+          message: 'Need pickup tomorrow',
+        ),
+      );
+
+      marketplaceState = container.read(marketplaceControllerProvider);
+      expect(marketplaceState.latestOffer, isNotNull);
+      expect(marketplaceState.latestOffer!.status, 'draft');
+      expect(
+        marketplaceState.statusMessage,
+        'Preview mode: offer saved locally for later sync.',
+      );
+    },
+  );
+
+  testWidgets(
+    'main navigation shows an update prompt when a newer build is available',
+    (tester) async {
+      final fakeUpdateService = FakeAppUpdateService(
+        update: const AppUpdateInfo(
+          versionName: '1.0.3',
+          versionCode: 5,
+          downloadUrl: 'https://example.com/app-release.apk',
+          playStoreUrl:
+              'https://play.google.com/store/apps/details?id=com.croppulse.mobile',
+          releaseNotes: 'Fresh marketplace fixes and release wiring.',
+        ),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(child: MyApp(updateService: fakeUpdateService)),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Update available'), findsOneWidget);
+      expect(find.text('CropPulse 1.0.3 is ready to install.'), findsOneWidget);
+      expect(
+        find.text('Fresh marketplace fixes and release wiring.'),
+        findsOneWidget,
+      );
+      expect(find.text('Later'), findsOneWidget);
+      expect(find.text('Open store'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'home screen language picker updates across repeated selections',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MyApp(updateService: FakeAppUpdateService(update: null)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Daily Intelligence Feed'), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.language));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(ListTile).at(1));
+      await tester.pumpAndSettle();
+
+      expect(find.text('दैनिक इंटेलिजेंस फ़ीड'), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.language));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(ListTile).at(2));
+      await tester.pumpAndSettle();
+
+      expect(find.text('దినసరి ఇంటెలిజెన్స్ ఫీడ్'), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.language));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(ListTile).at(0));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Daily Intelligence Feed'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'commerce home fits categories and preview catalog on narrow screens',
+    (tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(_buildTestApp(const HomeScreen()));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Categories'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Pilot catalog preview'),
+      300,
+      scrollable: find.byType(Scrollable).first,
     );
+    expect(find.text('Pilot catalog preview'), findsOneWidget);
+      expect(find.text('Vegetables'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
-    await tester.pumpWidget(
-      _buildTestApp(
-        const LoginScreen(),
-        overrides: [apiServiceProvider.overrideWithValue(fakeApi)],
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    await tester.enterText(find.byType(TextField).first, '9876543210');
-    await tester.tap(find.text('Request OTP'));
-    await tester.pumpAndSettle();
-
-    expect(fakeApi.requestedPhones, ['9876543210']);
-    expect(find.text('Verify OTP'), findsOneWidget);
-    expect(find.textContaining('Use the mock code 123456 for now.'), findsOneWidget);
-
-    await tester.enterText(find.byType(TextField).at(1), '123456');
-    await tester.tap(find.text('Verify OTP'));
-    await tester.pumpAndSettle();
-
-    expect(fakeApi.verifiedOtps, ['123456']);
-    expect(find.text('Signed in successfully.'), findsOneWidget);
-
-    final preferences = await SharedPreferences.getInstance();
-    expect(preferences.getString('auth_access_token'), 'test-token');
-    expect(preferences.getString('auth_phone'), '+919876543210');
-  });
-
-  test('marketplace controller keeps guest listings and offers as local drafts', () async {
+  test('commerce cart adds, increments, and removes preview products', () {
     final container = ProviderContainer();
     addTearDown(container.dispose);
+    final controller = container.read(cartControllerProvider.notifier);
 
-    final controller = container.read(marketplaceControllerProvider.notifier);
+    controller.add('tomato-grade-a-1kg');
+    controller.add('tomato-grade-a-1kg');
+    controller.add('onion-1kg');
 
-    await controller.createListing(
-      const MarketplaceListingRequest(
-        cropId: 'rice_crop_1',
-        quantityKg: 1000,
-        qualityGrade: 'A',
-        pricePerKg: 2400,
-        availableDate: '2026-09-20',
-        description: 'Guest draft listing',
-      ),
+    expect(container.read(cartControllerProvider).itemCount, 3);
+    expect(
+      container.read(cartControllerProvider).quantityFor('tomato-grade-a-1kg'),
+      2,
     );
+    expect(container.read(cartControllerProvider).previewSubtotalPaise, 12000);
 
-    var marketplaceState = container.read(marketplaceControllerProvider);
-    expect(marketplaceState.sellOrders, hasLength(1));
-    expect(marketplaceState.sellOrders.first.status, 'draft');
-    expect(marketplaceState.statusMessage, 'Preview mode: listing saved locally as a draft.');
+    controller.removeOne('tomato-grade-a-1kg');
+    controller.remove('onion-1kg');
 
-    await controller.makeOffer(
-      const MarketplaceOfferRequest(
-        listingId: 'listing-123',
-        offeredPricePerKg: 2350,
-        quantityKg: 500,
-        pickupLocation: 'Erode, Tamil Nadu',
-        message: 'Need pickup tomorrow',
-      ),
-    );
-
-    marketplaceState = container.read(marketplaceControllerProvider);
-    expect(marketplaceState.latestOffer, isNotNull);
-    expect(marketplaceState.latestOffer!.status, 'draft');
-    expect(marketplaceState.statusMessage, 'Preview mode: offer saved locally for later sync.');
+    expect(container.read(cartControllerProvider).itemCount, 1);
+    expect(container.read(cartControllerProvider).previewSubtotalPaise, 4200);
   });
 
-  testWidgets('main navigation shows an update prompt when a newer build is available', (tester) async {
-    final fakeUpdateService = FakeAppUpdateService(
-      update: const AppUpdateInfo(
-        versionName: '1.0.3',
-        versionCode: 5,
-        downloadUrl: 'https://example.com/app-release.apk',
-        playStoreUrl: 'https://play.google.com/store/apps/details?id=com.croppulse.mobile',
-        releaseNotes: 'Fresh marketplace fixes and release wiring.',
-      ),
-    );
-
-    await tester.pumpWidget(
-      ProviderScope(
-        child: MyApp(updateService: fakeUpdateService),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Update available'), findsOneWidget);
-    expect(find.text('CropPulse 1.0.3 is ready to install.'), findsOneWidget);
-    expect(find.text('Fresh marketplace fixes and release wiring.'), findsOneWidget);
-    expect(find.text('Later'), findsOneWidget);
-    expect(find.text('Open store'), findsOneWidget);
-  });
-
-  testWidgets('home screen language picker updates across repeated selections', (tester) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        child: MyApp(
-          updateService: FakeAppUpdateService(update: null),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Daily Intelligence Feed'), findsOneWidget);
-
-    await tester.tap(find.byIcon(Icons.language));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byType(ListTile).at(1));
-    await tester.pumpAndSettle();
-
-    expect(find.text('दैनिक इंटेलिजेंस फ़ीड'), findsOneWidget);
-
-    await tester.tap(find.byIcon(Icons.language));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byType(ListTile).at(2));
-    await tester.pumpAndSettle();
-
-    expect(find.text('దినసరి ఇంటెలిజెన్స్ ఫీడ్'), findsOneWidget);
-
-    await tester.tap(find.byIcon(Icons.language));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byType(ListTile).at(0));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Daily Intelligence Feed'), findsOneWidget);
-  });
-
-  testWidgets('home screen keeps all role options on one line on narrow screens', (tester) async {
+  testWidgets('trader hub fits localized cards on narrow screens', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
-      _buildTestApp(
-        const HomeScreen(),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    final farmerY = tester.getTopLeft(find.text('Farmer')).dy;
-    final traderY = tester.getTopLeft(find.text('Trader')).dy;
-    final customerY = tester.getTopLeft(find.text('Customer')).dy;
-    final exporterY = tester.getTopLeft(find.text('Exporter')).dy;
-
-    expect(traderY, closeTo(farmerY, 2));
-    expect(customerY, closeTo(farmerY, 2));
-    expect(exporterY, closeTo(farmerY, 2));
-  });
-
-  testWidgets('trader hub fits localized cards on narrow screens', (tester) async {
-    tester.view.physicalSize = const Size(360, 800);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    await tester.pumpWidget(
-      _buildTestApp(
-        const TraderHubScreen(),
-        locale: const Locale('te'),
-      ),
+      _buildTestApp(const TraderHubScreen(), locale: const Locale('te')),
     );
     await tester.pumpAndSettle();
 
@@ -212,7 +256,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('marketplace fits filters and tabs on narrow localized screens', (tester) async {
+  testWidgets('marketplace fits filters and tabs on narrow localized screens', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -237,38 +283,37 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('intelligence screen fits localized advisor and supply cards on narrow screens', (tester) async {
+  testWidgets(
+    'intelligence screen fits localized advisor and supply cards on narrow screens',
+    (tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        _buildTestApp(const IntelligenceScreen(), locale: const Locale('te')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('ఏఐ ప్రైస్ అడ్వైజర్'), findsOneWidget);
+      expect(find.text('ప్రైస్ అడ్వైజర్ తెరవండి'), findsOneWidget);
+      expect(find.textContaining('సరఫరా వర్సెస్ డిమాండ్'), findsOneWidget);
+      expect(find.text('కొనుగోలుదారుల ఆసక్తి'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('farmer profile actions fit localized labels on narrow screens', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
-      _buildTestApp(
-        const IntelligenceScreen(),
-        locale: const Locale('te'),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('ఏఐ ప్రైస్ అడ్వైజర్'), findsOneWidget);
-    expect(find.text('ప్రైస్ అడ్వైజర్ తెరవండి'), findsOneWidget);
-    expect(find.textContaining('సరఫరా వర్సెస్ డిమాండ్'), findsOneWidget);
-    expect(find.text('కొనుగోలుదారుల ఆసక్తి'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('farmer profile actions fit localized labels on narrow screens', (tester) async {
-    tester.view.physicalSize = const Size(360, 800);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    await tester.pumpWidget(
-      _buildTestApp(
-        const FarmerProfileScreen(),
-        locale: const Locale('te'),
-      ),
+      _buildTestApp(const FarmerProfileScreen(), locale: const Locale('te')),
     );
     await tester.pumpAndSettle();
 
@@ -277,48 +322,53 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('price insight fits localized hero and result tiles on narrow screens', (tester) async {
-    tester.view.physicalSize = const Size(360, 800);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+  testWidgets(
+    'price insight fits localized hero and result tiles on narrow screens',
+    (tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
-    final fakeApi = FakeApiService(
-      priceInsight: const PriceInsight(
-        crop: 'Rice',
-        recommendedPrice: 2650,
-        marketTrend: 'పెరుగుతోంది',
-        nearbyPrices: {
-          'Warangal Mandi': 2620,
-          'Khammam Mandi': 2675,
-        },
-        bestSellingTime: 'తదుపరి 48 గంటలు',
-        analysis: 'డిమాండ్ బలంగా ఉంది, కాబట్టి ధరల కదలికను గమనిస్తూ త్వరగా అమ్మడం మంచిది.',
-        source: InsightSource.fallback,
-      ),
-    );
+      final fakeApi = FakeApiService(
+        priceInsight: const PriceInsight(
+          crop: 'Rice',
+          recommendedPrice: 2650,
+          marketTrend: 'పెరుగుతోంది',
+          nearbyPrices: {'Warangal Mandi': 2620, 'Khammam Mandi': 2675},
+          bestSellingTime: 'తదుపరి 48 గంటలు',
+          analysis:
+              'డిమాండ్ బలంగా ఉంది, కాబట్టి ధరల కదలికను గమనిస్తూ త్వరగా అమ్మడం మంచిది.',
+          source: InsightSource.fallback,
+        ),
+      );
 
-    await tester.pumpWidget(
-      _buildTestApp(
-        const PriceInsightScreen(initialCrop: 'Rice'),
-        locale: const Locale('te'),
-        overrides: [apiServiceProvider.overrideWithValue(fakeApi)],
-      ),
-    );
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        _buildTestApp(
+          const PriceInsightScreen(initialCrop: 'Rice'),
+          locale: const Locale('te'),
+          overrides: [apiServiceProvider.overrideWithValue(fakeApi)],
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('సిఫార్సు తెమ్మండి'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('సిఫార్సు తెమ్మండి'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('లైవ్ అమ్మకాల మార్గదర్శకం'), findsOneWidget);
-    expect(find.text('సమీప మార్కెట్లు'), findsOneWidget);
-    expect(find.textContaining('అమ్మడానికి ఉత్తమ సమయం'), findsOneWidget);
-    expect(find.text('మార్కెట్ ధోరణి'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
+      expect(find.text('లైవ్ అమ్మకాల మార్గదర్శకం'), findsOneWidget);
+      expect(find.text('సమీప మార్కెట్లు'), findsOneWidget);
+      expect(find.textContaining('అమ్మడానికి ఉత్తమ సమయం'), findsOneWidget);
+      expect(find.text('మార్కెట్ ధోరణి'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }
 
-Widget _buildTestApp(Widget child, {List<Override> overrides = const [], Locale? locale}) {
+Widget _buildTestApp(
+  Widget child, {
+  List<Override> overrides = const [],
+  Locale? locale,
+}) {
   return ProviderScope(
     overrides: overrides,
     child: MaterialApp(
@@ -339,7 +389,12 @@ Widget _buildTestApp(Widget child, {List<Override> overrides = const [], Locale?
 }
 
 class FakeApiService extends ApiService {
-  FakeApiService({this.otpResult, this.session, this.searchResults, this.priceInsight}) : super();
+  FakeApiService({
+    this.otpResult,
+    this.session,
+    this.searchResults,
+    this.priceInsight,
+  }) : super();
 
   final OtpRequestResult? otpResult;
   final AuthSession? session;
@@ -360,7 +415,10 @@ class FakeApiService extends ApiService {
   }
 
   @override
-  Future<AuthSession> verifyOtp({required String phoneNumber, required String otp}) async {
+  Future<AuthSession> verifyOtp({
+    required String phoneNumber,
+    required String otp,
+  }) async {
     verifiedOtps.add(otp);
     return session ??
         AuthSession(
@@ -382,7 +440,9 @@ class FakeApiService extends ApiService {
   }
 
   @override
-  Future<PriceInsight> getPriceInsight(PriceInsightRequestPayload request) async {
+  Future<PriceInsight> getPriceInsight(
+    PriceInsightRequestPayload request,
+  ) async {
     return priceInsight ??
         const PriceInsight(
           crop: 'Rice',
@@ -398,10 +458,11 @@ class FakeApiService extends ApiService {
 
 class FakeAppUpdateService extends AppUpdateService {
   FakeAppUpdateService({this.update, this.prompt = true})
-      : super(
-          metadataUrl: 'https://example.com/update.json',
-          fallbackPlayStoreUrl: 'https://play.google.com/store/apps/details?id=com.croppulse.mobile',
-        );
+    : super(
+        metadataUrl: 'https://example.com/update.json',
+        fallbackPlayStoreUrl:
+            'https://play.google.com/store/apps/details?id=com.croppulse.mobile',
+      );
 
   final AppUpdateInfo? update;
   final bool prompt;
