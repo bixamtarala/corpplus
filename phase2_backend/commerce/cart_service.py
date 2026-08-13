@@ -178,6 +178,18 @@ class CartService:
         self._check_version(cart, expected_version)
         return self._render(cart)
 
+    def checkout_snapshot(self, *, user_id: str, expected_version: int) -> tuple[Cart, CartResponse]:
+        """Lock and revalidate an authenticated cart without committing.
+
+        Checkout uses the same authoritative cart rules, but owns the outer
+        transaction so inventory reservations and the order ledger commit
+        atomically with the cart conversion.
+        """
+
+        cart = self._resolve(user_id=user_id, guest_token=None, create_user=False, lock=True)
+        self._check_version(cart, expected_version)
+        return cart, self._render(cart, commit=False)
+
     def merge_guest(
         self,
         *,
@@ -281,7 +293,13 @@ class CartService:
             raise CartNotFound("Cart not found")
         return cart
 
-    def _render(self, cart: Cart, *, guest_token: str | None = None) -> CartResponse:
+    def _render(
+        self,
+        cart: Cart,
+        *,
+        guest_token: str | None = None,
+        commit: bool = True,
+    ) -> CartResponse:
         self.db.flush()
         now = self._now()
         cart_issues: list[CartIssueResponse] = []
@@ -365,7 +383,10 @@ class CartService:
         else:
             validation_status = "valid"
 
-        self.db.commit()
+        if commit:
+            self.db.commit()
+        else:
+            self.db.flush()
         return CartResponse(
             id=cart.id,
             owner_type="authenticated" if cart.user_id else "guest",
