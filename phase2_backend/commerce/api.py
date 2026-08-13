@@ -139,9 +139,11 @@ def create_app() -> FastAPI:
     application.include_router(catalog_router)
     from .address_router import router as address_router
     from .cart_router import router as cart_router
+    from .order_router import router as order_router
 
     application.include_router(address_router)
     application.include_router(cart_router)
+    application.include_router(order_router)
 
     allowed_origins = [
         origin.strip() for origin in os.getenv("COMMERCE_ALLOWED_ORIGINS", "").split(",") if origin.strip()
@@ -152,7 +154,13 @@ def create_app() -> FastAPI:
             allow_origins=allowed_origins,
             allow_credentials=False,
             allow_methods=["GET", "POST", "PATCH", "DELETE"],
-            allow_headers=["Authorization", "Content-Type", "X-Guest-Cart-Token", "X-Request-ID"],
+            allow_headers=[
+                "Authorization",
+                "Content-Type",
+                "Idempotency-Key",
+                "X-Guest-Cart-Token",
+                "X-Request-ID",
+            ],
             expose_headers=["X-Request-ID"],
         )
 

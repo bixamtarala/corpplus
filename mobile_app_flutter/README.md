@@ -32,10 +32,10 @@ Status snapshot: 13 August 2026.
 | Product discovery | Home sections, category browsing, multilingual-name search, product details | Preview implemented |
 | Location | Flutter pincode serviceability and authenticated saved-address create/edit/delete/default selection now use `/api/commerce/v1` | Launch zones are not operationally loaded |
 | Cart | Flutter restores persistent guest/authenticated carts, merges after login, and displays authoritative validation and totals | Checkout and inventory reservation remain pending |
-| Checkout | Deliberately disabled | Not implemented |
+| Checkout | Backend quote, COD order creation, reservation, history/detail and confirmed-order cancellation implemented | Flutter checkout screens, delivery slots and online payment remain pending |
 | Authentication | Flutter uses `/api/commerce/v1` OTP, rotating refresh sessions, logout revocation, and encrypted platform token storage | Twilio and hosted database are not activated |
 | Commerce database | Isolated SQLAlchemy models and initial Alembic migration for 18 `commerce_*` tables | Implemented locally; not yet applied to a hosted PostgreSQL database |
-| Orders and payments | Product requirements and screen states documented | Not implemented |
+| Orders and payments | Immutable server order ledger, idempotent COD creation, inventory reservations and customer history API implemented | Payment gateway, fulfilment and Flutter integration remain pending |
 | Operations | Fulfilment workflow documented | No operations console or live workflow |
 | B2B/B2B2C | Architecture direction documented | Not implemented |
 | Legacy tools | Farmer, Trader, Intelligence, Marketplace, and Profile remain accessible through Account | Existing demo/API behavior retained |

@@ -48,6 +48,11 @@ PATCH  /api/commerce/v1/cart/items/{item_id}
 DELETE /api/commerce/v1/cart/items/{item_id}
 POST   /api/commerce/v1/cart/validate
 POST   /api/commerce/v1/cart/merge
+POST   /api/commerce/v1/checkout/quote
+POST   /api/commerce/v1/orders
+GET    /api/commerce/v1/orders
+GET    /api/commerce/v1/orders/{order_id}
+POST   /api/commerce/v1/orders/{order_id}/cancel
 ```
 
 Catalog browsing is intentionally available to guests. Account and future mutation endpoints require authenticated server-side authorization.

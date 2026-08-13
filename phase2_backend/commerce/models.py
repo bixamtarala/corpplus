@@ -422,6 +422,139 @@ class CartItem(TimestampMixin, Base):
     cart: Mapped[Cart] = relationship(back_populates="items")
 
 
+class Order(TimestampMixin, Base):
+    __tablename__ = "commerce_orders"
+    __table_args__ = (
+        UniqueConstraint("user_id", "idempotency_key_hash", name="uq_commerce_order_idempotency"),
+        CheckConstraint(
+            "status IN ('confirmed', 'processing', 'fulfilled', 'cancelled')",
+            name="ck_commerce_orders_status",
+        ),
+        CheckConstraint("payment_method IN ('cod')", name="ck_commerce_orders_payment_method"),
+        CheckConstraint(
+            "payment_status IN ('pending', 'collected', 'failed', 'refunded', 'voided')",
+            name="ck_commerce_orders_payment_status",
+        ),
+        CheckConstraint(
+            "substitution_preference IN ('contact_me', 'allow', 'do_not_substitute')",
+            name="ck_commerce_orders_substitution",
+        ),
+        CheckConstraint(
+            "subtotal_paise >= 0 AND tax_paise >= 0 AND delivery_fee_paise >= 0 "
+            "AND discount_paise >= 0 AND total_paise >= 0",
+            name="ck_commerce_orders_totals",
+        ),
+        Index("ix_commerce_orders_user_created", "user_id", "created_at"),
+        Index("ix_commerce_orders_status_created", "status", "created_at"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    order_number: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
+    user_id: Mapped[str] = mapped_column(ForeignKey("commerce_users.id", ondelete="RESTRICT"), nullable=False)
+    source_cart_id: Mapped[str] = mapped_column(ForeignKey("commerce_carts.id", ondelete="RESTRICT"), nullable=False)
+    address_id: Mapped[str | None] = mapped_column(ForeignKey("commerce_addresses.id", ondelete="SET NULL"))
+    service_zone_id: Mapped[str | None] = mapped_column(ForeignKey("commerce_service_zones.id", ondelete="SET NULL"))
+    idempotency_key_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    request_fingerprint: Mapped[str] = mapped_column(String(64), nullable=False)
+    address_snapshot: Mapped[dict[str, object]] = mapped_column(JSON, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default="confirmed", nullable=False)
+    payment_method: Mapped[str] = mapped_column(String(20), default="cod", nullable=False)
+    payment_status: Mapped[str] = mapped_column(String(20), default="pending", nullable=False)
+    substitution_preference: Mapped[str] = mapped_column(String(24), default="contact_me", nullable=False)
+    customer_note: Mapped[str | None] = mapped_column(String(500))
+    currency: Mapped[str] = mapped_column(String(3), default="INR", nullable=False)
+    subtotal_paise: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    tax_paise: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
+    delivery_fee_paise: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
+    discount_paise: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
+    total_paise: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    confirmed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+    cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    items: Mapped[list["OrderItem"]] = relationship(back_populates="order", cascade="all, delete-orphan")
+    reservations: Mapped[list["InventoryReservation"]] = relationship(
+        back_populates="order", cascade="all, delete-orphan"
+    )
+    events: Mapped[list["OrderEvent"]] = relationship(back_populates="order", cascade="all, delete-orphan")
+
+
+class OrderItem(TimestampMixin, Base):
+    __tablename__ = "commerce_order_items"
+    __table_args__ = (
+        CheckConstraint("quantity > 0", name="ck_commerce_order_items_quantity"),
+        CheckConstraint(
+            "unit_price_paise >= 0 AND subtotal_paise >= 0 AND tax_paise >= 0 AND total_paise >= 0",
+            name="ck_commerce_order_items_totals",
+        ),
+        Index("ix_commerce_order_items_order", "order_id"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    order_id: Mapped[str] = mapped_column(ForeignKey("commerce_orders.id", ondelete="CASCADE"), nullable=False)
+    sku_id: Mapped[str] = mapped_column(ForeignKey("commerce_skus.id", ondelete="RESTRICT"), nullable=False)
+    sku_code: Mapped[str] = mapped_column(String(80), nullable=False)
+    product_name: Mapped[str] = mapped_column(String(160), nullable=False)
+    unit_of_measure: Mapped[str] = mapped_column(String(20), nullable=False)
+    quantity: Mapped[Decimal] = mapped_column(Numeric(14, 3), nullable=False)
+    unit_price_paise: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    tax_rate_basis_points: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    subtotal_paise: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    tax_paise: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
+    total_paise: Mapped[int] = mapped_column(BigInteger, nullable=False)
+
+    order: Mapped[Order] = relationship(back_populates="items")
+    reservations: Mapped[list["InventoryReservation"]] = relationship(
+        back_populates="order_item", cascade="all, delete-orphan"
+    )
+
+
+class InventoryReservation(TimestampMixin, Base):
+    __tablename__ = "commerce_inventory_reservations"
+    __table_args__ = (
+        CheckConstraint("quantity > 0", name="ck_commerce_inventory_reservations_quantity"),
+        CheckConstraint(
+            "status IN ('active', 'consumed', 'released')",
+            name="ck_commerce_inventory_reservations_status",
+        ),
+        Index("ix_commerce_reservations_order", "order_id", "status"),
+        Index("ix_commerce_reservations_balance", "inventory_balance_id", "status"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    order_id: Mapped[str] = mapped_column(ForeignKey("commerce_orders.id", ondelete="CASCADE"), nullable=False)
+    order_item_id: Mapped[str] = mapped_column(
+        ForeignKey("commerce_order_items.id", ondelete="CASCADE"), nullable=False
+    )
+    inventory_balance_id: Mapped[str] = mapped_column(
+        ForeignKey("commerce_inventory_balances.id", ondelete="RESTRICT"), nullable=False
+    )
+    quantity: Mapped[Decimal] = mapped_column(Numeric(14, 3), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), default="active", nullable=False)
+    released_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    consumed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    order: Mapped[Order] = relationship(back_populates="reservations")
+    order_item: Mapped[OrderItem] = relationship(back_populates="reservations")
+
+
+class OrderEvent(Base):
+    __tablename__ = "commerce_order_events"
+    __table_args__ = (
+        UniqueConstraint("order_id", "sequence", name="uq_commerce_order_event_sequence"),
+        Index("ix_commerce_order_events_order", "order_id", "sequence"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    order_id: Mapped[str] = mapped_column(ForeignKey("commerce_orders.id", ondelete="CASCADE"), nullable=False)
+    sequence: Mapped[int] = mapped_column(Integer, nullable=False)
+    event_type: Mapped[str] = mapped_column(String(80), nullable=False)
+    actor_user_id: Mapped[str | None] = mapped_column(ForeignKey("commerce_users.id", ondelete="SET NULL"))
+    payload: Mapped[dict[str, object]] = mapped_column(JSON, default=dict, nullable=False)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+    order: Mapped[Order] = relationship(back_populates="events")
+
+
 class AuditEvent(Base):
     __tablename__ = "commerce_audit_events"
     __table_args__ = (
