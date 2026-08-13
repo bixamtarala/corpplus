@@ -235,25 +235,25 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             selectedIcon: const Icon(Icons.home),
             label: l10n.text('nav_home'),
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.grid_view_outlined),
-            selectedIcon: Icon(Icons.grid_view),
-            label: 'Categories',
+          NavigationDestination(
+            icon: const Icon(Icons.grid_view_outlined),
+            selectedIcon: const Icon(Icons.grid_view),
+            label: l10n.text('nav_categories'),
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.search),
-            selectedIcon: Icon(Icons.manage_search),
-            label: 'Search',
+          NavigationDestination(
+            icon: const Icon(Icons.search),
+            selectedIcon: const Icon(Icons.manage_search),
+            label: l10n.text('nav_search'),
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.shopping_cart_outlined),
-            selectedIcon: Icon(Icons.shopping_cart),
-            label: 'Cart',
+          NavigationDestination(
+            icon: const Icon(Icons.shopping_cart_outlined),
+            selectedIcon: const Icon(Icons.shopping_cart),
+            label: l10n.text('nav_cart'),
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Account',
+          NavigationDestination(
+            icon: const Icon(Icons.person_outline),
+            selectedIcon: const Icon(Icons.person),
+            label: l10n.text('nav_account'),
           ),
         ],
       ),

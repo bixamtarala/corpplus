@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../localization/app_strings.dart';
 import '../models/auth_session.dart';
+import '../services/api_service.dart';
 import 'api_providers.dart';
 
 class AuthState {
@@ -17,18 +18,14 @@ class AuthState {
     this.errorMessage,
     this.session,
   });
-
-  factory AuthState.initial() {
-    return const AuthState(
-      isInitialized: false,
-      isLoading: false,
-      isAuthenticated: false,
-      isOtpRequested: false,
-      phoneNumber: '',
-      displayName: 'CropPulse User',
-    );
-  }
-
+  factory AuthState.initial() => const AuthState(
+    isInitialized: false,
+    isLoading: false,
+    isAuthenticated: false,
+    isOtpRequested: false,
+    phoneNumber: '',
+    displayName: 'CropPulse User',
+  );
   final bool isInitialized;
   final bool isLoading;
   final bool isAuthenticated;
@@ -38,7 +35,6 @@ class AuthState {
   final String? statusMessage;
   final String? errorMessage;
   final AuthSession? session;
-
   AuthState copyWith({
     bool? isInitialized,
     bool? isLoading,
@@ -51,59 +47,75 @@ class AuthState {
     AuthSession? session,
     bool clearStatus = false,
     bool clearError = false,
-  }) {
-    return AuthState(
-      isInitialized: isInitialized ?? this.isInitialized,
-      isLoading: isLoading ?? this.isLoading,
-      isAuthenticated: isAuthenticated ?? this.isAuthenticated,
-      isOtpRequested: isOtpRequested ?? this.isOtpRequested,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
-      displayName: displayName ?? this.displayName,
-      statusMessage: clearStatus ? null : statusMessage ?? this.statusMessage,
-      errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
-      session: session ?? this.session,
-    );
-  }
+    bool clearSession = false,
+  }) => AuthState(
+    isInitialized: isInitialized ?? this.isInitialized,
+    isLoading: isLoading ?? this.isLoading,
+    isAuthenticated: isAuthenticated ?? this.isAuthenticated,
+    isOtpRequested: isOtpRequested ?? this.isOtpRequested,
+    phoneNumber: phoneNumber ?? this.phoneNumber,
+    displayName: displayName ?? this.displayName,
+    statusMessage: clearStatus ? null : statusMessage ?? this.statusMessage,
+    errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
+    session: clearSession ? null : session ?? this.session,
+  );
 }
 
 class AuthController extends StateNotifier<AuthState> {
   AuthController(this._ref) : super(AuthState.initial()) {
     _restoreSession();
   }
-
-  static const _tokenKey = 'auth_access_token';
-  static const _tokenTypeKey = 'auth_token_type';
-  static const _userIdKey = 'auth_user_id';
-  static const _phoneKey = 'auth_phone';
-
+  static const accessKey = 'commerce_access_token';
+  static const refreshKey = 'commerce_refresh_token';
   final Ref _ref;
 
   Future<void> _restoreSession() async {
-    final prefs = await _ref.read(sharedPreferencesProvider.future);
-    final token = prefs.getString(_tokenKey);
-    final phone = prefs.getString(_phoneKey);
-
-    if (token == null || phone == null) {
-      state = state.copyWith(isInitialized: true, clearError: true, clearStatus: true);
+    final storage = _ref.read(secureStorageProvider);
+    final access = await storage.read(accessKey);
+    final refresh = await storage.read(refreshKey);
+    if (access == null || refresh == null) {
+      state = state.copyWith(isInitialized: true, clearError: true);
       return;
     }
-
-    final session = AuthSession.fromStorage({
-      'access_token': token,
-      'token_type': prefs.getString(_tokenTypeKey),
-      'user_id': prefs.getString(_userIdKey),
-      'phone': phone,
-    });
-
-    state = state.copyWith(
-      isInitialized: true,
-      isAuthenticated: true,
-      session: session,
-      phoneNumber: session.phone,
-      displayName: _displayNameFromPhone(session.phone),
-      clearError: true,
-      clearStatus: true,
-    );
+    try {
+      var session = AuthSession(
+        accessToken: access,
+        refreshToken: refresh,
+        tokenType: 'bearer',
+      );
+      CurrentCommerceUser user;
+      try {
+        user = await _ref
+            .read(apiServiceProvider)
+            .getCurrentCommerceUser(access);
+      } on DioException catch (error) {
+        if (error.response?.statusCode != 401) rethrow;
+        session = await _ref
+            .read(apiServiceProvider)
+            .refreshCommerceSession(refresh);
+        await _saveTokens(session);
+        user = await _ref
+            .read(apiServiceProvider)
+            .getCurrentCommerceUser(session.accessToken);
+      }
+      session = session.withUser(user);
+      state = state.copyWith(
+        isInitialized: true,
+        isAuthenticated: true,
+        session: session,
+        phoneNumber: user.phone,
+        displayName: user.displayName ?? _displayName(user.phone),
+        clearError: true,
+      );
+    } catch (_) {
+      await _clearTokens();
+      state = state.copyWith(
+        isInitialized: true,
+        isAuthenticated: false,
+        clearSession: true,
+        clearError: true,
+      );
+    }
   }
 
   Future<void> requestOtp(String phoneNumber) async {
@@ -114,29 +126,26 @@ class AuthController extends StateNotifier<AuthState> {
       clearError: true,
       clearStatus: true,
     );
-
     try {
-      final result = await _ref.read(apiServiceProvider).requestOtp(phoneNumber);
+      final result = await _ref
+          .read(apiServiceProvider)
+          .requestOtp(phoneNumber);
       state = state.copyWith(
         isInitialized: true,
         isLoading: false,
         isOtpRequested: true,
-        phoneNumber: result.phone,
-        statusMessage: '${result.message}. ${l10n.text('mock_code_suffix')}',
+        phoneNumber: phoneNumber,
+        statusMessage: result.message,
         clearError: true,
       );
-    } on DioException catch (error) {
+    } catch (error) {
+      final message = commerceErrorMessage(error);
       state = state.copyWith(
         isInitialized: true,
         isLoading: false,
-        errorMessage: error.response?.data['detail']?.toString() ?? l10n.text('could_not_request_otp'),
-        clearStatus: true,
-      );
-    } on FormatException catch (error) {
-      state = state.copyWith(
-        isInitialized: true,
-        isLoading: false,
-        errorMessage: error.message,
+        errorMessage: message == 'offline'
+            ? l10n.text('commerce_offline')
+            : message,
         clearStatus: true,
       );
     }
@@ -144,63 +153,71 @@ class AuthController extends StateNotifier<AuthState> {
 
   Future<void> verifyOtp(String otp) async {
     final l10n = AppStrings(_ref.read(appLocaleProvider));
-    state = state.copyWith(isLoading: true, clearError: true, clearStatus: true);
-
+    state = state.copyWith(
+      isLoading: true,
+      clearError: true,
+      clearStatus: true,
+    );
     try {
-      final session = await _ref.read(apiServiceProvider).verifyOtp(
-            phoneNumber: state.phoneNumber,
-            otp: otp,
-          );
-      final prefs = await _ref.read(sharedPreferencesProvider.future);
-      await prefs.setString(_tokenKey, session.accessToken);
-      await prefs.setString(_tokenTypeKey, session.tokenType);
-      await prefs.setString(_userIdKey, session.userId);
-      await prefs.setString(_phoneKey, session.phone);
-
+      var session = await _ref
+          .read(apiServiceProvider)
+          .verifyOtp(phoneNumber: state.phoneNumber, otp: otp);
+      final user = await _ref
+          .read(apiServiceProvider)
+          .getCurrentCommerceUser(session.accessToken);
+      session = session.withUser(user);
+      await _saveTokens(session);
       state = state.copyWith(
         isInitialized: true,
         isLoading: false,
         isAuthenticated: true,
         isOtpRequested: false,
         session: session,
-        phoneNumber: session.phone,
-        displayName: _displayNameFromPhone(session.phone),
+        phoneNumber: user.phone,
+        displayName: user.displayName ?? _displayName(user.phone),
         statusMessage: l10n.text('signed_in_successfully'),
         clearError: true,
       );
-    } on DioException catch (error) {
+    } catch (error) {
+      final message = commerceErrorMessage(error);
       state = state.copyWith(
         isInitialized: true,
         isLoading: false,
-        errorMessage: error.response?.data['detail']?.toString() ?? l10n.text('could_not_verify_otp'),
-        clearStatus: true,
-      );
-    } on FormatException catch (error) {
-      state = state.copyWith(
-        isInitialized: true,
-        isLoading: false,
-        errorMessage: error.message,
+        errorMessage: message == 'offline'
+            ? l10n.text('commerce_offline')
+            : message,
         clearStatus: true,
       );
     }
   }
 
   Future<void> logout() async {
-    final prefs = await _ref.read(sharedPreferencesProvider.future);
-    await prefs.remove(_tokenKey);
-    await prefs.remove(_tokenTypeKey);
-    await prefs.remove(_userIdKey);
-    await prefs.remove(_phoneKey);
-
+    final refresh = state.session?.refreshToken;
+    if (refresh != null && refresh.isNotEmpty) {
+      try {
+        await _ref.read(apiServiceProvider).logoutCommerce(refresh);
+      } catch (_) {}
+    }
+    await _clearTokens();
     state = AuthState.initial().copyWith(isInitialized: true);
   }
 
-  String _displayNameFromPhone(String phone) {
-    final visible = phone.length >= 4 ? phone.substring(phone.length - 4) : phone;
-    return 'User $visible';
+  Future<void> _saveTokens(AuthSession session) async {
+    final storage = _ref.read(secureStorageProvider);
+    await storage.write(accessKey, session.accessToken);
+    await storage.write(refreshKey, session.refreshToken);
   }
+
+  Future<void> _clearTokens() async {
+    final storage = _ref.read(secureStorageProvider);
+    await storage.delete(accessKey);
+    await storage.delete(refreshKey);
+  }
+
+  String _displayName(String phone) =>
+      'User ${phone.length >= 4 ? phone.substring(phone.length - 4) : phone}';
 }
 
-final authControllerProvider = StateNotifierProvider<AuthController, AuthState>((ref) {
-  return AuthController(ref);
-});
+final authControllerProvider = StateNotifierProvider<AuthController, AuthState>(
+  (ref) => AuthController(ref),
+);

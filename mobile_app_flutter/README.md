@@ -28,12 +28,12 @@ Status snapshot: 13 August 2026.
 | Area | Current state | Production status |
 | --- | --- | --- |
 | Buyer navigation | Five tabs: Home, Categories, Search, Cart, Account | Preview implemented |
-| Catalog | Read-only API plus an idempotent, inactive 12-product draft review seed; Flutter still shows local preview products | Final 75-150 SKUs, activation, media, suppliers, declarations, and inventory remain unapproved |
+| Catalog | Flutter now loads localized categories, products, SKUs and current prices from `/api/commerce/v1`; inactive draft seed remains hidden | Final 75-150 SKUs, activation, media, suppliers, declarations, and inventory remain unapproved |
 | Product discovery | Home sections, category browsing, multilingual-name search, product details | Preview implemented |
-| Location | Six-digit pincode capture plus versioned service-zone validation and saved-address API | Flutter still uses the local location screen; launch zones are not operationally loaded |
-| Cart | Persistent guest/authenticated backend, restoration, login merge, authoritative validation; Flutter preview cart still supports local mutations | Flutter secure-token storage and API integration remain pending |
+| Location | Flutter pincode serviceability and authenticated saved-address create/edit/delete/default selection now use `/api/commerce/v1` | Launch zones are not operationally loaded |
+| Cart | Flutter restores persistent guest/authenticated carts, merges after login, and displays authoritative validation and totals | Checkout and inventory reservation remain pending |
 | Checkout | Deliberately disabled | Not implemented |
-| Authentication | Provider-backed OTP service, persistent challenges, rotating sessions, and `/api/commerce/v1` auth routes implemented locally | Flutter still uses legacy `/api/v2`; Twilio and hosted database are not activated |
+| Authentication | Flutter uses `/api/commerce/v1` OTP, rotating refresh sessions, logout revocation, and encrypted platform token storage | Twilio and hosted database are not activated |
 | Commerce database | Isolated SQLAlchemy models and initial Alembic migration for 18 `commerce_*` tables | Implemented locally; not yet applied to a hosted PostgreSQL database |
 | Orders and payments | Product requirements and screen states documented | Not implemented |
 | Operations | Fulfilment workflow documented | No operations console or live workflow |
@@ -131,7 +131,9 @@ Pilot seed status: a 6-category, 12-product/SKU draft catalog can be previewed o
 
 Address and serviceability status: authenticated create/edit/delete/default address routes and a public pincode check are implemented locally. Responses distinguish `serviceable`, `temporarily_unavailable`, and `not_serviceable`; address ownership, soft deletion, default promotion, audit metadata, and ambiguous-zone fail-closed behavior are covered by tests. Launch-zone data, hosted migration, and Flutter integration remain pending. See `phase2_backend/COMMERCE_ADDRESSES.md`.
 
-Persistent cart status: guest and authenticated carts, secure guest restoration tokens, optimistic versions, saved-address/pincode context, item mutations, login merge, and server-side price, inventory, MOQ/step, serviceability, and zone-minimum validation are implemented locally. Inventory checks do not reserve stock. Hosted migration, live inventory feeds, cleanup jobs, checkout reservation, and Flutter integration remain pending. See `phase2_backend/COMMERCE_CART.md`.
+Persistent cart status: guest and authenticated carts, secure guest restoration tokens, optimistic versions, saved-address/pincode context, item mutations, login merge, and server-side price, inventory, MOQ/step, serviceability, and zone-minimum validation are implemented locally. Inventory checks do not reserve stock. Hosted migration, live inventory feeds, cleanup jobs, checkout reservation, and physical-device validation remain pending. See `phase2_backend/COMMERCE_CART.md`.
+
+Flutter commerce integration status: the app now consumes the versioned OTP, catalog, serviceability, address, and cart contracts. Access/refresh and guest-cart credentials use `flutter_secure_storage`; hardcoded storefront catalog/cart records were removed. English, Hindi, and Telugu commerce keys have parity, and primary commerce surfaces expose loading, pull-to-refresh, offline, error, empty, and retry states. A real provider, hosted API/database, approved active catalog/inventory, and physical-device end-to-end verification remain required.
 
 Minimum initial data model:
 
@@ -214,7 +216,7 @@ Add these checks before treating a mobile build as releasable:
 | Slice | Outcome | Key scope |
 | --- | --- | --- |
 | 1. Storefront foundation | Browse a safe preview catalog | Implemented: buyer shell, catalog, search, product details, preview cart |
-| 2. Identity and reliable cart | Real customer, location, catalog, and recoverable cart | Database, OTP, shared API, read-only catalog, inactive draft seed, address/serviceability, and persistent cart APIs implemented locally; final catalog approval, hosted activation, and mobile integration remain |
+| 2. Identity and reliable cart | Real customer, location, catalog, and recoverable cart | Database, OTP, shared API, catalog, address/serviceability, persistent cart, secure Flutter integration, and EN/HI/TE commerce localization implemented locally; final catalog approval, hosted activation, and device/provider verification remain |
 | 3. Checkout and order ledger | Create a non-duplicated payable order | Delivery slots, substitution preference, coupons, tax/fees, COD/online payment, idempotent order creation, order history |
 | 4. Fulfilment operations | Reliably receive, pack, dispatch, and deliver | Supplier intake, grading, lots, reservations, pick/pack, proof of delivery, notifications |
 | 5. Resolution and reconciliation | Resolve failures and close financial records | Issues, partial fulfilment, replacements, refunds, invoices, supplier settlement, audit trail |

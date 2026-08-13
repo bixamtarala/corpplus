@@ -1,24 +1,24 @@
 import 'package:dio/dio.dart';
 
 import '../models/auth_session.dart';
+import '../models/commerce_api_models.dart';
 import '../models/farmer_profile.dart';
 import '../models/marketplace.dart';
 import '../models/price_insight.dart';
 
 class ApiService {
   ApiService({Dio? dio})
-      : _dio = dio ??
-            Dio(
-              BaseOptions(
-                baseUrl: _baseUrl,
-                connectTimeout: const Duration(seconds: 4),
-                receiveTimeout: const Duration(seconds: 4),
-                sendTimeout: const Duration(seconds: 4),
-                headers: const {
-                  'Content-Type': 'application/json',
-                },
-              ),
-            );
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              baseUrl: _baseUrl,
+              connectTimeout: const Duration(seconds: 4),
+              receiveTimeout: const Duration(seconds: 4),
+              sendTimeout: const Duration(seconds: 4),
+              headers: const {'Content-Type': 'application/json'},
+            ),
+          );
 
   static const String _baseUrl = String.fromEnvironment(
     'CROPPULSE_API_BASE_URL',
@@ -26,21 +26,20 @@ class ApiService {
   );
 
   final Dio _dio;
+  String _pendingChallengeId = '';
 
   Future<OtpRequestResult> requestOtp(String phoneNumber) async {
     final formattedPhone = _normalizeIndianPhone(phoneNumber);
 
     final response = await _dio.post<Map<String, dynamic>>(
-      '/api/v2/auth/request-otp',
+      '/api/commerce/v1/auth/otp/request',
       data: {'phone': formattedPhone},
     );
 
     final data = response.data ?? const <String, dynamic>{};
-    return OtpRequestResult(
-      phone: (data['phone'] as String?) ?? formattedPhone,
-      message: (data['message'] as String?) ?? 'OTP sent',
-      expiresInSeconds: (data['expires_in_seconds'] as num?)?.toInt() ?? 600,
-    );
+    final result = OtpRequestResult.fromJson(data);
+    _pendingChallengeId = result.challengeId;
+    return result;
   }
 
   Future<AuthSession> verifyOtp({
@@ -48,10 +47,11 @@ class ApiService {
     required String otp,
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
-      '/api/v2/auth/verify-otp',
+      '/api/commerce/v1/auth/otp/verify',
       data: {
+        'challenge_id': _pendingChallengeId,
         'phone': _normalizeIndianPhone(phoneNumber),
-        'otp': otp,
+        'code': otp,
       },
     );
 
@@ -63,9 +63,239 @@ class ApiService {
     return AuthSession.fromJson(data);
   }
 
-  Future<FarmerProfile> getFarmerProfile({
-    required String accessToken,
+  Future<AuthSession> refreshCommerceSession(String refreshToken) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/api/commerce/v1/auth/refresh',
+      data: {'refresh_token': refreshToken},
+    );
+    return AuthSession.fromJson(_requiredData(response, 'refresh'));
+  }
+
+  Future<CurrentCommerceUser> getCurrentCommerceUser(String accessToken) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/api/commerce/v1/auth/me',
+      options: _authorizedOptions(accessToken),
+    );
+    return CurrentCommerceUser.fromJson(_requiredData(response, 'user'));
+  }
+
+  Future<void> logoutCommerce(String refreshToken) async {
+    await _dio.post<void>(
+      '/api/commerce/v1/auth/logout',
+      data: {'refresh_token': refreshToken},
+    );
+  }
+
+  Future<List<CommerceCategory>> getCommerceCategories({
+    required String locale,
   }) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/api/commerce/v1/catalog/categories',
+      queryParameters: {'locale': locale},
+    );
+    final data = _requiredData(response, 'categories');
+    return (data['items'] as List<dynamic>? ?? const [])
+        .map((item) => CommerceCategory.fromJson(item as Map<String, dynamic>))
+        .toList(growable: false);
+  }
+
+  Future<List<CommerceProduct>> getCommerceProducts({
+    required String locale,
+    String? category,
+    String? query,
+  }) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/api/commerce/v1/catalog/products',
+      queryParameters: {
+        'locale': locale,
+        'limit': 50,
+        'category': ?category,
+        if (query != null && query.trim().isNotEmpty) 'query': query.trim(),
+      },
+    );
+    final data = _requiredData(response, 'products');
+    return (data['items'] as List<dynamic>? ?? const [])
+        .map((item) => CommerceProduct.fromJson(item as Map<String, dynamic>))
+        .toList(growable: false);
+  }
+
+  Future<ServiceabilityDecision> checkServiceability(String pincode) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/api/commerce/v1/serviceability',
+      queryParameters: {'pincode': pincode},
+    );
+    return ServiceabilityDecision.fromJson(
+      _requiredData(response, 'serviceability'),
+    );
+  }
+
+  Future<List<CommerceAddress>> getAddresses(String accessToken) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/api/commerce/v1/addresses',
+      options: _authorizedOptions(accessToken),
+    );
+    final data = _requiredData(response, 'addresses');
+    return (data['items'] as List<dynamic>? ?? const [])
+        .map((item) => CommerceAddress.fromJson(item as Map<String, dynamic>))
+        .toList(growable: false);
+  }
+
+  Future<CommerceAddress> saveAddress({
+    required String accessToken,
+    required Map<String, dynamic> data,
+    String? addressId,
+  }) async {
+    final response = addressId == null
+        ? await _dio.post<Map<String, dynamic>>(
+            '/api/commerce/v1/addresses',
+            data: data,
+            options: _authorizedOptions(accessToken),
+          )
+        : await _dio.patch<Map<String, dynamic>>(
+            '/api/commerce/v1/addresses/$addressId',
+            data: data,
+            options: _authorizedOptions(accessToken),
+          );
+    return CommerceAddress.fromJson(_requiredData(response, 'address'));
+  }
+
+  Future<void> deleteAddress({
+    required String accessToken,
+    required String addressId,
+  }) => _dio.delete<void>(
+    '/api/commerce/v1/addresses/$addressId',
+    options: _authorizedOptions(accessToken),
+  );
+
+  Future<CommerceAddress> setDefaultAddress({
+    required String accessToken,
+    required String addressId,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/api/commerce/v1/addresses/$addressId/default',
+      options: _authorizedOptions(accessToken),
+    );
+    return CommerceAddress.fromJson(_requiredData(response, 'address'));
+  }
+
+  Future<CommerceCart> createGuestCart({String? pincode}) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/api/commerce/v1/cart/guest',
+      data: {'pincode': ?pincode},
+    );
+    return CommerceCart.fromJson(_requiredData(response, 'guest cart'));
+  }
+
+  Future<CommerceCart> restoreCart({
+    String? accessToken,
+    String? guestToken,
+  }) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/api/commerce/v1/cart',
+      options: _commerceOptions(
+        accessToken: accessToken,
+        guestToken: guestToken,
+      ),
+    );
+    return CommerceCart.fromJson(_requiredData(response, 'cart'));
+  }
+
+  Future<CommerceCart> setCartContext({
+    String? accessToken,
+    String? guestToken,
+    String? addressId,
+    String? pincode,
+    required int version,
+  }) async {
+    final response = await _dio.patch<Map<String, dynamic>>(
+      '/api/commerce/v1/cart',
+      data: {
+        'expected_version': version,
+        'address_id': ?addressId,
+        'pincode': ?pincode,
+      },
+      options: _commerceOptions(
+        accessToken: accessToken,
+        guestToken: guestToken,
+      ),
+    );
+    return CommerceCart.fromJson(_requiredData(response, 'cart'));
+  }
+
+  Future<CommerceCart> addCartItem({
+    String? accessToken,
+    String? guestToken,
+    required String skuId,
+    required double quantity,
+    required int version,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/api/commerce/v1/cart/items',
+      data: {
+        'sku_id': skuId,
+        'quantity': quantity,
+        'expected_version': version,
+      },
+      options: _commerceOptions(
+        accessToken: accessToken,
+        guestToken: guestToken,
+      ),
+    );
+    return CommerceCart.fromJson(_requiredData(response, 'cart'));
+  }
+
+  Future<CommerceCart> updateCartItem({
+    String? accessToken,
+    String? guestToken,
+    required String itemId,
+    required double quantity,
+    required int version,
+  }) async {
+    final response = await _dio.patch<Map<String, dynamic>>(
+      '/api/commerce/v1/cart/items/$itemId',
+      data: {'quantity': quantity, 'expected_version': version},
+      options: _commerceOptions(
+        accessToken: accessToken,
+        guestToken: guestToken,
+      ),
+    );
+    return CommerceCart.fromJson(_requiredData(response, 'cart'));
+  }
+
+  Future<CommerceCart> deleteCartItem({
+    String? accessToken,
+    String? guestToken,
+    required String itemId,
+    required int version,
+  }) async {
+    final response = await _dio.delete<Map<String, dynamic>>(
+      '/api/commerce/v1/cart/items/$itemId',
+      queryParameters: {'expected_version': version},
+      options: _commerceOptions(
+        accessToken: accessToken,
+        guestToken: guestToken,
+      ),
+    );
+    return CommerceCart.fromJson(_requiredData(response, 'cart'));
+  }
+
+  Future<CommerceCart> mergeGuestCart({
+    required String accessToken,
+    required String guestToken,
+    int? version,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/api/commerce/v1/cart/merge',
+      data: {'expected_version': ?version},
+      options: _commerceOptions(
+        accessToken: accessToken,
+        guestToken: guestToken,
+      ),
+    );
+    return CommerceCart.fromJson(_requiredData(response, 'cart'));
+  }
+
+  Future<FarmerProfile> getFarmerProfile({required String accessToken}) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/api/v2/farmer/profile',
       options: _authorizedOptions(accessToken),
@@ -121,7 +351,10 @@ class ApiService {
 
     final data = response.data ?? const <String, dynamic>{};
     final results = (data['results'] as List<dynamic>? ?? const [])
-        .map((item) => MarketplaceSearchResult.fromJson(item as Map<String, dynamic>))
+        .map(
+          (item) =>
+              MarketplaceSearchResult.fromJson(item as Map<String, dynamic>),
+        )
         .toList();
     return results;
   }
@@ -162,7 +395,9 @@ class ApiService {
     return MarketplaceOffer.fromJson(data);
   }
 
-  Future<PriceInsight> getPriceInsight(PriceInsightRequestPayload request) async {
+  Future<PriceInsight> getPriceInsight(
+    PriceInsightRequestPayload request,
+  ) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         '/api/v2/intelligence/price-insight',
@@ -200,7 +435,8 @@ class ApiService {
         'Salem Mandi': basePrice + 75,
       },
       bestSellingTime: 'Next 3-5 days',
-      analysis: 'Live API was unavailable, so this recommendation uses offline benchmark data for ${request.state}.',
+      analysis:
+          'Live API was unavailable, so this recommendation uses offline benchmark data for ${request.state}.',
       source: InsightSource.fallback,
     );
   }
@@ -223,10 +459,42 @@ class ApiService {
   }
 
   Options _authorizedOptions(String accessToken) {
-    return Options(
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-      },
-    );
+    return Options(headers: {'Authorization': 'Bearer $accessToken'});
   }
+
+  Options _commerceOptions({String? accessToken, String? guestToken}) =>
+      Options(
+        headers: {
+          if (accessToken != null) 'Authorization': 'Bearer $accessToken',
+          'X-Guest-Cart-Token': ?guestToken,
+        },
+      );
+
+  Map<String, dynamic> _requiredData(
+    Response<Map<String, dynamic>> response,
+    String label,
+  ) {
+    final data = response.data;
+    if (data == null) throw FormatException('Empty $label response body');
+    return data;
+  }
+}
+
+String commerceErrorMessage(Object error) {
+  if (error is DioException) {
+    final data = error.response?.data;
+    if (data is Map<String, dynamic>) {
+      final envelope = data['error'];
+      if (envelope is Map<String, dynamic> && envelope['message'] is String) {
+        return envelope['message'] as String;
+      }
+      if (data['detail'] is String) return data['detail'] as String;
+    }
+    if (error.type == DioExceptionType.connectionError ||
+        error.type == DioExceptionType.connectionTimeout ||
+        error.type == DioExceptionType.receiveTimeout) {
+      return 'offline';
+    }
+  }
+  return error.toString();
 }

@@ -1,21 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/commerce_product.dart';
+import '../localization/app_strings.dart';
+import '../models/commerce_api_models.dart';
 import '../providers/commerce_provider.dart';
 import '../theme/app_theme.dart';
-
-IconData commerceCategoryIcon(String categoryId) {
-  return switch (categoryId) {
-    'vegetables' => Icons.eco_outlined,
-    'fruits' => Icons.apple_outlined,
-    'greens' => Icons.grass_outlined,
-    'grains' => Icons.grain_outlined,
-    'pulses' => Icons.breakfast_dining_outlined,
-    'spices' => Icons.local_fire_department_outlined,
-    _ => Icons.shopping_basket_outlined,
-  };
-}
 
 class CommerceProductCard extends ConsumerWidget {
   const CommerceProductCard({
@@ -23,23 +12,19 @@ class CommerceProductCard extends ConsumerWidget {
     required this.product,
     required this.onOpen,
   });
-
   final CommerceProduct product;
   final VoidCallback onOpen;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final quantity = ref.watch(
-      cartControllerProvider.select((state) => state.quantityFor(product.id)),
-    );
-    final languageCode = Localizations.localeOf(context).languageCode;
-
+    final l10n = AppStrings.of(context);
+    final sku = product.skus.firstOrNull;
+    final cart = ref.watch(cartControllerProvider);
+    final quantity = sku == null ? 0.0 : cart.quantityForSku(sku.id);
     return Card(
       clipBehavior: Clip.antiAlias,
-      margin: EdgeInsets.zero,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         side: const BorderSide(color: AppTheme.lightGray),
       ),
       child: InkWell(
@@ -49,49 +34,57 @@ class CommerceProductCard extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                height: 92,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  commerceCategoryIcon(product.category),
-                  size: 44,
-                  color: AppTheme.primaryGreen,
+              Expanded(
+                child: Center(
+                  child: Icon(
+                    commerceCategoryIcon(product.category.slug),
+                    size: 58,
+                    color: AppTheme.primaryGreen,
+                  ),
                 ),
               ),
-              const SizedBox(height: 10),
               Text(
-                product.displayName(languageCode),
+                product.name,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.w700),
+                style: const TextStyle(fontWeight: FontWeight.w800),
               ),
-              const SizedBox(height: 3),
+              const SizedBox(height: 4),
               Text(
-                product.packLabel,
+                sku?.packLabel ?? l10n.text('not_available'),
                 style: const TextStyle(fontSize: 12, color: AppTheme.lightText),
               ),
-              const Spacer(),
+              const SizedBox(height: 6),
               Text(
-                '${product.formattedPreviewPrice} preview',
-                style: const TextStyle(fontWeight: FontWeight.w700),
+                sku?.pricePaise == null
+                    ? l10n.text('price_unavailable')
+                    : formatPaise(sku!.pricePaise!),
+                style: const TextStyle(fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 8),
-              if (quantity == 0)
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () => ref
-                        .read(cartControllerProvider.notifier)
-                        .add(product.id),
-                    child: const Text('Add'),
-                  ),
-                )
-              else
-                _QuantityControl(productId: product.id, quantity: quantity),
+              SizedBox(
+                width: double.infinity,
+                child: quantity > 0
+                    ? OutlinedButton(
+                        onPressed: null,
+                        child: Text(
+                          l10n.text(
+                            'in_cart',
+                            params: {'quantity': compactQuantity(quantity)},
+                          ),
+                        ),
+                      )
+                    : ElevatedButton(
+                        onPressed:
+                            sku?.pricePaise == null ||
+                                cart.status == LoadStatus.loading
+                            ? null
+                            : () => ref
+                                  .read(cartControllerProvider.notifier)
+                                  .addSku(sku!),
+                        child: Text(l10n.text('add_to_cart')),
+                      ),
+              ),
             ],
           ),
         ),
@@ -100,45 +93,17 @@ class CommerceProductCard extends ConsumerWidget {
   }
 }
 
-class _QuantityControl extends ConsumerWidget {
-  const _QuantityControl({required this.productId, required this.quantity});
-
-  final String productId;
-  final int quantity;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final controller = ref.read(cartControllerProvider.notifier);
-    return Container(
-      height: 40,
-      decoration: BoxDecoration(
-        border: Border.all(color: AppTheme.primaryGreen),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: IconButton(
-              tooltip: 'Remove one',
-              padding: EdgeInsets.zero,
-              onPressed: () => controller.removeOne(productId),
-              icon: const Icon(Icons.remove, size: 18),
-            ),
-          ),
-          Text(
-            '$quantity',
-            style: const TextStyle(fontWeight: FontWeight.w700),
-          ),
-          Expanded(
-            child: IconButton(
-              tooltip: 'Add one',
-              padding: EdgeInsets.zero,
-              onPressed: () => controller.add(productId),
-              icon: const Icon(Icons.add, size: 18),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+IconData commerceCategoryIcon(String category) => switch (category) {
+  'vegetables' => Icons.eco_outlined,
+  'fruits' => Icons.apple_outlined,
+  'greens' => Icons.grass_outlined,
+  'grains' => Icons.rice_bowl_outlined,
+  'pulses' => Icons.scatter_plot_outlined,
+  'spices' => Icons.local_fire_department_outlined,
+  _ => Icons.inventory_2_outlined,
+};
+String formatPaise(int paise) =>
+    '₹${(paise / 100).toStringAsFixed(paise % 100 == 0 ? 0 : 2)}';
+String compactQuantity(double value) => value == value.roundToDouble()
+    ? value.toInt().toString()
+    : value.toString();
