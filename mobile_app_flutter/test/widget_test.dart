@@ -12,7 +12,10 @@ void main() {
 
     expect(find.text('CropPulse'), findsOneWidget);
     expect(find.text('Home'), findsOneWidget);
-    expect(find.text('Market'), findsOneWidget);
+    expect(find.text('Categories'), findsWidgets);
+    expect(find.text('Search'), findsOneWidget);
+    expect(find.text('Cart'), findsOneWidget);
+    expect(find.text('Account'), findsOneWidget);
     expect(find.text('Choose how to open CropPulse'), findsNothing);
   });
 }
