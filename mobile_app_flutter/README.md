@@ -33,7 +33,7 @@ Status snapshot: 13 August 2026.
 | Location | Six-digit pincode capture and validation | No live serviceability decision |
 | Cart | Add, increment, decrement, remove, item count, and indicative subtotal | In-memory only; not restored after restart |
 | Checkout | Deliberately disabled | Not implemented |
-| Authentication | Existing `/api/v2` OTP client flow | Mock backend; not production-safe |
+| Authentication | Provider-backed OTP service, persistent challenges, rotating sessions, and `/api/commerce/v1` auth routes implemented locally | Flutter still uses legacy `/api/v2`; Twilio and hosted database are not activated |
 | Commerce database | Isolated SQLAlchemy models and initial Alembic migration for 18 `commerce_*` tables | Implemented locally; not yet applied to a hosted PostgreSQL database |
 | Orders and payments | Product requirements and screen states documented | Not implemented |
 | Operations | Fulfilment workflow documented | No operations console or live workflow |
@@ -121,7 +121,9 @@ Legal and tax professionals must approve the seller of record, GST/invoice treat
 
 Create a versioned commerce API backed by PostgreSQL. Do not evolve the current sample `/api/v2` service into production merely by adding checkout routes.
 
-Database foundation status: the isolated commerce models, initial Alembic migration, environment configuration, constraints, and focused tests are implemented under `phase2_backend/commerce` and `phase2_backend/migrations`. Deployment to a hosted PostgreSQL database and the versioned API routes are still pending.
+Database foundation status: the isolated commerce models, Alembic migrations, environment configuration, constraints, and focused tests are implemented under `phase2_backend/commerce` and `phase2_backend/migrations`. Deployment to hosted PostgreSQL and non-authentication commerce API routes are still pending.
+
+Authentication foundation status: the versioned commerce auth routes, Twilio Verify provider integration, persistent one-time challenges, request/attempt limits, short-lived access tokens, rotating refresh tokens, logout revocation, and focused tests are implemented locally. Provider credentials, hosted migration, physical SMS verification, and Flutter integration remain pending.
 
 Minimum initial data model:
 
@@ -204,7 +206,7 @@ Add these checks before treating a mobile build as releasable:
 | Slice | Outcome | Key scope |
 | --- | --- | --- |
 | 1. Storefront foundation | Browse a safe preview catalog | Implemented: buyer shell, catalog, search, product details, preview cart |
-| 2. Identity and reliable cart | Real customer, location, catalog, and recoverable cart | Database foundation implemented locally; OTP, hosted migration, API routes, seed data, mobile integration, and persistent cart behavior remain |
+| 2. Identity and reliable cart | Real customer, location, catalog, and recoverable cart | Database and OTP/API foundations implemented locally; hosted activation, seed data, catalog/address/cart APIs, mobile integration, and persistent cart behavior remain |
 | 3. Checkout and order ledger | Create a non-duplicated payable order | Delivery slots, substitution preference, coupons, tax/fees, COD/online payment, idempotent order creation, order history |
 | 4. Fulfilment operations | Reliably receive, pack, dispatch, and deliver | Supplier intake, grading, lots, reservations, pick/pack, proof of delivery, notifications |
 | 5. Resolution and reconciliation | Resolve failures and close financial records | Issues, partial fulfilment, replacements, refunds, invoices, supplier settlement, audit trail |
