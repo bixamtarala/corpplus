@@ -126,6 +126,8 @@ def test_alembic_upgrade_and_downgrade_chain(monkeypatch) -> None:
         engine = create_engine(database_url)
         table_names = set(inspect(engine).get_table_names())
         assert EXPECTED_TABLES <= table_names
+        address_indexes = {index["name"] for index in inspect(engine).get_indexes("commerce_addresses")}
+        assert "uq_commerce_addresses_active_default" in address_indexes
 
         command.downgrade(config, "base")
         remaining = set(inspect(engine).get_table_names())

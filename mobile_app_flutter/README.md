@@ -30,7 +30,7 @@ Status snapshot: 13 August 2026.
 | Buyer navigation | Five tabs: Home, Categories, Search, Cart, Account | Preview implemented |
 | Catalog | Read-only API plus an idempotent, inactive 12-product draft review seed; Flutter still shows local preview products | Final 75-150 SKUs, activation, media, suppliers, declarations, and inventory remain unapproved |
 | Product discovery | Home sections, category browsing, multilingual-name search, product details | Preview implemented |
-| Location | Six-digit pincode capture and validation | No live serviceability decision |
+| Location | Six-digit pincode capture plus versioned service-zone validation and saved-address API | Flutter still uses the local location screen; launch zones are not operationally loaded |
 | Cart | Add, increment, decrement, remove, item count, and indicative subtotal | In-memory only; not restored after restart |
 | Checkout | Deliberately disabled | Not implemented |
 | Authentication | Provider-backed OTP service, persistent challenges, rotating sessions, and `/api/commerce/v1` auth routes implemented locally | Flutter still uses legacy `/api/v2`; Twilio and hosted database are not activated |
@@ -129,6 +129,8 @@ Versioned API status: the `/api/commerce/v1` entrypoint now provides request IDs
 
 Pilot seed status: a 6-category, 12-product/SKU draft catalog can be previewed or applied idempotently. All records remain inactive/draft, prices remain indicative in a separate inactive price list, and no stock, serviceability, supplier, origin, grade, or product-image claims are seeded. Operational review and expansion to the final assortment remain pending.
 
+Address and serviceability status: authenticated create/edit/delete/default address routes and a public pincode check are implemented locally. Responses distinguish `serviceable`, `temporarily_unavailable`, and `not_serviceable`; address ownership, soft deletion, default promotion, audit metadata, and ambiguous-zone fail-closed behavior are covered by tests. Launch-zone data, hosted migration, and Flutter integration remain pending. See `phase2_backend/COMMERCE_ADDRESSES.md`.
+
 Minimum initial data model:
 
 - `users` and authenticated sessions
@@ -210,7 +212,7 @@ Add these checks before treating a mobile build as releasable:
 | Slice | Outcome | Key scope |
 | --- | --- | --- |
 | 1. Storefront foundation | Browse a safe preview catalog | Implemented: buyer shell, catalog, search, product details, preview cart |
-| 2. Identity and reliable cart | Real customer, location, catalog, and recoverable cart | Database, OTP, shared API, read-only catalog, and inactive draft seed implemented locally; final catalog approval, hosted activation, address/serviceability/cart APIs, mobile integration, and persistent cart behavior remain |
+| 2. Identity and reliable cart | Real customer, location, catalog, and recoverable cart | Database, OTP, shared API, read-only catalog, inactive draft seed, and address/serviceability APIs implemented locally; final catalog approval, hosted activation, mobile integration, and persistent cart behavior remain |
 | 3. Checkout and order ledger | Create a non-duplicated payable order | Delivery slots, substitution preference, coupons, tax/fees, COD/online payment, idempotent order creation, order history |
 | 4. Fulfilment operations | Reliably receive, pack, dispatch, and deliver | Supplier intake, grading, lots, reservations, pick/pack, proof of delivery, notifications |
 | 5. Resolution and reconciliation | Resolve failures and close financial records | Issues, partial fulfilment, replacements, refunds, invoices, supplier settlement, audit trail |
