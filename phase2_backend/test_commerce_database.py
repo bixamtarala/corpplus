@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import tempfile
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
+from alembic import command
+from alembic.config import Config
 from sqlalchemy import create_engine, event, inspect
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -22,6 +26,7 @@ EXPECTED_TABLES = {
     "commerce_category_translations",
     "commerce_inventory_balances",
     "commerce_inventory_locations",
+    "commerce_otp_challenges",
     "commerce_prices",
     "commerce_price_lists",
     "commerce_product_media",
@@ -108,3 +113,21 @@ def test_production_database_url_is_required(monkeypatch) -> None:
 def test_legacy_postgres_url_is_normalized(monkeypatch) -> None:
     monkeypatch.setenv("COMMERCE_DATABASE_URL", "postgres://user:pass@db/app")
     assert commerce_database_url() == "postgresql+psycopg2://user:pass@db/app"
+
+
+def test_alembic_upgrade_and_downgrade_chain(monkeypatch) -> None:
+    with tempfile.TemporaryDirectory() as directory:
+        database_path = Path(directory) / "commerce.db"
+        database_url = f"sqlite+pysqlite:///{database_path.as_posix()}"
+        monkeypatch.setenv("COMMERCE_DATABASE_URL", database_url)
+        config = Config("phase2_backend/alembic.ini")
+
+        command.upgrade(config, "head")
+        engine = create_engine(database_url)
+        table_names = set(inspect(engine).get_table_names())
+        assert EXPECTED_TABLES <= table_names
+
+        command.downgrade(config, "base")
+        remaining = set(inspect(engine).get_table_names())
+        assert not any(name.startswith("commerce_") for name in remaining)
+        engine.dispose()

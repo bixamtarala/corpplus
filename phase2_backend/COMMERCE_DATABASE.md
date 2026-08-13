@@ -38,6 +38,7 @@ Do not run a destructive downgrade against production. Production changes requir
 ## Foundation tables
 
 - Customers and refresh sessions
+- Persistent provider-backed OTP challenges
 - Addresses and service-zone pincodes
 - Categories and translations
 - Products, translations, and media
@@ -61,7 +62,7 @@ SQLite tests do not prove that a production PostgreSQL migration was applied. Be
 
 ## Still pending
 
-- OTP challenge/request tables and provider integration
+- Hosted PostgreSQL application and production connection verification
 - Inventory lots and expiring reservations
 - Delivery capacity and slot tables
 - Checkout quotes, orders, order lines, and state transitions

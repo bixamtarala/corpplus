@@ -85,6 +85,38 @@ class CommerceSession(TimestampMixin, Base):
     user: Mapped[CommerceUser] = relationship(back_populates="sessions")
 
 
+class OtpChallenge(TimestampMixin, Base):
+    __tablename__ = "commerce_otp_challenges"
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('requested', 'consumed', 'failed', 'expired')",
+            name="ck_commerce_otp_challenges_status",
+        ),
+        CheckConstraint(
+            "failed_attempts >= 0 AND failed_attempts <= max_attempts",
+            name="ck_commerce_otp_challenges_attempts",
+        ),
+        CheckConstraint(
+            "max_attempts >= 1 AND max_attempts <= 10",
+            name="ck_commerce_otp_challenges_max_attempts",
+        ),
+        CheckConstraint("expires_at > created_at", name="ck_commerce_otp_challenges_expiry"),
+        Index("ix_commerce_otp_phone_created", "phone_hash", "created_at"),
+        Index("ix_commerce_otp_ip_created", "request_ip_hash", "created_at"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    phone_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    request_ip_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    provider: Mapped[str] = mapped_column(String(32), nullable=False)
+    provider_reference: Mapped[str] = mapped_column(String(128), unique=True, nullable=False)
+    status: Mapped[str] = mapped_column(String(16), default="requested", nullable=False)
+    failed_attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    max_attempts: Mapped[int] = mapped_column(Integer, default=5, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    consumed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
 class ServiceZone(TimestampMixin, Base):
     __tablename__ = "commerce_service_zones"
     __table_args__ = (
