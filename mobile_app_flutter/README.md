@@ -28,7 +28,7 @@ Status snapshot: 13 August 2026.
 | Area | Current state | Production status |
 | --- | --- | --- |
 | Buyer navigation | Five tabs: Home, Categories, Search, Cart, Account | Preview implemented |
-| Catalog | 12 local preview products across six categories | Hardcoded; not connected to live inventory |
+| Catalog | Read-only localized category/product API implemented; Flutter still shows 12 local preview products | API has no approved pilot seed or serviceability-confirmed inventory |
 | Product discovery | Home sections, category browsing, multilingual-name search, product details | Preview implemented |
 | Location | Six-digit pincode capture and validation | No live serviceability decision |
 | Cart | Add, increment, decrement, remove, item count, and indicative subtotal | In-memory only; not restored after restart |
@@ -125,6 +125,8 @@ Database foundation status: the isolated commerce models, Alembic migrations, en
 
 Authentication foundation status: the versioned commerce auth routes, Twilio Verify provider integration, persistent one-time challenges, request/attempt limits, short-lived access tokens, rotating refresh tokens, logout revocation, and focused tests are implemented locally. Provider credentials, hosted migration, physical SMS verification, and Flutter integration remain pending.
 
+Versioned API status: the `/api/commerce/v1` entrypoint now provides request IDs, stable error envelopes, liveness/readiness separation, and read-only localized category/product routes with effective consumer prices and cursor pagination. Pilot seed data, serviceability-confirmed inventory, mutations, and Flutter integration remain pending.
+
 Minimum initial data model:
 
 - `users` and authenticated sessions
@@ -206,7 +208,7 @@ Add these checks before treating a mobile build as releasable:
 | Slice | Outcome | Key scope |
 | --- | --- | --- |
 | 1. Storefront foundation | Browse a safe preview catalog | Implemented: buyer shell, catalog, search, product details, preview cart |
-| 2. Identity and reliable cart | Real customer, location, catalog, and recoverable cart | Database and OTP/API foundations implemented locally; hosted activation, seed data, catalog/address/cart APIs, mobile integration, and persistent cart behavior remain |
+| 2. Identity and reliable cart | Real customer, location, catalog, and recoverable cart | Database, OTP, shared API, and read-only catalog foundations implemented locally; hosted activation, seed data, address/serviceability/cart APIs, mobile integration, and persistent cart behavior remain |
 | 3. Checkout and order ledger | Create a non-duplicated payable order | Delivery slots, substitution preference, coupons, tax/fees, COD/online payment, idempotent order creation, order history |
 | 4. Fulfilment operations | Reliably receive, pack, dispatch, and deliver | Supplier intake, grading, lots, reservations, pick/pack, proof of delivery, notifications |
 | 5. Resolution and reconciliation | Resolve failures and close financial records | Issues, partial fulfilment, replacements, refunds, invoices, supplier settlement, audit trail |
