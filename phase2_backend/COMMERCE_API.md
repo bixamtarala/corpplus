@@ -111,9 +111,14 @@ Implemented locally:
 - Cursor pagination and constrained query inputs.
 - Liveness/readiness separation.
 
+Implemented as a separate review-only increment:
+
+- An idempotent draft seed containing 6 categories and 12 product/SKU candidates.
+- The seed remains hidden, inactive, and separate from consumer pricing until operational approval.
+
 Still separate future increments:
 
-- Approved pilot catalog seed data.
+- Expansion and operational approval of the final 75-150 SKU pilot catalog.
 - Addresses and serviceability.
 - Location-aware inventory availability.
 - Persistent cart mutations and validation.
