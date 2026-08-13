@@ -2,10 +2,10 @@ import 'package:croppulse_mobile/localization/app_strings.dart';
 import 'package:croppulse_mobile/main.dart';
 import 'package:croppulse_mobile/models/app_update_info.dart';
 import 'package:croppulse_mobile/models/auth_session.dart';
+import 'package:croppulse_mobile/models/commerce_api_models.dart';
 import 'package:croppulse_mobile/models/marketplace.dart';
 import 'package:croppulse_mobile/models/price_insight.dart';
 import 'package:croppulse_mobile/providers/api_providers.dart';
-import 'package:croppulse_mobile/providers/commerce_provider.dart';
 import 'package:croppulse_mobile/providers/marketplace_provider.dart';
 import 'package:croppulse_mobile/screens/farmer_profile_screen.dart';
 import 'package:croppulse_mobile/screens/home_screen.dart';
@@ -16,6 +16,7 @@ import 'package:croppulse_mobile/screens/price_insight_screen.dart';
 import 'package:croppulse_mobile/screens/trader_hub_screen.dart';
 import 'package:croppulse_mobile/services/api_service.dart';
 import 'package:croppulse_mobile/services/app_update_service.dart';
+import 'package:croppulse_mobile/services/secure_storage_service.dart';
 import 'package:croppulse_mobile/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -25,9 +26,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  late MemorySecureStorage secureStorage;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
+    secureStorage = MemorySecureStorage();
   });
 
   testWidgets(
@@ -50,7 +53,10 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(
           const LoginScreen(),
-          overrides: [apiServiceProvider.overrideWithValue(fakeApi)],
+          overrides: [
+            apiServiceProvider.overrideWithValue(fakeApi),
+            secureStorageProvider.overrideWithValue(secureStorage),
+          ],
         ),
       );
       await tester.pumpAndSettle();
@@ -61,10 +67,7 @@ void main() {
 
       expect(fakeApi.requestedPhones, ['9876543210']);
       expect(find.text('Verify OTP'), findsOneWidget);
-      expect(
-        find.textContaining('Use the mock code 123456 for now.'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('OTP sent'), findsOneWidget);
 
       await tester.enterText(find.byType(TextField).at(1), '123456');
       await tester.tap(find.text('Verify OTP'));
@@ -73,16 +76,16 @@ void main() {
       expect(fakeApi.verifiedOtps, ['123456']);
       expect(find.text('Signed in successfully.'), findsOneWidget);
 
-      final preferences = await SharedPreferences.getInstance();
-      expect(preferences.getString('auth_access_token'), 'test-token');
-      expect(preferences.getString('auth_phone'), '+919876543210');
+      expect(secureStorage.values['commerce_access_token'], 'test-token');
     },
   );
 
   test(
     'marketplace controller keeps guest listings and offers as local drafts',
     () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [secureStorageProvider.overrideWithValue(secureStorage)],
+      );
       addTearDown(container.dispose);
 
       final controller = container.read(marketplaceControllerProvider.notifier);
@@ -141,7 +144,13 @@ void main() {
       );
 
       await tester.pumpWidget(
-        ProviderScope(child: MyApp(updateService: fakeUpdateService)),
+        ProviderScope(
+          overrides: [
+            apiServiceProvider.overrideWithValue(FakeApiService()),
+            secureStorageProvider.overrideWithValue(secureStorage),
+          ],
+          child: MyApp(updateService: fakeUpdateService),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -161,33 +170,37 @@ void main() {
     (tester) async {
       await tester.pumpWidget(
         ProviderScope(
+          overrides: [
+            apiServiceProvider.overrideWithValue(FakeApiService()),
+            secureStorageProvider.overrideWithValue(secureStorage),
+          ],
           child: MyApp(updateService: FakeAppUpdateService(update: null)),
         ),
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Daily Intelligence Feed'), findsOneWidget);
+      expect(find.text('Categories'), findsWidgets);
 
       await tester.tap(find.byIcon(Icons.language));
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(ListTile).at(1));
+      await tester.tap(find.text('Hindi'));
       await tester.pumpAndSettle();
 
-      expect(find.text('दैनिक इंटेलिजेंस फ़ीड'), findsOneWidget);
-
-      await tester.tap(find.byIcon(Icons.language));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byType(ListTile).at(2));
-      await tester.pumpAndSettle();
-
-      expect(find.text('దినసరి ఇంటెలిజెన్స్ ఫీడ్'), findsOneWidget);
+      expect(find.text('श्रेणियाँ'), findsWidgets);
 
       await tester.tap(find.byIcon(Icons.language));
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(ListTile).at(0));
+      await tester.tap(find.text('तेलुगु'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Daily Intelligence Feed'), findsOneWidget);
+      expect(find.text('వర్గాలు'), findsWidgets);
+
+      await tester.tap(find.byIcon(Icons.language));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('ఇంగ్లీష్'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Categories'), findsWidgets);
     },
   );
 
@@ -199,43 +212,25 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(_buildTestApp(const HomeScreen()));
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        _buildTestApp(
+          const HomeScreen(),
+          overrides: [apiServiceProvider.overrideWithValue(FakeApiService())],
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('Categories'), findsOneWidget);
-    await tester.scrollUntilVisible(
-      find.text('Pilot catalog preview'),
-      300,
-      scrollable: find.byType(Scrollable).first,
-    );
-    expect(find.text('Pilot catalog preview'), findsOneWidget);
+      expect(find.text('Categories'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('Available products'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Available products'), findsOneWidget);
       expect(find.text('Vegetables'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
-
-  test('commerce cart adds, increments, and removes preview products', () {
-    final container = ProviderContainer();
-    addTearDown(container.dispose);
-    final controller = container.read(cartControllerProvider.notifier);
-
-    controller.add('tomato-grade-a-1kg');
-    controller.add('tomato-grade-a-1kg');
-    controller.add('onion-1kg');
-
-    expect(container.read(cartControllerProvider).itemCount, 3);
-    expect(
-      container.read(cartControllerProvider).quantityFor('tomato-grade-a-1kg'),
-      2,
-    );
-    expect(container.read(cartControllerProvider).previewSubtotalPaise, 12000);
-
-    controller.removeOne('tomato-grade-a-1kg');
-    controller.remove('onion-1kg');
-
-    expect(container.read(cartControllerProvider).itemCount, 1);
-    expect(container.read(cartControllerProvider).previewSubtotalPaise, 4200);
-  });
 
   testWidgets('trader hub fits localized cards on narrow screens', (
     tester,
@@ -370,7 +365,10 @@ Widget _buildTestApp(
   Locale? locale,
 }) {
   return ProviderScope(
-    overrides: overrides,
+    overrides: [
+      secureStorageProvider.overrideWithValue(MemorySecureStorage()),
+      ...overrides,
+    ],
     child: MaterialApp(
       onGenerateTitle: (context) => AppStrings.of(context).text('app_title'),
       debugShowCheckedModeBanner: false,
@@ -402,6 +400,40 @@ class FakeApiService extends ApiService {
   final PriceInsight? priceInsight;
   final List<String> requestedPhones = <String>[];
   final List<String> verifiedOtps = <String>[];
+  static const category = CommerceCategory(
+    id: 'category-1',
+    slug: 'vegetables',
+    name: 'Vegetables',
+  );
+  static const sku = CommerceSku(
+    id: 'sku-1',
+    code: 'TOMATO-1KG',
+    packQuantity: 1,
+    unitOfMeasure: 'kg',
+    minimumOrderQuantity: 1,
+    quantityStep: 1,
+    pricePaise: 4200,
+  );
+  static const product = CommerceProduct(
+    id: 'product-1',
+    slug: 'tomato',
+    name: 'Tomato',
+    category: category,
+    skus: [sku],
+  );
+  static const emptyCart = CommerceCart(
+    id: 'cart-1',
+    ownerType: 'guest',
+    guestToken: 'guest-token-which-is-long-enough-for-tests',
+    version: 1,
+    currency: 'INR',
+    subtotalPaise: 0,
+    itemCount: 0,
+    validForCheckout: false,
+    validationStatus: 'empty',
+    issues: [],
+    items: [],
+  );
 
   @override
   Future<OtpRequestResult> requestOtp(String phoneNumber) async {
@@ -428,6 +460,66 @@ class FakeApiService extends ApiService {
           phone: phoneNumber,
         );
   }
+
+  @override
+  Future<CurrentCommerceUser> getCurrentCommerceUser(
+    String accessToken,
+  ) async => const CurrentCommerceUser(
+    id: 'user-123',
+    phone: '+919876543210',
+    preferredLocale: 'en',
+  );
+
+  @override
+  Future<List<CommerceCategory>> getCommerceCategories({
+    required String locale,
+  }) async => [
+    CommerceCategory(
+      id: category.id,
+      slug: category.slug,
+      name: locale == 'hi'
+          ? 'सब्ज़ियाँ'
+          : locale == 'te'
+          ? 'కూరగాయలు'
+          : category.name,
+    ),
+  ];
+
+  @override
+  Future<List<CommerceProduct>> getCommerceProducts({
+    required String locale,
+    String? category,
+    String? query,
+  }) async => [
+    CommerceProduct(
+      id: product.id,
+      slug: product.slug,
+      name: locale == 'hi'
+          ? 'टमाटर'
+          : locale == 'te'
+          ? 'టమాటా'
+          : product.name,
+      category: CommerceCategory(
+        id: FakeApiService.category.id,
+        slug: FakeApiService.category.slug,
+        name: locale == 'hi'
+            ? 'सब्ज़ियाँ'
+            : locale == 'te'
+            ? 'కూరగాయలు'
+            : FakeApiService.category.name,
+      ),
+      skus: product.skus,
+    ),
+  ];
+
+  @override
+  Future<CommerceCart> createGuestCart({String? pincode}) async => emptyCart;
+
+  @override
+  Future<CommerceCart> restoreCart({
+    String? accessToken,
+    String? guestToken,
+  }) async => emptyCart;
 
   @override
   Future<List<MarketplaceSearchResult>> searchListings({

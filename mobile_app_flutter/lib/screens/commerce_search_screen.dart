@@ -1,146 +1,108 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/commerce_catalog.dart';
-import '../models/commerce_product.dart';
-import '../theme/app_theme.dart';
+import '../localization/app_strings.dart';
+import '../models/commerce_api_models.dart';
+import '../providers/api_providers.dart';
+import '../services/api_service.dart';
 import '../widgets/commerce_product_card.dart';
 import 'product_detail_screen.dart';
 
-class CommerceSearchScreen extends StatefulWidget {
+class CommerceSearchScreen extends ConsumerStatefulWidget {
   const CommerceSearchScreen({super.key});
-
   @override
-  State<CommerceSearchScreen> createState() => _CommerceSearchScreenState();
+  ConsumerState<CommerceSearchScreen> createState() => _State();
 }
 
-class _CommerceSearchScreenState extends State<CommerceSearchScreen> {
-  final TextEditingController _controller = TextEditingController();
-  List<CommerceProduct> _results = CommerceCatalog.products;
-
+class _State extends ConsumerState<CommerceSearchScreen> {
+  final controller = TextEditingController();
+  List<CommerceProduct> results = const [];
+  bool loading = false;
+  String? error;
   @override
   void dispose() {
-    _controller.dispose();
+    controller.dispose();
     super.dispose();
   }
 
-  void _search(String value) {
+  Future<void> search() async {
     setState(() {
-      _results = CommerceCatalog.search(value);
+      loading = true;
+      error = null;
     });
+    try {
+      final items = await ref
+          .read(apiServiceProvider)
+          .getCommerceProducts(
+            locale: Localizations.localeOf(context).languageCode,
+            query: controller.text,
+          );
+      if (mounted) setState(() => results = items);
+    } catch (e) {
+      if (mounted) setState(() => error = commerceErrorMessage(e));
+    } finally {
+      if (mounted) setState(() => loading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppStrings.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Search')),
+      appBar: AppBar(title: Text(l10n.text('search'))),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: const EdgeInsets.all(16),
             child: TextField(
-              controller: _controller,
-              autofocus: false,
+              controller: controller,
               textInputAction: TextInputAction.search,
-              onChanged: _search,
+              onSubmitted: (_) => search(),
               decoration: InputDecoration(
-                hintText: 'Search vegetables, fruits, grains...',
+                hintText: l10n.text('search_products'),
                 prefixIcon: const Icon(Icons.search),
-                suffixIcon: _controller.text.isEmpty
-                    ? null
-                    : IconButton(
-                        tooltip: 'Clear search',
-                        onPressed: () {
-                          _controller.clear();
-                          _search('');
-                        },
-                        icon: const Icon(Icons.close),
-                      ),
+                suffixIcon: IconButton(
+                  onPressed: search,
+                  icon: const Icon(Icons.arrow_forward),
+                ),
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    _controller.text.isEmpty
-                        ? 'Browse the preview catalog'
-                        : '${_results.length} preview result${_results.length == 1 ? '' : 's'}',
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                ),
-                const Text(
-                  'Not live',
-                  style: TextStyle(color: AppTheme.warningOrange),
-                ),
-              ],
+          if (loading) const LinearProgressIndicator(),
+          if (error != null)
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                error == 'offline' ? l10n.text('commerce_offline') : error!,
+                style: const TextStyle(color: Colors.red),
+              ),
             ),
-          ),
           Expanded(
-            child: _results.isEmpty
-                ? const _NoResults()
-                : LayoutBuilder(
-                    builder: (context, constraints) {
-                      final columns = constraints.maxWidth >= 700 ? 4 : 2;
-                      return GridView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: columns,
+            child: results.isEmpty
+                ? Center(child: Text(l10n.text('search_prompt')))
+                : GridView.builder(
+                    padding: const EdgeInsets.all(16),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
                           mainAxisSpacing: 12,
                           crossAxisSpacing: 12,
-                          childAspectRatio: constraints.maxWidth < 370
-                              ? 0.57
-                              : 0.64,
+                          childAspectRatio: .64,
                         ),
-                        itemCount: _results.length,
-                        itemBuilder: (context, index) {
-                          final product = _results[index];
-                          return CommerceProductCard(
-                            product: product,
-                            onOpen: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    ProductDetailScreen(product: product),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
+                    itemCount: results.length,
+                    itemBuilder: (_, i) => CommerceProductCard(
+                      product: results[i],
+                      onOpen: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              ProductDetailScreen(product: results[i]),
+                        ),
+                      ),
+                    ),
                   ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _NoResults extends StatelessWidget {
-  const _NoResults();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.search_off, size: 48, color: AppTheme.lightText),
-            SizedBox(height: 12),
-            Text(
-              'No products match this search.',
-              style: TextStyle(fontWeight: FontWeight.w700),
-            ),
-            SizedBox(height: 6),
-            Text(
-              'Try a product name or category. More products will be added after pilot approval.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.lightText, height: 1.4),
-            ),
-          ],
-        ),
       ),
     );
   }
